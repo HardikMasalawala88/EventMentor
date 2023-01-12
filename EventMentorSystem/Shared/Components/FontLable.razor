@@ -1,0 +1,14 @@
+﻿<span class="@Class" style="font-size:@FontSize;font-weight:@FontWeight">@ChildContent</span>
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string FontSize { get; set; } = "16px";
+    [Parameter]
+    public string FontWeight { get; set; } = "400";
+    [Parameter]
+    public string Class { get; set; }
+}

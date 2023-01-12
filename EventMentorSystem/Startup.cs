@@ -1,11 +1,16 @@
+using EMS.DB;
+using EMS.DB.Service;
+using EMS.DB.unitofwork;
 using EventMentorSystem.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MudBlazor.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +33,13 @@ namespace EventMentorSystem
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddMudServices();
             services.AddSingleton<WeatherForecastService>();
+            services.AddScoped<IEventService, EventService>();
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            #region Connection String
+            services.AddDbContext<AppDbContext>(item => item.UseSqlServer(Configuration.GetConnectionString("myconn")));
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
