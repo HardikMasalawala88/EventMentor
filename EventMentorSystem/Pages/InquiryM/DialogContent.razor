@@ -1,0 +1,35 @@
+﻿@using EMS.DB.Models
+@using EMS.DB.Service.Interface
+
+<MudDialog>
+    <DialogContent>
+        
+            <MudTextField @bind-Value="inquiryModel.Fullname" Label="Full Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="inquiryModel.MobileNo" Label="MobileNo" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+      
+    <MudTextField @bind-Value="inquiryModel.AltPhoneNo" Label="AltPhoneNo" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+    <MudTextField @bind-Value="inquiryModel.Email" Label="Email" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+    <MudTextField @bind-Value="inquiryModel.NoOfAttendee" Label="NoOfAttendee" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+    <MudTextField @bind-Value="inquiryModel.AddressLine1" Label="AddressLine1" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+    <MudTextField @bind-Value="inquiryModel.AddressLine2" Label="AddressLine2" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+    <MudTextField @bind-Value="inquiryModel.Landmark" Label="Landmark" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+    <MudTextField @bind-Value="inquiryModel.Pincode" Label="Pincode" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+    <MudTextField @bind-Value="inquiryModel.City" Label="city" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+    <MudTextField @bind-Value="inquiryModel.SlotType" Label="SlotType" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+    <MudTextField @bind-Value="inquiryModel.State" Label="State" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+    <MudDatePicker Label="From Date" @bind-Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" />
+    <MudDatePicker Label="To Date" @bind-Date="inquiryModel.ToDate" DateFormat="dd.MM.yyyy" />
+    <MudTextField T="string" Label="Additional notes" Variant="Variant.Text" @bind-Text="inquiryModel.Additionalnotes" Lines="5" />
+</DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+    private Inquiry inquiryModel = new();
+}

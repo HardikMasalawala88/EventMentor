@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace EMS.DB.unitofwork
 {
-    public interface IRepository<T> where T : Event
+    public interface IRepository<T> where T : BaseEntity
     {
         List<T> GetAll();
         void Insert(T entity);

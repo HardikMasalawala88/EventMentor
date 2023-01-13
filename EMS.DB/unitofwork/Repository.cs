@@ -7,11 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace EMS.DB.unitofwork
-{
-    class Repository
-    {
-    }
-    public class Repository<T> : IRepository<T> where T : Event
+{ 
+    public class Repository<T> : IRepository<T> where T : BaseEntity
     {
         #region property
         private readonly AppDbContext _applicationDbContext;

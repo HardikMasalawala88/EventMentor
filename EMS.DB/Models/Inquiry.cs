@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EMS.DB.Models
 {
-    public class Inquiry
+    public class Inquiry : BaseEntity
     {
         [Required]
         public string Fullname { get; set; }
@@ -29,7 +29,7 @@ namespace EMS.DB.Models
         public string Pincode { get; set; }
 
         [Required]
-        public string city { get; set; }
+        public string City { get; set; }
 
         [Required]
         public string State { get; set; }
@@ -38,7 +38,8 @@ namespace EMS.DB.Models
         public string SlotType { get; set; }
         
         [Required]
-        public DateTime FromDate { get; set; }
-        public DateTime ToDate { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
+        public string Additionalnotes { get; set; }
     }
 }

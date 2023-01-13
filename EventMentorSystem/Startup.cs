@@ -1,5 +1,6 @@
 using EMS.DB;
 using EMS.DB.Service;
+using EMS.DB.Service.Interface;
 using EMS.DB.unitofwork;
 using EventMentorSystem.Data;
 using Microsoft.AspNetCore.Builder;
@@ -36,6 +37,8 @@ namespace EventMentorSystem
             services.AddMudServices();
             services.AddSingleton<WeatherForecastService>();
             services.AddScoped<IEventService, EventService>();
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<IInquiryService, InquiryService>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             #region Connection String
             services.AddDbContext<AppDbContext>(item => item.UseSqlServer(Configuration.GetConnectionString("myconn")));

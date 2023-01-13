@@ -1,4 +1,5 @@
 ﻿using EMS.DB.Models;
+using EMS.DB.Service.Interface;
 using EMS.DB.unitofwork;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace EMS.DB.Service
 {
-  
     public class EventService : IEventService
     {
         #region Property
@@ -24,17 +24,17 @@ namespace EMS.DB.Service
         }
         #endregion
 
-        public List<Event> GetEvents() => _repository.GetAll();
+        public List<Event> GetList() => _repository.GetAll();
 
-        public void InsertEvent(Event customer)
+        public void Insert(Event eventModel)
         {
-            if (customer.EventID is 0) _repository.Insert(customer);
-            else _repository.Update(customer);
+            if (eventModel.Id is 0) _repository.Insert(eventModel);
+            else _repository.Update(eventModel);
         }
 
-        public void DeleteEvent(long id)
+        public void Delete(long id)
         {
-            Event events = _appDbContext.EventList.FirstOrDefault(c => c.EventID.Equals(id));
+            Event events = _appDbContext.EventList.FirstOrDefault(c => c.Id.Equals(id));
             _repository.Remove(events);
             _repository.SaveChanges();
         }

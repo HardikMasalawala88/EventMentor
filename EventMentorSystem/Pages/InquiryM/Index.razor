@@ -1,0 +1,217 @@
+﻿@page "/Inqurylist"
+@using EMS.DB.Models
+@using EMS.DB.Service.Interface
+@using System.Globalization
+@using System.Reflection
+@using EMS.DB.Service
+@using EMS.DB.Constant
+
+
+@inject IInquiryService _inquiryService;
+@inject IDialogService DialogService
+
+<h1>Inquir Listing</h1>
+
+
+@if (IsEdit || IsAdd)
+{
+    <MudCard Elevation="25">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Edit Inquiry</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudItem>
+                
+            </MudItem>
+            <MudItem Class="d-flex justify-end">
+                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
+                    <FontLable FontWeight="500">Cancel</FontLable>
+                </MudButton>
+                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                    <FontLable FontWeight="500">Add</FontLable>
+                </MudButton>
+            </MudItem>
+        </MudCardContent>
+    </MudCard>
+
+}
+else
+{
+
+    <MudItem Class="d-flex justify-end">
+        @*<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ShowAddForm">
+                <FontLable FontWeight="500">Add</FontLable>
+            </MudButton>*@
+    </MudItem>
+}
+
+<MudTable Elevation="25" Items="GetLists()" Filter="new Func<Inquiry, bool>(Search)" @bind-customer="inquiryList">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Inquiry list</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Fullname</MudTh>
+        <MudTh>MobileNo</MudTh>
+        <MudTh>AltPhoneNo</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>NoOfAttendee</MudTh>
+        <MudTh>AddressLine1</MudTh>
+        <MudTh>AddressLine2</MudTh>
+        <MudTh>Landmark</MudTh>
+        <MudTh>Pincode</MudTh>
+        <MudTh>City</MudTh>
+        <MudTh>State</MudTh>
+        <MudTh>SlotType</MudTh>
+        <MudTh>FromDate</MudTh>
+        <MudTh>ToDate</MudTh>
+        <MudTh>Additional notes</MudTh>
+        <MudTh>Action</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Event Name">@context.Fullname</MudTd>
+        <MudTd DataLabel="">@context.MobileNo</MudTd>
+        <MudTd DataLabel="">@context.AltPhoneNo</MudTd>
+        <MudTd DataLabel="">@context.Email</MudTd>
+        <MudTd DataLabel="">@context.NoOfAttendee</MudTd>
+        <MudTd DataLabel="">@context.AddressLine1</MudTd>
+        <MudTd DataLabel="">@context.AddressLine2</MudTd>
+        <MudTd DataLabel="">@context.Landmark</MudTd>
+        <MudTd DataLabel="">@context.Pincode</MudTd>
+        <MudTd DataLabel="">@context.City</MudTd>
+        <MudTd DataLabel="">@context.State</MudTd>
+        <MudTd DataLabel="">@context.SlotType</MudTd>
+        <MudTd DataLabel="">@context.FromDate</MudTd>
+        <MudTd DataLabel="">@context.ToDate</MudTd>
+        <MudTd DataLabel="">@context.Additionalnotes</MudTd>
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+    </PagerContent>
+</MudTable>
+<MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+    Open Dialog
+</MudButton>
+
+@code{
+
+    private string searchString = "";
+    private Inquiry inquiryModel = new();
+    private bool IsEdit;
+    private bool IsAdd;
+    private List<Inquiry> inquiryList = new();
+
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetLists();
+        }
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private List<Inquiry> GetLists()
+    {
+        inquiryList = _inquiryService.GetLists();
+        return inquiryList;
+    }
+
+    private bool Search(Inquiry inquiry)
+    {
+        if (StringValid(inquiry.Fullname)
+            && StringValid(inquiry.MobileNo)
+            && StringValid(inquiry.AltPhoneNo)
+            && StringValid(inquiry.Email)
+            && StringValid(inquiry.AddressLine1)
+            && StringValid(inquiry.Landmark)
+            && StringValid(inquiry.AddressLine2)
+            && StringValid(inquiry.Pincode)
+            && StringValid(inquiry.City)
+            && StringValid(inquiry.State)
+            && StringValid(inquiry.SlotType)
+            &&
+            inquiry.Fullname.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || inquiry.MobileNo.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || inquiry.AltPhoneNo.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || inquiry.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || inquiry.AddressLine1.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || inquiry.AddressLine2.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || inquiry.Pincode.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || inquiry.City.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || inquiry.State.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || inquiry.SlotType.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+
+            )
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool StringValid(string strValue)
+    {
+        if (!string.IsNullOrEmpty(strValue))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void Save()
+    {
+        _inquiryService.Insert(inquiryModel);
+
+        GetLists();
+        IsEdit = false;
+        IsAdd = false;
+        inquiryModel = new Inquiry();
+    }
+
+    private void ShowAddForm()
+    {
+        inquiryModel = new Inquiry();
+        IsAdd = true;
+    }
+
+    private void Edit(long id)
+    {
+        IsEdit = true;
+        inquiryModel = inquiryList.FirstOrDefault(c => c.Id == id);
+    }
+
+    private void CancelForm()
+    {
+        IsEdit = false;
+        IsAdd = false;
+        inquiryModel = new Inquiry();
+    }
+
+    private void Delete(long id)
+    {
+        _inquiryService.Delete(id);
+
+        GetLists();
+    }
+
+
+    private void OpenDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogService.Show<DialogContent>("Simple Dialog", options);
+    }
+
+
+}

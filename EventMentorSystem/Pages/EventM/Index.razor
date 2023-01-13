@@ -1,11 +1,13 @@
 ﻿@page "/eventlist"
 @using EMS.DB.Models
+@using EMS.DB.Service.Interface
 @using System.Globalization
 @using System.Reflection
 @using EMS.DB.Service
 @using EMS.DB.Constant
 @inject IEventService _eventService;
-@*@inject MudBlazor.Snackbar snackBar;*@
+@inject ISnackbar Snackbar;
+
 
 <h1>Event Listing</h1>
 
@@ -27,7 +29,7 @@
                 <MudTextField @bind-Value="eventModel.OrganizerContact" Label="Organizer Contact" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
                 <MudTextField @bind-Value="eventModel.Description" Label="" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
                 <MudDatePicker Label="Scheduled On" @bind-Date="eventModel.ScheduledOn" DateFormat="dd.MM.yyyy" />
-                <MudSwitch @bind-Checked="eventModel.IsApproved" Color="Color.Primary" />
+                <MudSwitch @bind-Checked="eventModel.IsApproved" Color="Color.Primary" Label="Approved?" />
             </MudItem>
             <MudItem Class="d-flex justify-end">
                 <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
@@ -43,12 +45,15 @@
 else
 {
 
-<MudItem Class="d-flex justify-end">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ShowAddForm">
-        <FontLable FontWeight="500">Add</FontLable>
-    </MudButton>
-</MudItem>
+    <MudItem Class="d-flex justify-end">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ShowAddForm">
+            <FontLable FontWeight="500">Add</FontLable>
+        </MudButton>
+    </MudItem>
 }
+
+
+
 
 <MudTable Elevation="25" Items="GetAllevents()" Filter="new Func<Event, bool>(Search)" @bind-customer="eventList">
     <ToolBarContent>
@@ -66,7 +71,7 @@ else
         <MudTh>Action</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Id">@context.EventID</MudTd>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Event Name">@context.EventName</MudTd>
         <MudTd DataLabel="">@context.OperatorName</MudTd>
         <MudTd DataLabel="">@context.EventVenue</MudTd>
@@ -76,8 +81,8 @@ else
         <MudTd DataLabel="">@context.ScheduledOn</MudTd>
         <MudTd DataLabel="">@context.IsApproved</MudTd>
         <MudTd DataLabel="">
-            <MudFab @onclick="@(()=>Edit(@context.EventID))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-            <MudFab @onclick="@(()=>Delete(@context.EventID))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
         </MudTd>
     </RowTemplate>
     <PagerContent>
@@ -88,9 +93,6 @@ else
 @code{
 
     private string searchString = "";
-
-
-
     private Event eventModel = new();
     private bool IsEdit;
     private bool IsAdd;
@@ -109,7 +111,7 @@ else
 
     private List<Event> GetAllevents()
     {
-        eventList = _eventService.GetEvents();
+        eventList = _eventService.GetList();
         return eventList;
     }
 
@@ -144,22 +146,14 @@ else
         return false;
     }
 
-
-
-
-
-
-
     private void Save()
     {
-        _eventService.InsertEvent(eventModel);
-        // snackBar.Add(" record saved", Severity.Success);
+        _eventService.Insert(eventModel);
+        Snackbar.Add(" record saved", Severity.Success);
         GetAllevents();
         IsEdit = false;
         IsAdd = false;
         eventModel = new Event();
-
-
     }
 
     private void ShowAddForm()
@@ -170,23 +164,46 @@ else
 
     private void Edit(long id)
     {
-        IsEdit = true;
-        eventModel = eventList.FirstOrDefault(c => c.EventID == id);
+       
+        try
+        {
+            IsEdit = true;
+            eventModel = eventList.FirstOrDefault(c => c.Id == id);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
     }
 
     private void CancelForm()
     {
-        IsEdit = false;
-        IsAdd = false;
-        eventModel = new Event();
+        try
+        {
+            IsEdit = false;
+            IsAdd = false;
+            eventModel = new Event();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+
+
     }
 
 
     private void Delete(long id)
     {
-        _eventService.DeleteEvent(id);
-        //snackBar.Add("Customer Data Deleted.", Severity.Success);
-        GetAllevents();
+        try
+        {
+            _eventService.Delete(id);
+            Snackbar.Add("Customer Data Deleted.", Severity.Success);
+            GetAllevents();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
     }
-
 }

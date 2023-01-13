@@ -14,5 +14,6 @@ namespace EMS.DB
         {
         }
         public DbSet<Event> EventList { get; set; }
+        public DbSet<Inquiry> InquiryList { get; set; }
     }
 }
