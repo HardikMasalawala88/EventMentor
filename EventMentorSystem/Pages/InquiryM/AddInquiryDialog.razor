@@ -1,0 +1,138 @@
+﻿@using EMS.DB.Models
+@using EMS.DB.Constant
+@using EMS.DB.Service.Interface
+@inject IEventService _eventService;
+@inject ISnackbar Snackbar;
+@inject IInquiryService _inquiryService;
+<MudDialog>
+    <DialogContent>
+        <MudGrid>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="inquiryModel.Id" Label="Id" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="inquiryModel.Fullname" Label="Full Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="inquiryModel.MobileNo" Label="MobileNo" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="inquiryModel.AltPhoneNo" Label="AltPhoneNo" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="inquiryModel.Email" Label="Email" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="inquiryModel.NoOfAttendee" Label="NoOfAttendee" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="inquiryModel.AddressLine1" Label="AddressLine1" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="inquiryModel.AddressLine2" Label="AddressLine2" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="inquiryModel.Landmark" Label="Landmark" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="inquiryModel.Pincode" Label="Pincode" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="inquiryModel.City" Label="city" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="inquiryModel.State" Label="State" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudText>SlotType</MudText>
+                <MudRadioGroup @bind-SelectedOption="@inquiryModel.SlotType">
+                    <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
+                    <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
+                    <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
+                    <MudRadio Option="@(EventSlotType.MultipleDay.ToString())" Color="Color.Primary">@EventSlotType.MultipleDay.ToString()</MudRadio>
+                </MudRadioGroup>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudDatePicker Label="From Date" @bind-Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" />
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudDatePicker Label="To Date" @bind-Date="inquiryModel.ToDate" DateFormat="dd.MM.yyyy" />
+            </MudItem>
+            <MudItem lg="12" md="12" xs="12">
+                <MudTextField T="string" Label="Additional notes" Variant="Variant.Text" @bind-Text="inquiryModel.Additionalnotes" Lines="5" />
+            </MudItem>
+        </MudGrid>
+
+    </DialogContent>
+    <DialogActions>
+        @if (!string.IsNullOrEmpty(inquiryModel.Additionalnotes))
+        {
+            <MudButton OnClick="()=>reject(inquiryModel.Id)" Variant="Variant.Filled" Color="Color.Error">Reject Inquiry</MudButton>
+            <MudButton OnClick="Cancel" Variant="Variant.Filled" Color="Color.Primary">Create Event</MudButton>
+        }
+        <MudButton OnClick="CancelForm" Variant="Variant.Filled" Color="Color.Error">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Save" Variant="Variant.Filled">Edit</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Inquiry InquiryModel { get; set; } = new Inquiry();
+
+    private Inquiry inquiryModel = new();
+    private List<Inquiry> inquiryList = new();
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+
+    private List<Inquiry> GetLists()
+    {
+        inquiryList = _inquiryService.GetLists();
+        return inquiryList;
+    }
+
+    protected override void OnInitialized()
+    {
+        inquiryModel = InquiryModel;
+        base.OnInitialized();
+    }
+
+
+    private void Save()
+    {
+        try
+        {
+            _inquiryService.Insert(inquiryModel);
+            MudDialog.Close(DialogResult.Ok(true));
+            inquiryModel = new Inquiry();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+
+    }
+    private void reject(long id)
+    {
+        try
+        {
+            _inquiryService.Delete(id);
+            GetLists();
+            MudDialog.Close(DialogResult.Ok(true));
+            inquiryModel = new Inquiry();
+            Snackbar.Add("Inquiry Rejected Successfull.", Severity.Success);
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+
+    }
+    private void CancelForm()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+        inquiryModel = new Inquiry();
+    }
+
+
+}

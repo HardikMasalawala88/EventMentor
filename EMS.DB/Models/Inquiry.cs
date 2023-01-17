@@ -41,5 +41,8 @@ namespace EMS.DB.Models
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public string Additionalnotes { get; set; }
+        public string Status { get; set; }
+
+        //public virtual Event Event { get; set; }
     }
 }

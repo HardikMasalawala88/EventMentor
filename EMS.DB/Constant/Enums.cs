@@ -13,4 +13,11 @@ namespace EMS.DB.Constant
         FullDay,
         MultipleDay
     }
+
+    public enum InquiryStatusType
+    {
+        InDiscussion,
+        Reject,
+        EventGenerated
+    }
 }

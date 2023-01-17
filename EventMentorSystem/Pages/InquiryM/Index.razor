@@ -2,8 +2,6 @@
 @using EMS.DB.Models
 @using EMS.DB.Service.Interface
 @using System.Globalization
-@using System.Reflection
-@using EMS.DB.Service
 @using EMS.DB.Constant
 
 
@@ -13,48 +11,15 @@
 <h1>Inquir Listing</h1>
 
 
-@if (IsEdit || IsAdd)
-{
-    <MudCard Elevation="25">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h6">Edit Inquiry</MudText>
-            </CardHeaderContent>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudItem>
-                
-            </MudItem>
-            <MudItem Class="d-flex justify-end">
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
-                    <FontLable FontWeight="500">Cancel</FontLable>
-                </MudButton>
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
-                    <FontLable FontWeight="500">Add</FontLable>
-                </MudButton>
-            </MudItem>
-        </MudCardContent>
-    </MudCard>
-
-}
-else
-{
-
-    <MudItem Class="d-flex justify-end">
-        @*<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ShowAddForm">
-                <FontLable FontWeight="500">Add</FontLable>
-            </MudButton>*@
-    </MudItem>
-}
-
-<MudTable Elevation="25" Items="GetLists()" Filter="new Func<Inquiry, bool>(Search)" @bind-customer="inquiryList">
+<MudTable Elevation="25" Items="GetLists()"  Filter="new Func<Inquiry, bool>(Search)" @bind-customer="inquiryList" >
     <ToolBarContent>
         <MudText Typo="Typo.h6">Inquiry list</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>Id</MudTh>
+        <MudTh>Action</MudTh>
+       
         <MudTh>Fullname</MudTh>
         <MudTh>MobileNo</MudTh>
         <MudTh>AltPhoneNo</MudTh>
@@ -69,11 +34,18 @@ else
         <MudTh>SlotType</MudTh>
         <MudTh>FromDate</MudTh>
         <MudTh>ToDate</MudTh>
-        <MudTh>Additional notes</MudTh>
-        <MudTh>Action</MudTh>
+       
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="">
+
+         
+            <MudFab @onclick="@(() => OpenDialog(context))"  Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small">
+                edit
+            </MudFab>
+            <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+        
         <MudTd DataLabel="Event Name">@context.Fullname</MudTd>
         <MudTd DataLabel="">@context.MobileNo</MudTd>
         <MudTd DataLabel="">@context.AltPhoneNo</MudTd>
@@ -89,21 +61,16 @@ else
         <MudTd DataLabel="">@context.FromDate</MudTd>
         <MudTd DataLabel="">@context.ToDate</MudTd>
         <MudTd DataLabel="">@context.Additionalnotes</MudTd>
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-            <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-        </MudTd>
+
     </RowTemplate>
     <PagerContent>
         <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
     </PagerContent>
+
 </MudTable>
-<MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
-    Open Dialog
-</MudButton>
+
 
 @code{
-
     private string searchString = "";
     private Inquiry inquiryModel = new();
     private bool IsEdit;
@@ -202,16 +169,25 @@ else
     private void Delete(long id)
     {
         _inquiryService.Delete(id);
-
         GetLists();
     }
 
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-    private void OpenDialog()
+    private void OpenDialog(Inquiry inquiry)
     {
-        var options = new DialogOptions { CloseOnEscapeKey = true };
-        DialogService.Show<DialogContent>("Simple Dialog", options);
-    }
 
+        var parameters = new DialogParameters();
+
+
+
+        parameters.Add("InquiryModel", inquiry);
+        var options = new DialogOptions() { CloseOnEscapeKey = false,
+            CloseButton = true, MaxWidth = MaxWidth.Large,
+            Position=DialogPosition.TopCenter };
+
+        DialogService.Show<AddInquiryDialog>("Edit Inquiry", parameters, options);
+
+    }
 
 }
