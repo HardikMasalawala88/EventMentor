@@ -43,6 +43,6 @@ namespace EMS.DB.Models
         public string Additionalnotes { get; set; }
         public string Status { get; set; }
 
-        //public virtual Event Event { get; set; }
+        public virtual Event Event { get; set; }
     }
 }

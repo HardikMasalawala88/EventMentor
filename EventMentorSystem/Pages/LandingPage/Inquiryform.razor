@@ -34,12 +34,14 @@
             <MudTextField @bind-Value="inquiryModel.Pincode" Label="Pincode" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
             <MudTextField @bind-Value="inquiryModel.City" Label="city" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
             <MudTextField @bind-Value="inquiryModel.State" Label="State" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-      
+
             <MudRadioGroup @bind-SelectedOption="@inquiryModel.SlotType">
                 <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
                 <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
                 <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
                 <MudRadio Option="@(EventSlotType.MultipleDay.ToString())" Color="Color.Primary">@EventSlotType.MultipleDay.ToString()</MudRadio>
+             
+
             </MudRadioGroup>
             <MudDatePicker Label="From Date" @bind-Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" />
             <MudDatePicker Label="To Date" @bind-Date="inquiryModel.ToDate" DateFormat="dd.MM.yyyy" />

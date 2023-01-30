@@ -18,12 +18,16 @@ namespace EMS.DB.Models
         public string Description { get; set; }
         
         [DataType(DataType.Date)]
-        public DateTime? ScheduledOn { get; set; }
+        public DateTime? FromDate { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime? Todate { get; set; }
 
         public bool IsApproved { get; set; }
-
+        public bool Ispaymentdone { get; set; }
         ////Foreign key for Standard
-        //public long? InquiryId { get; set; }
-        //public Inquiry Inquiry { get; set; }
+        public long? InquiryId { get; set; }
+     
+        public Inquiry Inquiry { get; set; }
     }
 }

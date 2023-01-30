@@ -8,10 +8,10 @@
 @inject IInquiryService _inquiryService;
 @inject IDialogService DialogService
 
-<h1>Inquir Listing</h1>
+<h1>Inquiry Listing</h1>
 
 
-<MudTable Elevation="25" Items="GetLists()"  Filter="new Func<Inquiry, bool>(Search)" @bind-customer="inquiryList" >
+<MudTable Elevation="25" Items="GetAllinquiry()"  Filter="new Func<Inquiry, bool>(Search)" @bind-customer="inquiryList" >
     <ToolBarContent>
         <MudText Typo="Typo.h6">Inquiry list</MudText>
         <MudSpacer />
@@ -73,8 +73,7 @@
 @code{
     private string searchString = "";
     private Inquiry inquiryModel = new();
-    private bool IsEdit;
-    private bool IsAdd;
+
     private List<Inquiry> inquiryList = new();
 
 
@@ -82,13 +81,13 @@
     {
         if (firstRender)
         {
-            GetLists();
+            GetAllinquiry();
         }
 
         return base.OnAfterRenderAsync(firstRender);
     }
 
-    private List<Inquiry> GetLists()
+    private List<Inquiry> GetAllinquiry()
     {
         inquiryList = _inquiryService.GetLists();
         return inquiryList;
@@ -141,53 +140,51 @@
     {
         _inquiryService.Insert(inquiryModel);
 
-        GetLists();
-        IsEdit = false;
-        IsAdd = false;
+        GetAllinquiry();
+
         inquiryModel = new Inquiry();
     }
 
     private void ShowAddForm()
     {
         inquiryModel = new Inquiry();
-        IsAdd = true;
+
     }
 
     private void Edit(long id)
     {
-        IsEdit = true;
+
         inquiryModel = inquiryList.FirstOrDefault(c => c.Id == id);
     }
 
     private void CancelForm()
     {
-        IsEdit = false;
-        IsAdd = false;
+
         inquiryModel = new Inquiry();
     }
 
     private void Delete(long id)
     {
         _inquiryService.Delete(id);
-        GetLists();
+        GetAllinquiry();
     }
 
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+   
 
     private void OpenDialog(Inquiry inquiry)
     {
 
         var parameters = new DialogParameters();
-
-
-
         parameters.Add("InquiryModel", inquiry);
         var options = new DialogOptions() { CloseOnEscapeKey = false,
             CloseButton = true, MaxWidth = MaxWidth.Large,
-            Position=DialogPosition.TopCenter };
+            Position=DialogPosition.TopCenter,
+            DisableBackdropClick = true
+        };
 
         DialogService.Show<AddInquiryDialog>("Edit Inquiry", parameters, options);
 
     }
+
 
 }

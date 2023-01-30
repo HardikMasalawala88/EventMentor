@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMS.DB.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230117113624_initial-3")]
-    partial class initial3
+    [Migration("20230130104822_initial-4")]
+    partial class initial4
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -43,6 +43,12 @@ namespace EMS.DB.Migrations
                     b.Property<string>("EventVenue")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("FromDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("InquiryId")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -50,6 +56,9 @@ namespace EMS.DB.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Ispaymentdone")
                         .HasColumnType("bit");
 
                     b.Property<string>("OperatorName")
@@ -61,7 +70,7 @@ namespace EMS.DB.Migrations
                     b.Property<string>("OrganizerName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("ScheduledOn")
+                    b.Property<DateTime?>("Todate")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("UpdatedBy")
@@ -71,6 +80,10 @@ namespace EMS.DB.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InquiryId")
+                        .IsUnique()
+                        .HasFilter("[InquiryId] IS NOT NULL");
 
                     b.ToTable("EventList");
                 });
@@ -159,6 +172,20 @@ namespace EMS.DB.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("InquiryList");
+                });
+
+            modelBuilder.Entity("EMS.DB.Models.Event", b =>
+                {
+                    b.HasOne("EMS.DB.Models.Inquiry", "Inquiry")
+                        .WithOne("Event")
+                        .HasForeignKey("EMS.DB.Models.Event", "InquiryId");
+
+                    b.Navigation("Inquiry");
+                });
+
+            modelBuilder.Entity("EMS.DB.Models.Inquiry", b =>
+                {
+                    b.Navigation("Event");
                 });
 #pragma warning restore 612, 618
         }

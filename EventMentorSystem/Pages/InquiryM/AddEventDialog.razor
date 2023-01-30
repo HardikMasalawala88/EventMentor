@@ -1,0 +1,133 @@
+﻿@using EMS.DB.Models
+@using EMS.DB.Constant
+@using EMS.DB.Service.Interface
+@inject IEventService _eventService;
+@inject ISnackbar Snackbar;
+@inject IInquiryService _inquiryService;
+@inject IDialogService DialogService
+<MudDialog>
+    <DialogContent>
+        <MudGrid>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="eventModel.EventName" Label="Event Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="eventModel.OperatorName" Label="OperatorName" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="eventModel.EventVenue" Label="Event Venue" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="eventModel.OrganizerName=inquiryModel.Fullname" Label="Organizer Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="eventModel.OrganizerContact=inquiryModel.MobileNo" Label="Organizer Contact" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudDatePicker Label="From Date" @bind-Date="eventModel.FromDate=inquiryModel.FromDate" DateFormat="dd.MM.yyyy" />
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudDatePicker Label="To Date" @bind-Date="eventModel.Todate=inquiryModel.ToDate" DateFormat="dd.MM.yyyy" />
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                @*<MudTextField @bind-Value="eventModel.IsApproved" Label="Approved ?" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>*@
+                <MudSwitch @bind-Checked="eventModel.IsApproved" Color="Color.Primary" />Approved ?
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                @*<MudTextField @bind-Value="eventModel.Ispaymentdone" Label="payment done ?" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>*@
+                <MudSwitch @bind-Checked="eventModel.Ispaymentdone" Color="Color.Primary" />payment done ?
+            </MudItem>
+            <MudItem lg="12" md="12" xs="12">
+                <MudTextField T="string" Label="Description" Variant="Variant.Text" @bind-Text="eventModel.Description=inquiryModel.Additionalnotes" Lines="5" />
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="eventModel.InquiryId" Label="OperatorName" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
+            </MudItem>
+        </MudGrid>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CancelForm" Variant="Variant.Filled" Color="Color.Error">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Save" Variant="Variant.Filled">Add</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Inquiry InquiryModel { get; set; } = new Inquiry();
+    [Parameter] public Event EventModel { get; set; } = new Event();
+
+    private List<Event> eventList = new();
+    private bool isReadOnly = false;
+    private Inquiry inquiryModel = new();
+    private Event eventModel = new();
+    private List<Inquiry> inquiryList = new();
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+
+    private List<Inquiry> GetLists()
+    {
+        inquiryList = _inquiryService.GetLists();
+        return inquiryList;
+    }
+
+
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            eventModel.EventVenue = string.Concat(inquiryModel.AddressLine1+"," + inquiryModel.AddressLine2 + "," + inquiryModel.Landmark + "," + inquiryModel.City + "," + inquiryModel.State +"." );
+            eventModel.InquiryId = inquiryModel.Id;
+        }
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected override void OnInitialized()
+    {
+        if (InquiryModel is not null && InquiryModel.Id > 0)
+        {
+            isReadOnly = true;
+        }
+
+        inquiryModel = InquiryModel;
+        eventModel = EventModel;
+        base.OnInitialized();
+    }
+
+
+    #region Private Methods
+
+    private List<Event> GetAllevents()
+    {
+        eventList = _eventService.GetList();
+        return eventList;
+    }
+
+    private void Save()
+    {
+        try
+        {
+            _eventService.Insert(eventModel);
+            Snackbar.Add(" record saved", Severity.Success);
+            GetAllevents();
+            eventModel = new Event();
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+
+    }
+
+    private void CancelForm()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+        inquiryModel = new Inquiry();
+    }
+    #endregion
+
+}

@@ -4,7 +4,7 @@
 @inject IEventService _eventService;
 @inject ISnackbar Snackbar;
 @inject IInquiryService _inquiryService;
-@inject IDialogService DialogService
+
 <MudDialog>
     <DialogContent>
         <MudGrid>
@@ -63,26 +63,20 @@
                 <MudTextField T="string" Label="Additional notes" Variant="Variant.Text" @bind-Text="inquiryModel.Additionalnotes" Lines="5" />
             </MudItem>
         </MudGrid>
-
     </DialogContent>
     <DialogActions>
-        @if (!string.IsNullOrEmpty(inquiryModel.Additionalnotes))
-        {
-            <MudButton OnClick="()=>reject(inquiryModel.Id)" Variant="Variant.Filled" Color="Color.Error">Reject Inquiry</MudButton>
-            <MudButton OnClick="@(() => OpenDialog(inquiryModel,eventModel))" Variant="Variant.Filled" Color="Color.Primary">Create Event</MudButton>
-        }
-        <MudButton OnClick="CancelForm" Variant="Variant.Filled" Color="Color.Error">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Save" Variant="Variant.Filled">Edit</MudButton>
-
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
+   
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Inquiry InquiryModel { get; set; } = new Inquiry();
 
     private bool isReadOnly = false;
     private Inquiry inquiryModel = new();
-    private Event eventModel = new();
+   
 
     private List<Inquiry> inquiryList = new();
 
@@ -104,67 +98,4 @@
         inquiryModel = InquiryModel;
         base.OnInitialized();
     }
-
-
-    private void Save()
-    {
-        try
-        {
-            _inquiryService.Insert(inquiryModel);
-            MudDialog.Close(DialogResult.Ok(true));
-            inquiryModel = new Inquiry();
-
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-
-    }
-
-    private void reject(long id)
-    {
-        try
-        {
-            _inquiryService.Delete(id);
-            GetLists();
-            MudDialog.Close(DialogResult.Ok(true));
-            inquiryModel = new Inquiry();
-            Snackbar.Add("Inquiry Rejected Successfull.", Severity.Success);
-
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-
-    }
-    private void CancelForm()
-    {
-        MudDialog.Close(DialogResult.Ok(true));
-        inquiryModel = new Inquiry();
-    }
-
-
-
-
-        private void OpenDialog(Inquiry inquiry,Event events)
-    {
-
-        var parameters = new DialogParameters();
-        parameters.Add("InquiryModel", inquiry);
-        parameters.Add("EventModel", events);
-        var options = new DialogOptions()
-        {
-            CloseOnEscapeKey = false,
-            CloseButton = true,
-            MaxWidth = MaxWidth.Large,
-            Position = DialogPosition.TopCenter,
-            DisableBackdropClick = true
-        };
-
-        DialogService.Show<AddEventDialog>("Create Event", parameters,options);
-
-    }
-
 }
