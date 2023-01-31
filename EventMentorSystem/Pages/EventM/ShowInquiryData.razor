@@ -9,85 +9,71 @@
     <DialogContent>
         <MudGrid>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.Id" Label="Id" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
+                <MudTextField @bind-Value="InquiryModel.Id" Label="Id" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.Fullname" Label="Full Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="InquiryModel.Fullname" Label="Full Name" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.MobileNo" Label="MobileNo" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="InquiryModel.MobileNo" Label="MobileNo" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.AltPhoneNo" Label="AltPhoneNo" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="InquiryModel.AltPhoneNo" Label="AltPhoneNo" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.Email" Label="Email" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="InquiryModel.Email" Label="Email" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.NoOfAttendee" Label="NoOfAttendee" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="InquiryModel.NoOfAttendee" Label="NoOfAttendee" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.AddressLine1" Label="AddressLine1" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="InquiryModel.AddressLine1" Label="AddressLine1" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.AddressLine2" Label="AddressLine2" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="InquiryModel.AddressLine2" Label="AddressLine2" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.Landmark" Label="Landmark" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="InquiryModel.Landmark" Label="Landmark" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.Pincode" Label="Pincode" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="InquiryModel.Pincode" Label="Pincode" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.City" Label="city" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="InquiryModel.City" Label="city" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.State" Label="State" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="InquiryModel.State" Label="State" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudText>SlotType</MudText>
-                <MudRadioGroup @bind-SelectedOption="@inquiryModel.SlotType">
-                    <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
-                    <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
-                    <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
-                    <MudRadio Option="@(EventSlotType.MultipleDay.ToString())" Color="Color.Primary">@EventSlotType.MultipleDay.ToString()</MudRadio>
-                </MudRadioGroup>
+                @*<MudText>SlotType: @InquiryModel.SlotType</MudText>*@
+                <MudTextField @bind-Value="InquiryModel.SlotType" Label="SlotType" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudDatePicker Label="From Date" @bind-Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" />
+                @*<MudDatePicker Label="From Date" @bind-Date="InquiryModel.FromDate" DateFormat="dd.MM.yyyy" ReadOnly="isReadOnly" />*@
+                <MudTextField @bind-Value="InquiryModel.FromDate" Label="FromDate" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
+               
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudDatePicker Label="To Date" @bind-Date="inquiryModel.ToDate" DateFormat="dd.MM.yyyy" />
+                @*<MudDatePicker Label="To Date" @bind-Date="InquiryModel.ToDate" DateFormat="dd.MM.yyyy" ReadOnly="isReadOnly" />*@
+                <MudTextField @bind-Value="InquiryModel.ToDate" Label="ToDate" Variant="Variant.Text" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="12" md="12" xs="12">
-                <MudTextField T="string" Label="Additional notes" Variant="Variant.Text" @bind-Text="inquiryModel.Additionalnotes" Lines="5" />
+                <MudTextField T="string" Label="Additional notes" Variant="Variant.Text" @bind-Text="InquiryModel.Additionalnotes" Lines="5" ReadOnly="isReadOnly"/>
             </MudItem>
         </MudGrid>
     </DialogContent>
-    <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
-    </DialogActions>
+    
 </MudDialog>
 @code {
-   
+
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Inquiry InquiryModel { get; set; } = new Inquiry();
 
     private bool isReadOnly = false;
-    private Inquiry inquiryModel = new();
-   
 
-    private List<Inquiry> inquiryList = new();
 
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
-
-    private List<Inquiry> GetLists()
-    {
-        inquiryList = _inquiryService.GetLists();
-        return inquiryList;
-    }
 
     protected override void OnInitialized()
     {
@@ -95,7 +81,7 @@
         {
             isReadOnly = true;
         }
-        inquiryModel = InquiryModel;
+
         base.OnInitialized();
     }
 }

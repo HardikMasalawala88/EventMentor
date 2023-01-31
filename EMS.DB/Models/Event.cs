@@ -26,7 +26,7 @@ namespace EMS.DB.Models
         public bool IsApproved { get; set; }
         public bool Ispaymentdone { get; set; }
         ////Foreign key for Standard
-        public long? InquiryId { get; set; }
+        public long InquiryId { get; set; }
      
         public Inquiry Inquiry { get; set; }
     }

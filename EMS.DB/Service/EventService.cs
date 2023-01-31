@@ -1,6 +1,7 @@
 ﻿using EMS.DB.Models;
 using EMS.DB.Service.Interface;
 using EMS.DB.unitofwork;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,10 @@ namespace EMS.DB.Service
         }
         #endregion
 
-        public List<Event> GetList() => _repository.GetAll();
+        //public List<Event> GetList() => _repository.GetAll();
+        public List<Event> GetList() {
+            return _appDbContext.EventList.Include(x => x.Inquiry).ToList();
+        }
 
         public void Insert(Event eventModel)
         {

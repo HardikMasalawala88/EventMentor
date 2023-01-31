@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,6 +37,10 @@ namespace EMS.DB.unitofwork
 
         public List<T> GetAll()
         {
+            //params Expression<Func<T, object>>[] includes
+            //if (includes is not null) {
+            //    object p = entities.Include(includes).ToList();
+            //}
             return entities.ToList();
         }
 
@@ -72,5 +77,18 @@ namespace EMS.DB.unitofwork
             entities.Update(entity);
             _applicationDbContext.SaveChanges();
         }
+
+
+    //    public static IQueryable<T> IncludeMultiple<T>(this IQueryable<T> query, params Expression<Func<T, object>>[] includes)
+    //where T : class
+    //    {
+    //        if (includes != null)
+    //        {
+    //            query = includes.Aggregate(query,
+    //                      (current, include) => current.Include(include));
+    //        }
+
+    //        return query;
+    //    }
     }
 }

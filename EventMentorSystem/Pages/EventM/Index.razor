@@ -92,7 +92,7 @@
             <MudTd DataLabel="">
                 <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
                 <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-                <MudButton Variant="Variant.Filled" @onclick="OpenDialog" Color="Color.Primary">view Inquiry</MudButton>
+                <MudButton Variant="Variant.Filled" @onclick="@(() => ViewInquiryDetail(context))" Color="Color.Primary" Size="Size.Small">view Inquiry</MudButton>
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -108,6 +108,7 @@
         private bool IsEdit;
         private bool IsAdd;
         private List<Event> eventList = new();
+
 
 
         protected override Task OnAfterRenderAsync(bool firstRender)
@@ -202,8 +203,6 @@
 
 
         }
-
-
         private void Delete(long id)
         {
             try
@@ -217,11 +216,21 @@
                 Snackbar.Add(ex.Message, Severity.Error);
             }
         }
-        private void OpenDialog()
+
+        private void ViewInquiryDetail(Event events)
         {
 
-            var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium };
-            DialogService.Show<ShowInquiryData>("View Inquiry Data", options);
+            var parameters = new DialogParameters();
+            parameters.Add("InquiryModel", events.Inquiry);
+            var options = new DialogOptions()
+            {
+                CloseOnEscapeKey = false,
+                CloseButton = true,
+                MaxWidth = MaxWidth.Large,
+                Position = DialogPosition.TopCenter,
+                DisableBackdropClick = true
+            };
+            DialogService.Show<ShowInquiryData>("View Inquiry Data",parameters, options);
         }
 
     }
