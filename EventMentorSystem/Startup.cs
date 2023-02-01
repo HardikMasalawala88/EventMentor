@@ -40,6 +40,10 @@ namespace EventMentorSystem
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IInquiryService, InquiryService>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<IServices, Service>();
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             #region Connection String
             services.AddDbContext<AppDbContext>(item => item.UseSqlServer(Configuration.GetConnectionString("myconn")));
             #endregion

@@ -1,0 +1,149 @@
+﻿@page "/EventCategory"
+@using EMS.DB.Models
+@using EMS.DB.Service.Interface
+@using System.Globalization
+@using System.Reflection
+@using EMS.DB.Service
+@using System.Collections.Generic;
+@using EMS.DB.Constant
+@inject ISnackbar Snackbar;
+@inject ICategoryService _categoryService;
+
+<h3>Category List</h3>
+<MudCard Elevation="25">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Add / Edit Category</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudItem>
+            <MudTextField @bind-Value="categoryModel.CategoryName" Label="Category Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            @*<MudSelect T="string" @bind-Value="categoryModel.CategoryName"  Label="select categorys" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@("Wedding")" />
+                <MudSelectItem Value="@("virtual event")" />
+                <MudSelectItem Value="@("Reception")" />
+                <MudSelectItem Value="@("birthday party")" />
+                <MudSelectItem Value="@("Ring ceremony")" />
+            </MudSelect>*@
+        </MudItem>
+        <MudItem Class="d-flex justify-end">
+            @*<MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="cancel">
+                    <FontLable FontWeight="500">Cancel</FontLable>
+                </MudButton>*@
+            <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                <FontLable FontWeight="500">Add</FontLable>
+            </MudButton>
+        </MudItem>
+    </MudCardContent>
+</MudCard>
+<MudTable Elevation="25" Items="GetAll()" Filter="new Func<Category, bool>(Search)" @bind-customer="CategoryList">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Category list</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Category..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>category Name</MudTh>
+        <MudTh>Action</MudTh>
+
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Category Name">@context.CategoryName</MudTd>
+
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+    </PagerContent>
+</MudTable>
+
+@code {
+
+    private Category categoryModel = new();
+    private List<Category> CategoryList = new();
+    private string searchString = "";
+
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetAll();
+        }
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private List<Category> GetAll()
+    {
+        CategoryList = _categoryService.GetList();
+        return CategoryList;
+    }
+
+
+    private void Save()
+    {
+        _categoryService.Insert(categoryModel);
+        Snackbar.Add(" record saved", Severity.Success);
+        GetAll();
+
+        categoryModel = new Category();
+    }
+
+
+    private void Edit(long id)
+    {
+
+        try
+        {
+
+            categoryModel = CategoryList.FirstOrDefault(c => c.Id == id);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+
+    private void Delete(long id)
+    {
+        try
+        {
+            _categoryService.Delete(id);
+            Snackbar.Add("Category Data Deleted.", Severity.Success);
+            GetAll();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private bool Search(Category categorys)
+    {
+        if (StringValid(categorys.CategoryName) && categorys.CategoryName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool StringValid(string strValue)
+    {
+        if (!string.IsNullOrEmpty(strValue))
+        {
+            return true;
+        }
+
+        return false;
+    }
+}
+

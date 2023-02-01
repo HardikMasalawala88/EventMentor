@@ -1,0 +1,165 @@
+﻿@page "/ServiceList"
+@using EMS.DB.Models
+@using EMS.DB.Service.Interface
+@using System.Globalization
+@using System.Reflection
+@using EMS.DB.Service
+@using System.Collections.Generic;
+@using EMS.DB.Constant
+@inject ISnackbar Snackbar;
+@inject IServices _Service;
+@inject ICategoryService _CategoryService;
+
+<h3>Service List</h3>
+<MudCard Elevation="25">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Add / Edit Service </MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudItem>
+            <MudSelect @bind-Value="ServiceModel.CategoryId" Label="select categorys" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+
+                @foreach (var eventCategory in EventCategoryList)
+                {
+                    <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
+                   
+                }
+            </MudSelect>
+            @if (ServiceModel.CategoryId > 0)
+            {
+                <MudTextField @bind-Value="ServiceModel.ServiceName" Label="Service Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            }
+        </MudItem>
+        
+        <MudItem Class="d-flex justify-end">
+            <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                <FontLable FontWeight="500">Add</FontLable>
+            </MudButton>
+        </MudItem>
+    </MudCardContent>
+</MudCard>
+<MudTable Elevation="25" Items="GetAll()" Filter="new Func<Services, bool>(Search)">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Service list</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Service..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Service Name</MudTh>
+        <MudTh>Category Id</MudTh>
+        <MudTh>Action</MudTh>
+
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Service Name">@context.ServiceName</MudTd>
+        <MudTd DataLabel="Category Id">@context.CategoryId</MudTd>
+        
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+    </PagerContent>
+</MudTable>
+
+@code {
+
+    private Services ServiceModel = new();
+    private List<Services> ServiceList = new();
+    private List<Category> EventCategoryList = new();
+
+
+    private string searchString = "";
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetEventCategoryList();
+            GetAll();
+           
+        }
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private List<Services> GetAll()
+    {
+        ServiceList = _Service.GetList();
+        return ServiceList;
+    }
+
+    private void GetEventCategoryList()
+    {
+        EventCategoryList = _CategoryService.GetList();
+    }
+
+
+    private void Save()
+    {
+        _Service.Insert(ServiceModel);
+        Snackbar.Add("Record saved", Severity.Success);
+        GetAll();
+
+        ServiceModel = new Services();
+    }
+
+
+    private void Edit(long id)
+    {
+
+        try
+        {
+
+            ServiceModel = ServiceList.FirstOrDefault(c => c.Id == id);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+
+    private void Delete(long id)
+    {
+        try
+        {
+            _Service.Delete(id);
+            Snackbar.Add("Category Data Deleted.", Severity.Success);
+            GetAll();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private bool Search(Services services)
+    {
+        if (StringValid(services.ServiceName) && services.ServiceName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool StringValid(string strValue)
+    {
+        if (!string.IsNullOrEmpty(strValue))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+
+}
+

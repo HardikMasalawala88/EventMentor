@@ -46,20 +46,14 @@ namespace EMS.DB.unitofwork
 
         public void Insert(T entity)
         {
-            if (entity == null)
-            {
-                throw new ArgumentNullException("entity");
-            }
-            entities.Add(entity);
+            _applicationDbContext.Set<T>().Add(entity);
+            //entities.Add(entity);
             _applicationDbContext.SaveChanges();
         }
 
         public void Remove(T entity)
         {
-            if (entity == null)
-            {
-                throw new ArgumentNullException("entity");
-            }
+           
             entities.Remove(entity);
         }
 
@@ -70,10 +64,7 @@ namespace EMS.DB.unitofwork
 
         public void Update(T entity)
         {
-            if (entity == null)
-            {
-                throw new ArgumentNullException("entity");
-            }
+            
             entities.Update(entity);
             _applicationDbContext.SaveChanges();
         }

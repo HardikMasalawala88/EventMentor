@@ -90,7 +90,8 @@
             <MudTd DataLabel="">@context.Ispaymentdone</MudTd>
             <MudTd DataLabel="">@context.InquiryId</MudTd>
             <MudTd DataLabel="">
-                <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                <MudLink Href="/ViewEvent" Color="Color.Primary" >Edit</MudLink>
+                <MudFab  @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
                 <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
                 <MudButton Variant="Variant.Filled" @onclick="@(() => ViewInquiryDetail(context))" Color="Color.Primary" Size="Size.Small">view Inquiry</MudButton>
             </MudTd>
@@ -232,5 +233,4 @@
             };
             DialogService.Show<ShowInquiryData>("View Inquiry Data",parameters, options);
         }
-
     }
