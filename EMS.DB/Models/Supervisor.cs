@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace EMS.DB.Models
 {
-    public class Category : BaseEntity
+    public class Supervisor : BaseEntity
     {
-        public String CategoryName { get; set; }
-
-        public virtual Services Services { get; set; }
+        public long UserId { get; set; }
+        public List<User> UserList { get; set; }
     }
 }

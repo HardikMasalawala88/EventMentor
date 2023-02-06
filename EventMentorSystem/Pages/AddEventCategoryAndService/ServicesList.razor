@@ -1,15 +1,14 @@
 ﻿@page "/ServiceList"
 @using EMS.DB.Models
-@using EMS.DB.Service.Interface
+@using  EMS.DB.Repository.Interface
 @using System.Globalization
 @using System.Reflection
-@using EMS.DB.Service
+@using EMS.DB.Repository
 @using System.Collections.Generic;
 @using EMS.DB.Constant
 @inject ISnackbar Snackbar;
-@inject IServices _Service;
-@inject ICategoryService _CategoryService;
-
+@inject IEventCategoryRepository _EventCategoryRepository;
+@inject ICategoryServiceRepository _CategoryServiceRepository;
 <h3>Service List</h3>
 <MudCard Elevation="25">
     <MudCardHeader>
@@ -19,20 +18,20 @@
     </MudCardHeader>
     <MudCardContent>
         <MudItem>
-            <MudSelect @bind-Value="ServiceModel.CategoryId" Label="select categorys" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+            <MudSelect @bind-Value="ServiceModel.EventCategoryId" Label="select categorys" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
 
                 @foreach (var eventCategory in EventCategoryList)
                 {
                     <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
-                   
+
                 }
             </MudSelect>
-            @if (ServiceModel.CategoryId > 0)
+            @if (ServiceModel.EventCategoryId > 0)
             {
                 <MudTextField @bind-Value="ServiceModel.ServiceName" Label="Service Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
             }
         </MudItem>
-        
+
         <MudItem Class="d-flex justify-end">
             <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
                 <FontLable FontWeight="500">Add</FontLable>
@@ -40,7 +39,7 @@
         </MudItem>
     </MudCardContent>
 </MudCard>
-<MudTable Elevation="25" Items="GetAll()" Filter="new Func<Services, bool>(Search)">
+<MudTable Elevation="25" Items="GetAll()" Filter="new Func<CategoryService, bool>(Search)">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Service list</MudText>
         <MudSpacer />
@@ -56,8 +55,8 @@
     <RowTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Service Name">@context.ServiceName</MudTd>
-        <MudTd DataLabel="Category Id">@context.CategoryId</MudTd>
-        
+        <MudTd DataLabel="Category Id">@context.EventCategoryId</MudTd>
+
         <MudTd DataLabel="">
             <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
             <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
@@ -70,9 +69,9 @@
 
 @code {
 
-    private Services ServiceModel = new();
-    private List<Services> ServiceList = new();
-    private List<Category> EventCategoryList = new();
+    private CategoryService ServiceModel = new();
+    private List<CategoryService> ServiceList = new();
+    private List<EventCategory> EventCategoryList = new();
 
 
     private string searchString = "";
@@ -83,31 +82,40 @@
         {
             GetEventCategoryList();
             GetAll();
-           
+
         }
 
         return base.OnAfterRenderAsync(firstRender);
     }
 
-    private List<Services> GetAll()
+    private List<CategoryService> GetAll()
     {
-        ServiceList = _Service.GetList();
+        ServiceList = _CategoryServiceRepository.GetList();
         return ServiceList;
     }
 
     private void GetEventCategoryList()
     {
-        EventCategoryList = _CategoryService.GetList();
+        EventCategoryList = _EventCategoryRepository.GetList();
     }
 
 
     private void Save()
     {
-        _Service.Insert(ServiceModel);
-        Snackbar.Add("Record saved", Severity.Success);
+        if (ServiceModel.Id > 0)
+        {
+
+            _CategoryServiceRepository.Update(ServiceModel);
+            Snackbar.Add("Record updated", Severity.Success);
+        }
+        else
+        {
+            _CategoryServiceRepository.Insert(ServiceModel);
+            Snackbar.Add("Record saved", Severity.Success);
+        }
         GetAll();
 
-        ServiceModel = new Services();
+        ServiceModel = new CategoryService();
     }
 
 
@@ -130,7 +138,7 @@
     {
         try
         {
-            _Service.Delete(id);
+            _CategoryServiceRepository.Delete(id);
             Snackbar.Add("Category Data Deleted.", Severity.Success);
             GetAll();
         }
@@ -140,7 +148,7 @@
         }
     }
 
-    private bool Search(Services services)
+    private bool Search(CategoryService services)
     {
         if (StringValid(services.ServiceName) && services.ServiceName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
         {

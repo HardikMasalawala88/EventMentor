@@ -2,7 +2,7 @@
 
 namespace EMS.DB.Migrations
 {
-    public partial class initial4 : Migration
+    public partial class initial1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

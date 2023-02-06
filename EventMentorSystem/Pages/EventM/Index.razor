@@ -1,236 +1,277 @@
 ﻿@page "/eventlist"
 @using EMS.DB.Models
-@using EMS.DB.Service.Interface
+@using  EMS.DB.Repository.Interface
 @using System.Globalization
 @using System.Reflection
-@using EMS.DB.Service
+@using EMS.DB.Repository
 @using EMS.DB.Constant
-@inject IEventService _eventService;
+@inject IEventRepository _EventRepository;
 @inject ISnackbar Snackbar;
 @inject IDialogService DialogService
-
-    <h1>Event Listing</h1>
-
-
-    @if (IsEdit || IsAdd)
-    {
-        <MudCard Elevation="25">
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Add / Edit Students</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudItem>
-                    <MudTextField @bind-Value="eventModel.EventName" Label="Event Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-                    <MudTextField @bind-Value="eventModel.OperatorName" Label="Operator Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-                    <MudTextField @bind-Value="eventModel.EventVenue" Label="EventVenue" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-                    <MudTextField @bind-Value="eventModel.OrganizerName" Label="Organizer Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-                    <MudTextField @bind-Value="eventModel.OrganizerContact" Label="Organizer Contact" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-                    <MudTextField @bind-Value="eventModel.Description" Label="Description" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-
-                    <MudSwitch @bind-Checked="eventModel.IsApproved" Color="Color.Primary" Label="Approved?" />
-                </MudItem>
-                <MudItem Class="d-flex justify-end">
-                    <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
-                        <FontLable FontWeight="500">Cancel</FontLable>
-                    </MudButton>
-                    <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
-                        <FontLable FontWeight="500">Add</FontLable>
-                    </MudButton>
-                </MudItem>
-            </MudCardContent>
-        </MudCard>
-    }
-    else
-    {
-
-        <MudItem Class="d-flex justify-end">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ShowAddForm">
-                <FontLable FontWeight="500">Add</FontLable>
-            </MudButton>
-        </MudItem>
-    }
+@inject NavigationManager NavigationManager
+@inject IEventCategoryRepository _EventCategoryRepository;
+@inject NavigationManager UriHelper
+<h1>Event Listing</h1>
 
 
+@if (IsEdit || IsAdd)
+{
+    <MudCard Elevation="25">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Add / Edit Events</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudItem>
+                <MudTextField @bind-Value="eventModel.EventName" Label="Event Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="eventModel.OperatorName" Label="Operator Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="eventModel.EventVenue" Label="EventVenue" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="eventModel.OrganizerName" Label="Organizer Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="eventModel.OrganizerContact" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudRadioGroup @bind-SelectedOption="@eventModel.SlotType">
+                    <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
+                    <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
+                    <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
+                    <MudRadio Option="@(EventSlotType.MultipleDay.ToString())" Color="Color.Primary">@EventSlotType.MultipleDay.ToString()</MudRadio>
+                </MudRadioGroup>
+                <MudDatePicker Variant="Variant.Filled" Label="From Date" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy" />
+                <MudDatePicker Variant="Variant.Filled" Label="To Date" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" />
+                <MudTextField @bind-Value="eventModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudSelect @bind-Value="eventModel.CategoryId" Label="Select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var eventCategory in GetEventCategoryList())
+                        {
+                        <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
 
+                        }
+                </MudSelect>
+                <MudSwitch @bind-Checked="eventModel.IsApproved" Color="Color.Primary" Label="Approved?" />
+            </MudItem>
+            <MudItem Class="d-flex justify-end">
+                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
+                    <FontLable FontWeight="500">Cancel</FontLable>
+                </MudButton>
+                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                    <FontLable FontWeight="500">Add</FontLable>
+                </MudButton>
+            </MudItem>
+        </MudCardContent>
+    </MudCard>
+}
+else
+{
 
-    <MudTable Elevation="25" Items="GetAllevents()" Filter="new Func<Event, bool>(Search)" @bind-customer="eventList">
-        <ToolBarContent>
-            <MudText Typo="Typo.h6">Event list</MudText>
-            <MudSpacer />
-            <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh>Id</MudTh>
-            <MudTh>Event Name</MudTh>
-            <MudTh>Operator Name</MudTh>
-            <MudTh>EventVenue</MudTh>
-            <MudTh>OrganizorName</MudTh>
-            <MudTh>OrganizorNo</MudTh>
-            <MudTh>Description</MudTh>
-            <MudTh>From date</MudTh>
-            <MudTh>To date</MudTh>
-            <MudTh>IsApproved</MudTh>
-            <MudTh>Ispaymentdone</MudTh>
-            <MudTh>Inquiry id</MudTh>
-            <MudTh>Action</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="Event Name">@context.EventName</MudTd>
-            <MudTd DataLabel="">@context.OperatorName</MudTd>
-            <MudTd DataLabel="">@context.EventVenue</MudTd>
-            <MudTd DataLabel="">@context.OrganizerName</MudTd>
-            <MudTd DataLabel="">@context.OrganizerContact</MudTd>
-            <MudTd DataLabel="">@context.Description</MudTd>
-            <MudTd DataLabel="">@context.FromDate</MudTd>
-            <MudTd DataLabel="">@context.Todate</MudTd>
-            <MudTd DataLabel="">@context.IsApproved</MudTd>
-            <MudTd DataLabel="">@context.Ispaymentdone</MudTd>
-            <MudTd DataLabel="">@context.InquiryId</MudTd>
-            <MudTd DataLabel="">
-                <MudLink Href="/ViewEvent" Color="Color.Primary" >Edit</MudLink>
-                <MudFab  @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-                <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+    <MudItem Class="d-flex justify-end">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary "  OnClick="ShowAddForm">
+            <FontLable FontWeight="500">Add</FontLable>
+        </MudButton>
+    </MudItem>
+}
+<MudTable Elevation="25" Items="GetAllevents()" T="Event" Filter="new Func<Event, bool>(Search)" Class="w-100"   @bind-customer="eventList" OnRowClick="@RowClicked">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Event list</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Action</MudTh>
+        <MudTh>Id</MudTh>
+        <MudTh>Event Name</MudTh>
+        <MudTh>Operator Name</MudTh>
+        <MudTh>EventVenue</MudTh>
+        <MudTh>OrganizorName</MudTh>
+        <MudTh>OrganizorNo</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>SlotType</MudTh>
+        <MudTh>From date</MudTh>
+        <MudTh>To date</MudTh>
+        <MudTh>IsApproved</MudTh>
+        <MudTh>Ispaymentdone</MudTh>
+        <MudTh>Inquiry id</MudTh>
+        <MudTh>Category id</MudTh>
+
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(()=>Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+            @if (context.InquiryId > 0)
+            {
                 <MudButton Variant="Variant.Filled" @onclick="@(() => ViewInquiryDetail(context))" Color="Color.Primary" Size="Size.Small">view Inquiry</MudButton>
-            </MudTd>
-        </RowTemplate>
-        <PagerContent>
-            <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
-        </PagerContent>
-    </MudTable>
-
-    @code{
-
-
-        private string searchString = "";
-        private Event eventModel = new();
-        private bool IsEdit;
-        private bool IsAdd;
-        private List<Event> eventList = new();
-
-
-
-        protected override Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                GetAllevents();
             }
+        </MudTd>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Event Name">@context.EventName</MudTd>
+        <MudTd DataLabel="">@context.OperatorName</MudTd>
+        <MudTd DataLabel="">@context.EventVenue</MudTd>
+        <MudTd DataLabel="">@context.OrganizerName</MudTd>
+        <MudTd DataLabel="">@context.OrganizerContact</MudTd>
+        <MudTd DataLabel="">@context.Description</MudTd>
+        <MudTd DataLabel="">@context.SlotType</MudTd>
+        <MudTd DataLabel="">@context.FromDate</MudTd>
+        <MudTd DataLabel="">@context.Todate</MudTd>
+        <MudTd DataLabel="">@context.IsApproved</MudTd>
+        <MudTd DataLabel="">@context.Ispaymentdone</MudTd>
+        <MudTd DataLabel="">@context.InquiryId</MudTd>
+        <MudTd DataLabel="">@context.CategoryId</MudTd>
 
-            return base.OnAfterRenderAsync(firstRender);
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+    </PagerContent>
+</MudTable>
+
+@code{
+
+
+    private string searchString = "";
+    private Event eventModel = new();
+    private bool IsEdit;
+    private bool IsAdd;
+    private List<Event> eventList = new();
+
+
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetAllevents();
         }
 
-        private List<Event> GetAllevents()
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private List<Event> GetAllevents()
+    {
+        eventList = _EventRepository.GetList();
+        return eventList;
+    }
+
+    private bool Search(Event events)
+    {
+        if (StringValid(events.EventName)
+            && StringValid(events.OperatorName)
+            && StringValid(events.EventVenue)
+            && StringValid(events.OrganizerName)
+            && StringValid(events.OrganizerContact)
+            && StringValid(events.Description)
+            &&
+            events.EventName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || events.OperatorName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || events.EventVenue.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || events.OrganizerName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || events.OrganizerContact.Contains(searchString, StringComparison.OrdinalIgnoreCase))
         {
-            eventList = _eventService.GetList();
-            return eventList;
+            return true;
         }
 
-        private bool Search(Event events)
-        {
-            if (StringValid(events.EventName)
-                && StringValid(events.OperatorName)
-                && StringValid(events.EventVenue)
-                && StringValid(events.OrganizerName)
-                && StringValid(events.OrganizerContact)
-                && StringValid(events.Description)
-                &&
-                events.EventName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-                || events.OperatorName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-                || events.EventVenue.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-                || events.OrganizerName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-                || events.OrganizerContact.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
+        return false;
+    }
 
-            return false;
+    public void RowClicked(TableRowClickEventArgs<Event> p)
+    {
+        // Example:
+        NavigationManager.NavigateTo($"/ViewEvent/{p.Item.Id.ToString()}");
+    }
+
+    private bool StringValid(string strValue)
+    {
+        if (!string.IsNullOrEmpty(strValue))
+        {
+            return true;
         }
 
-        private bool StringValid(string strValue)
-        {
-            if (!string.IsNullOrEmpty(strValue))
-            {
-                return true;
-            }
+        return false;
+    }
 
-            return false;
-        }
-
-        private void Save()
+    private void Save()
+    {
+        try
         {
-            _eventService.Insert(eventModel);
+            _EventRepository.Insert(eventModel);
             Snackbar.Add(" record saved", Severity.Success);
             GetAllevents();
             IsEdit = false;
             IsAdd = false;
             eventModel = new Event();
         }
-
-        private void ShowAddForm()
+        catch (Exception ex)
         {
-            eventModel = new Event();
-            IsAdd = true;
-        }
-
-        private void Edit(long id)
-        {
-
-            try
-            {
-                IsEdit = true;
-                eventModel = eventList.FirstOrDefault(c => c.Id == id);
-            }
-            catch (Exception ex)
-            {
-                Snackbar.Add(ex.Message, Severity.Error);
-            }
-        }
-
-        private void CancelForm()
-        {
-            try
-            {
-                IsEdit = false;
-                IsAdd = false;
-                eventModel = new Event();
-            }
-            catch (Exception ex)
-            {
-                Snackbar.Add(ex.Message, Severity.Error);
-            }
-
-
-        }
-        private void Delete(long id)
-        {
-            try
-            {
-                _eventService.Delete(id);
-                Snackbar.Add("Customer Data Deleted.", Severity.Success);
-                GetAllevents();
-            }
-            catch (Exception ex)
-            {
-                Snackbar.Add(ex.Message, Severity.Error);
-            }
-        }
-
-        private void ViewInquiryDetail(Event events)
-        {
-
-            var parameters = new DialogParameters();
-            parameters.Add("InquiryModel", events.Inquiry);
-            var options = new DialogOptions()
-            {
-                CloseOnEscapeKey = false,
-                CloseButton = true,
-                MaxWidth = MaxWidth.Large,
-                Position = DialogPosition.TopCenter,
-                DisableBackdropClick = true
-            };
-            DialogService.Show<ShowInquiryData>("View Inquiry Data",parameters, options);
+            Snackbar.Add(ex.Message, Severity.Error);
         }
     }
+
+    private void ShowAddForm()
+    {
+        eventModel = new Event();
+        IsAdd = true;
+    }
+
+    //private void Edit(long id)
+    //{
+
+    //    try
+    //    {
+    //        IsEdit = true;
+    //        eventModel = eventList.FirstOrDefault(c => c.Id == id);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Snackbar.Add(ex.Message, Severity.Error);
+    //    }
+    //}
+    private void Edit(Event events)
+    {
+        UriHelper.NavigateTo($"/ViewEvent/{events.Id.ToString()}");
+    }
+
+
+    private List<EventCategory> GetEventCategoryList()
+    {
+        return _EventCategoryRepository.GetList();
+    }
+
+    private void CancelForm()
+    {
+        try
+        {
+            IsEdit = false;
+            IsAdd = false;
+            eventModel = new Event();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+    private void Delete(long id)
+    {
+        try
+        {
+            _EventRepository.Delete(id);
+            Snackbar.Add("Customer Data Deleted.", Severity.Success);
+            GetAllevents();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private void ViewInquiryDetail(Event events)
+    {
+
+        var parameters = new DialogParameters();
+        parameters.Add("InquiryModel", events.Inquiry);
+        var options = new DialogOptions()
+        {
+            CloseOnEscapeKey = false,
+            CloseButton = true,
+            MaxWidth = MaxWidth.Large,
+            Position = DialogPosition.TopCenter,
+            DisableBackdropClick = true
+        };
+        DialogService.Show<ShowInquiryData>("View Inquiry Data", parameters, options);
+    }
+}

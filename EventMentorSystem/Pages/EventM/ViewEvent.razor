@@ -1,30 +1,180 @@
-﻿@page "/ViewEvent"
-<h3>ViewEvent</h3>
+﻿@page "/ViewEvent/{EventId}"
+@using EMS.DB.Models
+@using  EMS.DB.Repository.Interface
+@using System.Globalization
+@using System.Reflection
+@using EMS.DB.Repository
+@using EMS.DB.Constant
+@inject IEventRepository _eventService;
+@inject IEventCategoryRepository _EventCategoryRepository;
+@inject ICategoryServiceRepository _CategoryServiceRepository;
+@inject ISnackbar Snackbar;
+@inject IDialogService DialogService
+<h3>View Event:</h3>
 
-<MudCard>
-    <MudCardContent>
-        <MudText>Story of the day</MudText>
-        <MudItem Class="d-flex justify-end">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" />
+<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <MudItem xs="12" sm="12">
+            <MudCard Elevation="10" Style="height: 100%" Class="pa-4 rounded-lg">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h4">Event Details</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton OnClick="@(() => EditEventDetails(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudDivider />
+                <MudCardContent>
+                    <MudText>Event Name : @EventModel.EventName </MudText>
+                    <MudText>Organizor Name:   @EventModel.OrganizerName</MudText>
+                    <MudText>Organizor Contact:   @EventModel.OrganizerContact</MudText>
+                    <MudText>Event Description:   @EventModel.Description</MudText>
+                </MudCardContent>
+            </MudCard>
         </MudItem>
-    </MudCardContent>
-    <MudCardActions>
-        <MudButton Variant="Variant.Text" Color="Color.Primary">Learn More</MudButton>
-    </MudCardActions>
-</MudCard>
-    
-<MudCard>
-    <MudCardContent>
-        <MudText>Story of the day</MudText>
-        
-    </MudCardContent>
-    <MudCardActions>
-        <MudButton Variant="Variant.Text" Color="Color.Primary">Learn More</MudButton>
+        <MudItem xs="12" sm="6">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudCard Elevation="10" Style="height: 100%" Class="pa-4 rounded-lg">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h4">Event Address:</MudText>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudIconButton OnClick="@(() => EditEventDetails(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudDivider />
+                        <MudCardContent>
+                           <MudText>@EventModel.EventVenue</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudCard Elevation="10" Style="height: 100%" Class="pa-4 rounded-lg">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h4">Event Time:</MudText>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudIconButton OnClick="@(() => EditEventDetails(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudDivider />
+                        <MudCardContent>
+                            <MudText>Event Timeing:@EventModel.SlotType</MudText>
+                            <MudText>Event FromDate:@EventModel.FromDate</MudText>
+                            <MudText>Event ToDate:@EventModel.Todate</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudCard Class="pa-4 rounded-lg" Style="height: 100%" Elevation="10">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h4">Event Service:</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton OnClick="@(() => EditEventDetails(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudDivider />
+                <MudCardContent>
+                    <MudSelect @bind-Value="EventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+                        @foreach (var eventCategory in EventCategoryList)
+                        {
+                            <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
 
-    </MudCardActions>
-</MudCard>
+                        }
+                    </MudSelect>
+                    <MudSelect @bind-Value="CategoryServiceModel.EventCategoryId" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var Service in GetCategoryServices())
+                        {
+                            <MudSelectItem Value="@Service.Id">@Service.ServiceName</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
 
+    </MudGrid>
+</MudContainer>
 
 @code {
+
+    [Parameter]
+    public string EventId { get; set; }
+    private CategoryService CategoryServiceModel = new();
+    private List<CategoryService> ServiceList = new();
+    private List<EventCategory> EventCategoryList = new();
+    private List<Event> eventList = new();
+    private Event EventModel = new();
+
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            EventModel = _eventService.GetById(Convert.ToInt64(EventId));
+            GetEventCategoryList();
+            GetAll();
+            GetAllevents();
+            StateHasChanged();
+        }
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private List<CategoryService> GetAll()
+    {
+        ServiceList = _CategoryServiceRepository.GetList();
+        return ServiceList;
+    }
+
+    private void GetEventCategoryList()
+    {
+        EventCategoryList = _EventCategoryRepository.GetList();
+    }
+
+
+
+    private List<Event> GetAllevents()
+    {
+        eventList = _eventService.GetList();
+        return eventList;
+    }
+
+
+   
+
+    public List<CategoryService> GetCategoryServices()
+    {
+        //return new List<Services>();
+        return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
+    }
+
+    public void OnEventCategoryChange(long selectedEventCategoryId)
+    {
+    }
+    private void EditEventDetails(Event events)
+    {
+
+        var parameters = new DialogParameters();
+        parameters.Add("EventModel", events);
+        var options = new DialogOptions()
+        {
+            CloseOnEscapeKey = false,
+            CloseButton = true,
+            MaxWidth = MaxWidth.Large,
+            Position = DialogPosition.TopCenter,
+            DisableBackdropClick = true
+        };
+
+        DialogService.Show<EditEvent>("Edit Event", parameters, options);
+
+    }
 
 }

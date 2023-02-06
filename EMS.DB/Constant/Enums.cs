@@ -13,6 +13,13 @@ namespace EMS.DB.Constant
         FullDay,
         MultipleDay
     }
+    public enum Userrole
+    {
+        Admin,
+        staff,
+        operators,
+        supervisor
+    }
 
     public enum InquiryStatusType
     {

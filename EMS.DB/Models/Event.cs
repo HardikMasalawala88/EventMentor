@@ -16,6 +16,8 @@ namespace EMS.DB.Models
         public string OrganizerName { get; set; }
         public string OrganizerContact { get; set; }
         public string Description { get; set; }
+
+        public string SlotType { get;set; }
         
         [DataType(DataType.Date)]
         public DateTime? FromDate { get; set; }
@@ -26,8 +28,12 @@ namespace EMS.DB.Models
         public bool IsApproved { get; set; }
         public bool Ispaymentdone { get; set; }
         ////Foreign key for Standard
-        public long InquiryId { get; set; }
+        public Nullable<long> InquiryId { get; set; }
      
         public Inquiry Inquiry { get; set; }
+
+        public long CategoryId { get; set; } = 0;
+        public EventCategory Category { get; set; }
+
     }
 }

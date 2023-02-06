@@ -1,21 +1,15 @@
 using EMS.DB;
-using EMS.DB.Service;
-using EMS.DB.Service.Interface;
+using EMS.DB.Repository;
+using EMS.DB.Repository.Interface;
 using EMS.DB.unitofwork;
 using EventMentorSystem.Data;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MudBlazor.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EventMentorSystem
 {
@@ -35,15 +29,17 @@ namespace EventMentorSystem
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddMudServices();
-            services.AddSingleton<WeatherForecastService>();
-            services.AddScoped<IEventService, EventService>();
+            //services.AddSingleton<WeatherForecastService>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-            services.AddScoped<IInquiryService, InquiryService>();
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-            services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-            services.AddScoped<IServices, Service>();
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+            #region Register service
+            services.AddScoped<IEventRepository, EventRepository>();
+            services.AddScoped<IInquiryRepository, InquiryRepository>();
+            services.AddScoped<IEventCategoryRepository, EventCategoryRepository>();
+            services.AddScoped<ICategoryServiceRepository, CategoryServiceRepository>(); 
+            services.AddScoped<IUserRepository, UserRepository>(); 
+            #endregion
+
             #region Connection String
             services.AddDbContext<AppDbContext>(item => item.UseSqlServer(Configuration.GetConnectionString("myconn")));
             #endregion

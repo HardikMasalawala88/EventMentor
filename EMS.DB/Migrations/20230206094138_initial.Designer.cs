@@ -4,14 +4,16 @@ using EMS.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EMS.DB.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230206094138_initial")]
+    partial class initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,9 +109,6 @@ namespace EMS.DB.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OrganizerName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SlotType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("Todate")
@@ -261,39 +260,6 @@ namespace EMS.DB.Migrations
                     b.ToTable("Inquiries");
                 });
 
-            modelBuilder.Entity("EMS.DB.Models.Supervisor", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDelete")
-                        .HasColumnType("bit");
-
-                    b.Property<long>("UpdatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Supervisors");
-                });
-
             modelBuilder.Entity("EMS.DB.Models.User", b =>
                 {
                     b.Property<long>("Id")
@@ -312,9 +278,6 @@ namespace EMS.DB.Migrations
 
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
-
-                    b.Property<long?>("SupervisorId")
-                        .HasColumnType("bigint");
 
                     b.Property<long>("UpdatedBy")
                         .HasColumnType("bigint");
@@ -350,8 +313,6 @@ namespace EMS.DB.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SupervisorId");
 
                     b.ToTable("Users");
                 });
@@ -399,13 +360,6 @@ namespace EMS.DB.Migrations
                     b.Navigation("EventCategory");
                 });
 
-            modelBuilder.Entity("EMS.DB.Models.User", b =>
-                {
-                    b.HasOne("EMS.DB.Models.Supervisor", null)
-                        .WithMany("UserList")
-                        .HasForeignKey("SupervisorId");
-                });
-
             modelBuilder.Entity("EMS.DB.Models.CategoryService", b =>
                 {
                     b.Navigation("Inquiry");
@@ -421,11 +375,6 @@ namespace EMS.DB.Migrations
             modelBuilder.Entity("EMS.DB.Models.Inquiry", b =>
                 {
                     b.Navigation("Event");
-                });
-
-            modelBuilder.Entity("EMS.DB.Models.Supervisor", b =>
-                {
-                    b.Navigation("UserList");
                 });
 #pragma warning restore 612, 618
         }

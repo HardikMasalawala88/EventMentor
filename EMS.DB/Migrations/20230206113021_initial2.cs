@@ -3,17 +3,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace EMS.DB.Migrations
 {
-    public partial class ADDCategoryList : Migration
+    public partial class initial2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "CategoryList",
+                name: "Supervisors",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<long>(type: "bigint", nullable: false),
@@ -23,14 +23,25 @@ namespace EMS.DB.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CategoryList", x => x.Id);
+                    table.PrimaryKey("PK_Supervisors", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Supervisors_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Supervisors_UserId",
+                table: "Supervisors",
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CategoryList");
+                name: "Supervisors");
         }
     }
 }

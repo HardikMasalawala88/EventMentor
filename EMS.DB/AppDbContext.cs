@@ -13,9 +13,11 @@ namespace EMS.DB
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
-        public DbSet<Event> EventList { get; set; }
-        public DbSet<Inquiry> InquiryList { get; set; }
-        public DbSet<Category> CategoryList { get; set; }
-        public DbSet<Services> ServicesList { get; set; }
+        public DbSet<Event> Events { get; set; }
+        public DbSet<Inquiry> Inquiries { get; set; }
+        public DbSet<EventCategory> EventCategories { get; set; }
+        public DbSet<CategoryService> CategoryServices { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Supervisor> Supervisors { get; set; }
     }
 }

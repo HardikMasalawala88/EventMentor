@@ -23,6 +23,41 @@ namespace EMS.DB.unitofwork
             entities = _applicationDbContext.Set<T>();
         }
         #endregion
+        
+        public List<T> GetAll()
+        {
+            return entities.ToList();
+        }
+
+        public T GetById(long id)
+        {
+            return entities.FirstOrDefault(x => x.Id == id);
+        }
+
+        public void Insert(T entity)
+        {
+            entity.CreatedOn = DateTime.Now;
+            entities.Add(entity);
+            _applicationDbContext.SaveChanges();
+        }
+
+        public void Update(T entity)
+        {
+            entity.UpdatedOn = DateTime.Now;
+            entities.Update(entity);
+            _applicationDbContext.SaveChanges();
+        }
+
+        public void SaveChanges()
+        {
+            _applicationDbContext.SaveChanges();
+        }
+
+        public void Remove(T entity)
+        {
+
+            entities.Remove(entity);
+        }
 
         public void Delete(T entity)
         {
@@ -34,52 +69,5 @@ namespace EMS.DB.unitofwork
             _applicationDbContext.SaveChanges();
         }
 
-
-        public List<T> GetAll()
-        {
-            //params Expression<Func<T, object>>[] includes
-            //if (includes is not null) {
-            //    object p = entities.Include(includes).ToList();
-            //}
-            return entities.ToList();
-        }
-
-        public void Insert(T entity)
-        {
-            _applicationDbContext.Set<T>().Add(entity);
-            //entities.Add(entity);
-            _applicationDbContext.SaveChanges();
-        }
-
-        public void Remove(T entity)
-        {
-           
-            entities.Remove(entity);
-        }
-
-        public void SaveChanges()
-        {
-            _applicationDbContext.SaveChanges();
-        }
-
-        public void Update(T entity)
-        {
-            
-            entities.Update(entity);
-            _applicationDbContext.SaveChanges();
-        }
-
-
-    //    public static IQueryable<T> IncludeMultiple<T>(this IQueryable<T> query, params Expression<Func<T, object>>[] includes)
-    //where T : class
-    //    {
-    //        if (includes != null)
-    //        {
-    //            query = includes.Aggregate(query,
-    //                      (current, include) => current.Include(include));
-    //        }
-
-    //        return query;
-    //    }
     }
 }

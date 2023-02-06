@@ -20,9 +20,6 @@ namespace EMS.DB.Models
         public string Email { get; set; }
 
         [Required]
-        public int NoOfAttendee { get; set; }
-
-        [Required]
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
         public string Landmark { get; set; }
@@ -35,6 +32,9 @@ namespace EMS.DB.Models
         public string State { get; set; }
 
         [Required]
+        public int NoOfAttendee { get; set; }
+
+        [Required]
         public string SlotType { get; set; }
         
         [Required]
@@ -42,6 +42,12 @@ namespace EMS.DB.Models
         public DateTime? ToDate { get; set; }
         public string Additionalnotes { get; set; }
         public string Status { get; set; }
+
+        public long EventCategoryId { get; set; }
+        public EventCategory EventCategory { get; set; }
+
+        //public long CategoryServiceId { get; set; } 
+        //public CategoryService CategoryService { get; set; }
 
         public virtual Event Event { get; set; }
     }

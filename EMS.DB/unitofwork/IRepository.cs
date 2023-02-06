@@ -8,6 +8,7 @@ namespace EMS.DB.unitofwork
     public interface IRepository<T> where T : BaseEntity
     {
         List<T> GetAll();
+        T GetById(long id);
         //params Expression<Func<T, object>>[] includes
         void Insert(T entity);
         void Update(T entity);

@@ -1,0 +1,162 @@
+﻿@page "/EventCategorys"
+@using EMS.DB.Models
+@using  EMS.DB.Repository.Interface
+@using System.Collections.Generic;
+@using EMS.DB.Constant
+@inject ISnackbar Snackbar;
+@inject IEventCategoryRepository _IEventCategoryRepository;
+@using System.Text.RegularExpressions
+
+<h3>Category List</h3>
+<MudCard Elevation="25">
+
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Add / Edit Category</MudText>
+            @if (showLeaveAlert)
+            {
+                <MudAlert Severity="Severity.Error" ContentAlignment="HorizontalAlignment.Center" Class="my-2">@error</MudAlert>
+            }
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+
+        <MudItem>
+            <MudTextField @bind-Value="EventCategoryModel.CategoryName" Label="Category Name" Variant="Variant.Text" HelperText="@error" Error="@showLeaveAlert" Margin="Margin.Normal"></MudTextField>
+        </MudItem>
+        <MudItem Class="d-flex justify-end">
+            @*<MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="cancel">
+                    <FontLable FontWeight="500">Cancel</FontLable>
+                </MudButton>*@
+            <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                <FontLable FontWeight="500">Add</FontLable>
+            </MudButton>
+        </MudItem>
+    </MudCardContent>
+</MudCard>
+<MudTable Elevation="25" Items="GetAll()" Filter="new Func<EventCategory, bool>(Search)" @bind-customer="EventCategoryList">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Category list</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Category..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>category Name</MudTh>
+        <MudTh>Action</MudTh>
+
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Category Name">@context.CategoryName</MudTd>
+
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private bool showLeaveAlert = false;
+    private EventCategory EventCategoryModel = new();
+    private List<EventCategory> EventCategoryList = new();
+    private string searchString = "";
+    private string str { get; set; }
+    private string error { get; set; }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetAll();
+        }
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private List<EventCategory> GetAll()
+    {
+        EventCategoryList = _IEventCategoryRepository.GetList();
+        return EventCategoryList;
+    }
+
+
+    private void Save()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(EventCategoryModel.CategoryName))
+            {
+                error = "please enter a category name";
+                showLeaveAlert = true;
+            }
+            else
+            {
+                _IEventCategoryRepository.InsertOrUpdate(EventCategoryModel);
+                Snackbar.Add(" record saved", Severity.Success);
+                showLeaveAlert = false;
+                GetAll();
+                EventCategoryModel = new EventCategory();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+
+    private void Edit(long id)
+    {
+        try
+        {
+            EventCategoryModel = EventCategoryList.FirstOrDefault(c => c.Id == id);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+
+    private void Delete(long id)
+    {
+        try
+        {
+            _IEventCategoryRepository.Delete(id);
+            Snackbar.Add("Category Data Deleted.", Severity.Success);
+            GetAll();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private bool Search(EventCategory eventCategory)
+    {
+        if (StringValid(eventCategory.CategoryName) && eventCategory.CategoryName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool StringValid(string strValue)
+    {
+        if (!string.IsNullOrEmpty(strValue))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+
+}
+
