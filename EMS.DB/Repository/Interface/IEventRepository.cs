@@ -10,5 +10,6 @@ namespace  EMS.DB.Repository.Interface
         public void Insert(Event eventModel);
         public void Update(Event eventModel);
         public void Delete(long id);
+        public void SaveChanges();
     }
 }

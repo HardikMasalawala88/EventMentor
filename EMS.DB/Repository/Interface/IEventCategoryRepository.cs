@@ -8,5 +8,6 @@ namespace  EMS.DB.Repository.Interface
         public List<EventCategory> GetList();
         public void InsertOrUpdate(EventCategory categoryModel);
         public void Delete(long id);
+        public EventCategory GetById(long id);
     }
 }

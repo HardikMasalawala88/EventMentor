@@ -1,4 +1,5 @@
 ﻿@page "/ViewEvent/{EventId}"
+@page "/EditEvent/{EventId}"
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
 @using System.Globalization
@@ -27,9 +28,13 @@
                 <MudDivider />
                 <MudCardContent>
                     <MudText>Event Name : @EventModel.EventName </MudText>
-                    <MudText>Organizor Name:   @EventModel.OrganizerName</MudText>
-                    <MudText>Organizor Contact:   @EventModel.OrganizerContact</MudText>
-                    <MudText>Event Description:   @EventModel.Description</MudText>
+                    <MudText>Organizor Name:@EventModel.OrganizerName</MudText>
+                    <MudText>Organizor Contact:@EventModel.OrganizerContact</MudText>
+                    <MudText>Event Description:@EventModel.Description</MudText>
+                    <MudText>Event Timeing:@EventModel.SlotType</MudText>
+                    <MudText>Event FromDate:@EventModel.FromDate</MudText>
+                    <MudText>Event FromDate:@EventModel.Todate</MudText>
+                    <MudText>Event Venue:@EventModel.EventVenue</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -39,7 +44,7 @@
                     <MudCard Elevation="10" Style="height: 100%" Class="pa-4 rounded-lg">
                         <MudCardHeader>
                             <CardHeaderContent>
-                                <MudText Typo="Typo.h4">Event Address:</MudText>
+                                <MudText Typo="Typo.h4">Event Staff:</MudText>
                             </CardHeaderContent>
                             <CardHeaderActions>
                                 <MudIconButton OnClick="@(() => EditEventDetails(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
@@ -47,7 +52,7 @@
                         </MudCardHeader>
                         <MudDivider />
                         <MudCardContent>
-                           <MudText>@EventModel.EventVenue</MudText>
+                            <MudText></MudText>
                         </MudCardContent>
                     </MudCard>
                 </MudItem>
@@ -55,7 +60,7 @@
                     <MudCard Elevation="10" Style="height: 100%" Class="pa-4 rounded-lg">
                         <MudCardHeader>
                             <CardHeaderContent>
-                                <MudText Typo="Typo.h4">Event Time:</MudText>
+                                <MudText Typo="Typo.h4">Event payment:</MudText>
                             </CardHeaderContent>
                             <CardHeaderActions>
                                 <MudIconButton OnClick="@(() => EditEventDetails(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
@@ -63,9 +68,7 @@
                         </MudCardHeader>
                         <MudDivider />
                         <MudCardContent>
-                            <MudText>Event Timeing:@EventModel.SlotType</MudText>
-                            <MudText>Event FromDate:@EventModel.FromDate</MudText>
-                            <MudText>Event ToDate:@EventModel.Todate</MudText>
+
                         </MudCardContent>
                     </MudCard>
                 </MudItem>
@@ -83,19 +86,12 @@
                 </MudCardHeader>
                 <MudDivider />
                 <MudCardContent>
-                    <MudSelect @bind-Value="EventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
-                        @foreach (var eventCategory in EventCategoryList)
-                        {
-                            <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
-
-                        }
-                    </MudSelect>
-                    <MudSelect @bind-Value="CategoryServiceModel.EventCategoryId" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                        @foreach (var Service in GetCategoryServices())
-                        {
-                            <MudSelectItem Value="@Service.Id">@Service.ServiceName</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <MudText>category :@EventCategoryName.CategoryName</MudText>
+                    <MudText>Service :</MudText>
+                    @foreach (var Service in GetCategoryServices())
+                    {
+                        <MudChip Variant="Variant.Text">@Service.ServiceName</MudChip>
+                    }
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -112,13 +108,13 @@
     private List<EventCategory> EventCategoryList = new();
     private List<Event> eventList = new();
     private Event EventModel = new();
-
-
+    private EventCategory EventCategoryName = new();
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             EventModel = _eventService.GetById(Convert.ToInt64(EventId));
+            EventCategoryName = _EventCategoryRepository.GetById(EventModel.CategoryId);
             GetEventCategoryList();
             GetAll();
             GetAllevents();
@@ -138,30 +134,24 @@
     {
         EventCategoryList = _EventCategoryRepository.GetList();
     }
-
-
-
     private List<Event> GetAllevents()
     {
         eventList = _eventService.GetList();
         return eventList;
     }
 
-
-   
-
     public List<CategoryService> GetCategoryServices()
     {
-        //return new List<Services>();
+
         return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
     }
 
     public void OnEventCategoryChange(long selectedEventCategoryId)
     {
     }
+
     private void EditEventDetails(Event events)
     {
-
         var parameters = new DialogParameters();
         parameters.Add("EventModel", events);
         var options = new DialogOptions()
@@ -172,9 +162,7 @@
             Position = DialogPosition.TopCenter,
             DisableBackdropClick = true
         };
-
-        DialogService.Show<EditEvent>("Edit Event", parameters, options);
-
+        DialogService.Show<EditEvent>("Update Event", parameters, options);
     }
 
 }

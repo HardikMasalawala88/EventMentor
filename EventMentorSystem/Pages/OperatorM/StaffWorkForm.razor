@@ -1,0 +1,85 @@
+﻿@page "/AddStaffwork"
+@using EMS.DB.Models
+@using  EMS.DB.Repository.Interface
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@inject IStaffWorkRepository _StaffWorkRepository;
+@inject ISnackbar Snackbar;
+@using EMS.DB.Constant
+<h3>Staffworkform</h3>
+
+<MudCard Elevation="25">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Add Staffwork</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudItem>
+            <MudTextField @bind-Value="StaffWorkModel.OperatorName" Label="Operator Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="StaffWorkModel.EventName" Label="Event Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="StaffWorkModel.EventService" Label="EventService" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudDatePicker @bind-DateTime="StaffWorkModel.Date" Label="Date" Variant="Variant.Outlined" Margin="Margin.Normal"></MudDatePicker>
+            <MudRadioGroup @bind-SelectedOption="@StaffWorkModel.SlotTime">
+                <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
+                <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
+                <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
+                <MudRadio Option="@(EventSlotType.MultipleDay.ToString())" Color="Color.Primary">@EventSlotType.MultipleDay.ToString()</MudRadio>
+            </MudRadioGroup>
+            <MudTextField @bind-Value="StaffWorkModel.Venue" Label="Venue" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        </MudItem>
+        <MudItem Class="d-flex justify-end">
+            <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
+                <FontLable FontWeight="500">Cancel</FontLable>
+            </MudButton>
+            <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                <FontLable FontWeight="500">Add</FontLable>
+            </MudButton>
+        </MudItem>
+    </MudCardContent>
+</MudCard>
+
+@code { private List<StaffWork> StaffWorkList = new();
+            private StaffWork StaffWorkModel = new();
+            MudForm form;
+            protected override Task OnAfterRenderAsync(bool firstRender)
+            {
+                if (firstRender)
+                {
+                    GetAllStaffWork();
+                }
+
+                return base.OnAfterRenderAsync(firstRender);
+            }
+            private List<StaffWork> GetAllStaffWork()
+            {
+                StaffWorkList = _StaffWorkRepository.GetStaffWorkList();
+                return StaffWorkList;
+            }
+
+            private void Save()
+            {
+                try
+                {
+                    _StaffWorkRepository.Insert(StaffWorkModel);
+                    Snackbar.Add(" record saved", Severity.Success);
+                    GetAllStaffWork();
+
+                    StaffWorkModel = new StaffWork();
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add(ex.Message, Severity.Error);
+                }
+            }
+            private void CancelForm()
+            {
+                try
+                {
+                    StaffWorkModel = new StaffWork();
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add(ex.Message, Severity.Error);
+                }
+            } }

@@ -25,7 +25,10 @@ namespace EMS.DB.Repository
         #endregion
     
         public List<EventCategory> GetList() => _repository.GetAll();
-
+        public EventCategory GetById(long id)
+        {
+            return _repository.GetById(id);
+        }
         public void InsertOrUpdate(EventCategory categoryModel)
         {
             if (categoryModel.Id is 0) 

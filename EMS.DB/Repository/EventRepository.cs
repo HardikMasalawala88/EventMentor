@@ -27,7 +27,9 @@ namespace EMS.DB.Repository
 
         //public List<Event> GetList() => _repository.GetAll();
         public List<Event> GetList() {
+            _appDbContext.Events.Include(x => x.Category).ToList();
             return _appDbContext.Events.Include(x => x.Inquiry).ToList();
+           
         }
 
         public Event GetById(long id)
@@ -45,6 +47,11 @@ namespace EMS.DB.Repository
         public void Update(Event eventModel)
         {
             _repository.Update(eventModel);
+            _repository.SaveChanges();
+        }
+        public void SaveChanges()
+        {
+            _repository.SaveChanges();
         }
 
         public void Delete(long id)

@@ -10,6 +10,7 @@
 @inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 @inject IEventCategoryRepository _EventCategoryRepository;
+
 @inject NavigationManager UriHelper
 <h1>Event Listing</h1>
 
@@ -62,12 +63,12 @@ else
 {
 
     <MudItem Class="d-flex justify-end">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary "  OnClick="ShowAddForm">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary " OnClick="ShowAddForm">
             <FontLable FontWeight="500">Add</FontLable>
         </MudButton>
     </MudItem>
 }
-<MudTable Elevation="25" Items="GetAllevents()" T="Event" Filter="new Func<Event, bool>(Search)" Class="w-100"   @bind-customer="eventList" OnRowClick="@RowClicked">
+<MudTable Elevation="25" Items="GetAllevents()" T="Event" Filter="new Func<Event, bool>(Search)" Class="w-100" @bind-customer="eventList" OnRowClick="@RowClicked">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Event list</MudText>
         <MudSpacer />
@@ -87,18 +88,14 @@ else
         <MudTh>To date</MudTh>
         <MudTh>IsApproved</MudTh>
         <MudTh>Ispaymentdone</MudTh>
-        <MudTh>Inquiry id</MudTh>
-        <MudTh>Category id</MudTh>
+        <MudTh>reference</MudTh>
+        <MudTh>Category</MudTh>
 
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="">
-            <MudFab @onclick="@(()=>Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(() => Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
             <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-            @if (context.InquiryId > 0)
-            {
-                <MudButton Variant="Variant.Filled" @onclick="@(() => ViewInquiryDetail(context))" Color="Color.Primary" Size="Size.Small">view Inquiry</MudButton>
-            }
         </MudTd>
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Event Name">@context.EventName</MudTd>
@@ -112,9 +109,15 @@ else
         <MudTd DataLabel="">@context.Todate</MudTd>
         <MudTd DataLabel="">@context.IsApproved</MudTd>
         <MudTd DataLabel="">@context.Ispaymentdone</MudTd>
-        <MudTd DataLabel="">@context.InquiryId</MudTd>
-        <MudTd DataLabel="">@context.CategoryId</MudTd>
-
+        @if (context.InquiryId > 0)
+        {
+            <MudTd DataLabel="">ByInquiryForm</MudTd>
+        }
+        else
+        {
+            <MudTd DataLabel="">ByCall</MudTd>
+        }
+    <MudTd DataLabel="">@context.Category.CategoryName</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
@@ -129,6 +132,7 @@ else
     private bool IsEdit;
     private bool IsAdd;
     private List<Event> eventList = new();
+    private List<EventCategory> eventcategoryList = new();
 
 
 
@@ -137,6 +141,7 @@ else
         if (firstRender)
         {
             GetAllevents();
+
         }
 
         return base.OnAfterRenderAsync(firstRender);
@@ -172,7 +177,7 @@ else
     public void RowClicked(TableRowClickEventArgs<Event> p)
     {
         // Example:
-        NavigationManager.NavigateTo($"/ViewEvent/{p.Item.Id.ToString()}");
+        NavigationManager.NavigateTo($"/EditEvent/{p.Item.Id.ToString()}");
     }
 
     private bool StringValid(string strValue)
@@ -208,22 +213,10 @@ else
         IsAdd = true;
     }
 
-    //private void Edit(long id)
-    //{
 
-    //    try
-    //    {
-    //        IsEdit = true;
-    //        eventModel = eventList.FirstOrDefault(c => c.Id == id);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Snackbar.Add(ex.Message, Severity.Error);
-    //    }
-    //}
     private void Edit(Event events)
     {
-        UriHelper.NavigateTo($"/ViewEvent/{events.Id.ToString()}");
+        UriHelper.NavigateTo($"/EditEvent/{events.Id.ToString()}");
     }
 
 
@@ -259,19 +252,19 @@ else
         }
     }
 
-    private void ViewInquiryDetail(Event events)
-    {
+    //private void ViewInquiryDetail(Event events)
+    //{
 
-        var parameters = new DialogParameters();
-        parameters.Add("InquiryModel", events.Inquiry);
-        var options = new DialogOptions()
-        {
-            CloseOnEscapeKey = false,
-            CloseButton = true,
-            MaxWidth = MaxWidth.Large,
-            Position = DialogPosition.TopCenter,
-            DisableBackdropClick = true
-        };
-        DialogService.Show<ShowInquiryData>("View Inquiry Data", parameters, options);
-    }
+    //    var parameters = new DialogParameters();
+    //    parameters.Add("InquiryModel", events.Inquiry);
+    //    var options = new DialogOptions()
+    //    {
+    //        CloseOnEscapeKey = false,
+    //        CloseButton = true,
+    //        MaxWidth = MaxWidth.Large,
+    //        Position = DialogPosition.TopCenter,
+    //        DisableBackdropClick = true
+    //    };
+    //    DialogService.Show<ShowInquiryData>("View Inquiry Data", parameters, options);
+    //}
 }

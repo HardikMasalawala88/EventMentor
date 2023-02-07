@@ -31,17 +31,26 @@
                 <MudDatePicker Label="To Date" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" />
             </MudItem>
 
-            <MudItem lg="3" md="4" xs="12">
-                <MudSelect @bind-Value="eventModel.CategoryId" T="long" Label="select categorys" Class="mt-0" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+            <MudItem lg="4" md="4" xs="12">
+              
+                <MudSelect @bind-Value="eventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
                     @foreach (var eventCategory in EventCategoryList)
                     {
                         <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
+
                     }
                 </MudSelect>
             </MudItem>
-            
             <MudItem lg="4" md="4" xs="12">
-                @*<MudTextField @bind-Value="eventModel.IsApproved" Label="Approved ?" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>*@
+                <MudSelect @bind-Value="eventModel.CategoryId" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var Service in GetCategoryServices())
+                    {
+                        <MudSelectItem Value="@Service.Id">@Service.ServiceName</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+
+            <MudItem lg="4" md="4" xs="12">
                 <MudSwitch @bind-Checked="eventModel.IsApproved" Label="Approved?" Color="Color.Primary" />
                 <MudSwitch @bind-Checked="eventModel.Ispaymentdone" Label="Payment done?" Color="Color.Primary" />
             </MudItem>
@@ -67,6 +76,7 @@
     private bool isReadOnly = false;
     private Inquiry inquiryModel = new();
     private Event eventModel = new();
+    private List<CategoryService> ServiceList = new();
     private List<Inquiry> inquiryList = new();
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
@@ -79,6 +89,14 @@
     private void GetEventCategoryList()
     {
         EventCategoryList = _EventCategoryRepository.GetList();
+    }
+    public List<CategoryService> GetCategoryServices()
+    {
+        //return new List<Services>();
+        return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
+    }
+    public void OnEventCategoryChange(long selectedEventCategoryId)
+    {
     }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
@@ -93,6 +111,7 @@
             eventModel.EventVenue = string.Concat(inquiryModel.AddressLine1 + "," + inquiryModel.AddressLine2 + "," + inquiryModel.Landmark + "," + inquiryModel.City + "," + inquiryModel.State + ".");
             eventModel.InquiryId = inquiryModel.Id;
             GetEventCategoryList();
+            GetCategoryServices();
         }
 
         return base.OnAfterRenderAsync(firstRender);

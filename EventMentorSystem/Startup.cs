@@ -38,6 +38,7 @@ namespace EventMentorSystem
             services.AddScoped<IEventCategoryRepository, EventCategoryRepository>();
             services.AddScoped<ICategoryServiceRepository, CategoryServiceRepository>(); 
             services.AddScoped<IUserRepository, UserRepository>(); 
+            services.AddScoped<IStaffWorkRepository, StaffWorkRepository>(); 
             #endregion
 
             #region Connection String
