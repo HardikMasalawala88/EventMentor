@@ -27,6 +27,9 @@ namespace EMS.DB.Models
 
         public bool IsApproved { get; set; }
         public bool Ispaymentdone { get; set; }
+
+        public string SelectedService { get; set; }
+
         ////Foreign key for Standard
         public Nullable<long> InquiryId { get; set; }
      

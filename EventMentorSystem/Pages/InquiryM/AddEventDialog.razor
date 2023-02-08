@@ -32,24 +32,16 @@
             </MudItem>
 
             <MudItem lg="4" md="4" xs="12">
-              
-                <MudSelect @bind-Value="eventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+                <MudSelect @bind-Value="eventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                     @foreach (var eventCategory in EventCategoryList)
                     {
                         <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
-
                     }
                 </MudSelect>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudSelect @bind-Value="eventModel.CategoryId" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    @foreach (var Service in GetCategoryServices())
-                    {
-                        <MudSelectItem Value="@Service.Id">@Service.ServiceName</MudSelectItem>
-                    }
-                </MudSelect>
+               
             </MudItem>
-
             <MudItem lg="4" md="4" xs="12">
                 <MudSwitch @bind-Checked="eventModel.IsApproved" Label="Approved?" Color="Color.Primary" />
                 <MudSwitch @bind-Checked="eventModel.Ispaymentdone" Label="Payment done?" Color="Color.Primary" />
@@ -92,7 +84,7 @@
     }
     public List<CategoryService> GetCategoryServices()
     {
-        //return new List<Services>();
+
         return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
     }
     public void OnEventCategoryChange(long selectedEventCategoryId)
@@ -112,6 +104,8 @@
             eventModel.InquiryId = inquiryModel.Id;
             GetEventCategoryList();
             GetCategoryServices();
+            StateHasChanged();
+
         }
 
         return base.OnAfterRenderAsync(firstRender);
@@ -147,7 +141,6 @@
             GetAllevents();
             eventModel = new Event();
             MudDialog.Close();
-
         }
         catch (Exception ex)
         {

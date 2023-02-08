@@ -1,0 +1,85 @@
+﻿@using EMS.DB.Models
+@using EMS.DB.Constant
+@using  EMS.DB.Repository.Interface
+@inject IEventRepository _eventService;
+@inject IEventCategoryRepository _EventCategoryRepository;
+@inject ICategoryServiceRepository _CategoryServiceRepository;
+@inject ISnackbar Snackbar;
+<MudDialog>
+    <DialogContent>
+
+        <MudSelect @bind-Value="EventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+            @foreach (var eventCategory in EventCategoryList)
+            {
+                <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
+
+            }
+        </MudSelect>
+        <MudSelect @bind-Value="EventModel.SelectedService" MultiSelection="true" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+            @foreach (var Service in GetCategoryServices())
+            {
+                <MudSelectItem Value="@Service.Id">@Service.ServiceName</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit">Add Service</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private String demo { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Event EventModel { get; set; } = new Event();
+    private Event eventModel = new();
+    private bool isReadOnly = false;
+    private EventCategory EventCategoryName = new();
+    private CategoryService CategoryServiceModel = new();
+    private List<CategoryService> ServiceList = new();
+    private List<EventCategory> EventCategoryList = new();
+
+    protected override void OnInitialized()
+    {
+        if (EventModel is not null && EventModel.Id > 0)
+        {
+            isReadOnly = true;
+        }
+        eventModel = EventModel;
+        base.OnInitialized();
+    }
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            EventCategoryName = _EventCategoryRepository.GetById(EventModel.CategoryId);
+            GetEventCategoryList();
+            GetCategoryServices();
+            GetAll();
+            StateHasChanged();
+        }
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+    public void OnEventCategoryChange(long selectedEventCategoryId)
+    {
+    }
+    public List<CategoryService> GetCategoryServices()
+    {
+
+        return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
+    }
+    private void GetEventCategoryList()
+    {
+        EventCategoryList = _EventCategoryRepository.GetList();
+    }
+    private List<CategoryService> GetAll()
+    {
+        ServiceList = _CategoryServiceRepository.GetList();
+        return ServiceList;
+    }
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}

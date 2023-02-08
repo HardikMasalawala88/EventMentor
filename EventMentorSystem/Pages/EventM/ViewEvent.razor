@@ -63,7 +63,7 @@
                                 <MudText Typo="Typo.h4">Event payment:</MudText>
                             </CardHeaderContent>
                             <CardHeaderActions>
-                                <MudIconButton OnClick="@(() => EditEventDetails(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                                <MudIconButton  Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
                             </CardHeaderActions>
                         </MudCardHeader>
                         <MudDivider />
@@ -81,17 +81,15 @@
                         <MudText Typo="Typo.h4">Event Service:</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
-                        <MudIconButton OnClick="@(() => EditEventDetails(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                        <MudIconButton OnClick="@(() => EditEventSelectService(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
                     </CardHeaderActions>
                 </MudCardHeader>
                 <MudDivider />
                 <MudCardContent>
                     <MudText>category :@EventCategoryName.CategoryName</MudText>
                     <MudText>Service :</MudText>
-                    @foreach (var Service in GetCategoryServices())
-                    {
-                        <MudChip Variant="Variant.Text">@Service.ServiceName</MudChip>
-                    }
+                   
+
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -148,6 +146,21 @@
 
     public void OnEventCategoryChange(long selectedEventCategoryId)
     {
+    }
+
+    private void EditEventSelectService(Event events)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("EventModel", events);
+        var options = new DialogOptions()
+        {
+            CloseOnEscapeKey = false,
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            Position = DialogPosition.TopCenter,
+            //DisableBackdropClick = true
+        };
+        DialogService.Show<AddEventService>("Add Service",parameters, options);
     }
 
     private void EditEventDetails(Event events)
