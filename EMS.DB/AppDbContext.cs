@@ -18,7 +18,7 @@ namespace EMS.DB
         public DbSet<EventCategory> EventCategories { get; set; }
         public DbSet<CategoryService> CategoryServices { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<Supervisor> Supervisors { get; set; }
+        public DbSet<OperatorWork> OperatorWorks { get; set; }
         public DbSet<StaffWork> StaffWorks { get; set; }
     }
 }

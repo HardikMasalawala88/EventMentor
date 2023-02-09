@@ -33,7 +33,7 @@
                     <MudText>Event Description:@EventModel.Description</MudText>
                     <MudText>Event Timeing:@EventModel.SlotType</MudText>
                     <MudText>Event FromDate:@EventModel.FromDate</MudText>
-                    <MudText>Event FromDate:@EventModel.Todate</MudText>
+                    <MudText>Event ToDate:@EventModel.Todate</MudText>
                     <MudText>Event Venue:@EventModel.EventVenue</MudText>
                 </MudCardContent>
             </MudCard>
@@ -47,7 +47,7 @@
                                 <MudText Typo="Typo.h4">Event Staff:</MudText>
                             </CardHeaderContent>
                             <CardHeaderActions>
-                                <MudIconButton OnClick="@(() => EditEventDetails(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
                             </CardHeaderActions>
                         </MudCardHeader>
                         <MudDivider />
@@ -87,7 +87,7 @@
                 <MudDivider />
                 <MudCardContent>
                     <MudText>category :@EventCategoryName.CategoryName</MudText>
-                    <MudText>Service :</MudText>
+                    <MudText>Service :@EventModel.SelectedService</MudText>
                    
 
                 </MudCardContent>

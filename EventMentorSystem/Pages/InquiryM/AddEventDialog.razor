@@ -24,6 +24,14 @@
             <MudItem lg="4" md="4" xs="12">
                 <MudTextField Class="mt-0" @bind-Value="eventModel.OrganizerContact" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudSelect @bind-Value="@eventModel.SlotType" Class="m-0" T="string" Label="slot" Variant="Variant.Outlined">
+                    <MudSelectItem Value="@(EventSlotType.Morning.ToString())" />
+                    <MudSelectItem Value="@(EventSlotType.Evening.ToString())" />
+                    <MudSelectItem Value="@(EventSlotType.FullDay.ToString())" />
+                    <MudSelectItem Value="@(EventSlotType.MultipleDay.ToString())" />
+                </MudSelect>
+            </MudItem>
             <MudItem lg="2" md="3" xs="12">
                 <MudDatePicker Label="From Date" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy" />
             </MudItem>
@@ -40,7 +48,7 @@
                 </MudSelect>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-               
+
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
                 <MudSwitch @bind-Checked="eventModel.IsApproved" Label="Approved?" Color="Color.Primary" />

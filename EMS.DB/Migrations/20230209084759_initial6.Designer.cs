@@ -4,14 +4,16 @@ using EMS.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EMS.DB.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230209084759_initial6")]
+    partial class initial6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -464,7 +466,7 @@ namespace EMS.DB.Migrations
             modelBuilder.Entity("EMS.DB.Models.OperatorWork", b =>
                 {
                     b.HasOne("EMS.DB.Models.Event", "Event")
-                        .WithMany("OperatorWork")
+                        .WithMany()
                         .HasForeignKey("EventId");
 
                     b.Navigation("Event");
@@ -473,11 +475,6 @@ namespace EMS.DB.Migrations
             modelBuilder.Entity("EMS.DB.Models.CategoryService", b =>
                 {
                     b.Navigation("Inquiry");
-                });
-
-            modelBuilder.Entity("EMS.DB.Models.Event", b =>
-                {
-                    b.Navigation("OperatorWork");
                 });
 
             modelBuilder.Entity("EMS.DB.Models.EventCategory", b =>

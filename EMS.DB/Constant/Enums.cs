@@ -13,6 +13,12 @@ namespace EMS.DB.Constant
         FullDay,
         MultipleDay
     }
+    public enum Status
+    {
+        Workpending,
+        WorkOnProcess,
+        WorkFinish
+    }
     public enum Userrole
     {
         Admin,

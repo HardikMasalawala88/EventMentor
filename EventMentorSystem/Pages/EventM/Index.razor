@@ -1,16 +1,12 @@
 ﻿@page "/eventlist"
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
-@using System.Globalization
-@using System.Reflection
-@using EMS.DB.Repository
 @using EMS.DB.Constant
 @inject IEventRepository _EventRepository;
 @inject ISnackbar Snackbar;
 @inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 @inject IEventCategoryRepository _EventCategoryRepository;
-
 @inject NavigationManager UriHelper
 <h1>Event Listing</h1>
 
@@ -68,6 +64,7 @@ else
         </MudButton>
     </MudItem>
 }
+
 <MudTable Elevation="25" Items="GetAllevents()" T="Event" Filter="new Func<Event, bool>(Search)" Class="w-100" @bind-customer="eventList" OnRowClick="@RowClicked">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Event list</MudText>

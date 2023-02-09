@@ -10,10 +10,6 @@
 @inject IInquiryRepository _InquiryRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
 
-<h1></h1>
-
-
-
 <MudCard Elevation="25">
     <MudCardHeader>
         <CardHeaderContent>
@@ -33,7 +29,7 @@
             <MudTextField @bind-Value="inquiryModel.City" Label="city" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             <MudTextField @bind-Value="inquiryModel.State" Label="State" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             <MudTextField @bind-Value="inquiryModel.NoOfAttendee" Label="NoOfAttendee" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-            <MudSelect @bind-Value="inquiryModel.EventCategoryId" T="long"  Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+            <MudSelect @bind-Value="inquiryModel.EventCategoryId" T="long" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                 @foreach (var eventCategory in EventCategoryList)
                 {
                     <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
@@ -46,9 +42,11 @@
                 <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
                 <MudRadio Option="@(EventSlotType.MultipleDay.ToString())" Color="Color.Primary">@EventSlotType.MultipleDay.ToString()</MudRadio>
             </MudRadioGroup>
-            <MudDatePicker Variant="Variant.Filled" Label="From Date" @bind-Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" />
-            <MudDatePicker Variant="Variant.Filled" Label="To Date" @bind-Date="inquiryModel.ToDate" DateFormat="dd.MM.yyyy" />
-
+            <MudDatePicker Variant="Variant.Outlined" Label="From Date" @bind-Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" />
+            @if (inquiryModel.SlotType == "MultipleDay")
+            {
+                <MudDatePicker Variant="Variant.Outlined" Label="To Date" @bind-Date="inquiryModel.ToDate" DateFormat="dd.MM.yyyy" />
+            }
         </MudItem>
         <MudItem Class="d-flex justify-end flex-wrap gap-4">
             <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
@@ -75,7 +73,7 @@
     {
         if (firstRender)
         {
-            GetEventCategoryList();   
+            GetEventCategoryList();
         }
 
         return base.OnAfterRenderAsync(firstRender);
@@ -85,7 +83,7 @@
     {
         EventCategoryList = _EventCategoryRepository.GetList();
     }
-    
+
     private void Save()
     {
 

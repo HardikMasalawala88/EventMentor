@@ -38,5 +38,7 @@ namespace EMS.DB.Models
         public long CategoryId { get; set; } = 0;
         public EventCategory Category { get; set; }
 
+        public virtual List<OperatorWork> OperatorWork { get; set; }
+
     }
 }

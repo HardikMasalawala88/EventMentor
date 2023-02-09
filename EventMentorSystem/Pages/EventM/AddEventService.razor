@@ -1,30 +1,27 @@
 ﻿@using EMS.DB.Models
-@using EMS.DB.Constant
 @using  EMS.DB.Repository.Interface
 @inject IEventRepository _eventService;
 @inject IEventCategoryRepository _EventCategoryRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject ISnackbar Snackbar;
+
 <MudDialog>
     <DialogContent>
-
-        <MudSelect @bind-Value="EventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
-            @foreach (var eventCategory in EventCategoryList)
-            {
-                <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
-
-            }
+        <MudSelect @bind-Value="eventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+            <MudSelectItem Value="@eventModel.CategoryId">@eventModel.Category.CategoryName</MudSelectItem>
         </MudSelect>
-        <MudSelect @bind-Value="EventModel.SelectedService" MultiSelection="true" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+        @*@bind-Value="@(e => SetSelectedServices(e))" @bind-SelectedValues="@GetSelectedServices()"  SelectedValuesChanged="@(e => OnSetSelectedServices((IEnumerable<long>)e))"*@
+        <!--<MudSelect SelectedValues="@GetSelectedServices()"  SelectedValuesChanged="@OnSetSelectedServices"
+                   MultiSelection="true" Label="select Services" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
             @foreach (var Service in GetCategoryServices())
             {
-                <MudSelectItem Value="@Service.Id">@Service.ServiceName</MudSelectItem>
+                <MudSelectItem T="long" Value="@Service.Id">@Service.ServiceName</MudSelectItem>
             }
-        </MudSelect>
+        </MudSelect>-->
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit">Add Service</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddService">Add Service</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -38,7 +35,7 @@
     private CategoryService CategoryServiceModel = new();
     private List<CategoryService> ServiceList = new();
     private List<EventCategory> EventCategoryList = new();
-
+    private List<String> options { get; set; } = new List<string>();
     protected override void OnInitialized()
     {
         if (EventModel is not null && EventModel.Id > 0)
@@ -52,11 +49,10 @@
     {
         if (firstRender)
         {
-
             EventCategoryName = _EventCategoryRepository.GetById(EventModel.CategoryId);
             GetEventCategoryList();
             GetCategoryServices();
-            GetAll();
+            GetAllService();
             StateHasChanged();
         }
 
@@ -70,16 +66,40 @@
 
         return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
     }
+
     private void GetEventCategoryList()
     {
         EventCategoryList = _EventCategoryRepository.GetList();
     }
-    private List<CategoryService> GetAll()
+    private List<CategoryService> GetAllService()
     {
         ServiceList = _CategoryServiceRepository.GetList();
         return ServiceList;
     }
+    void Cancel() => MudDialog.Close(DialogResult.Ok(false));
+    private void AddService()
+    {
+        try
+        {
 
-    void Submit() => MudDialog.Close(DialogResult.Ok(true));
-    void Cancel() => MudDialog.Cancel();
+            _eventService.Update(eventModel);
+            eventModel = new Event();
+            MudDialog.Close();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+    private IEnumerable<long> GetSelectedServices()
+    {
+        return eventModel.SelectedService.Split(',').Select(x => Convert.ToInt64(x));
+
+    }
+    //IEnumerable<long>
+    private void OnSetSelectedServices(IEnumerable<object> values)
+    {
+        //return eventModel.SelectedService.Split(',').Select(x => Convert.ToInt64(x)).ToList();
+
+    }
 }
