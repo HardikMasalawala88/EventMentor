@@ -1,0 +1,196 @@
+﻿@page "/ViewPayment"
+@using EMS.DB.Models
+@using  EMS.DB.Repository.Interface
+@using System.Globalization
+@using System.Reflection
+@using EMS.DB.Repository
+@using EMS.DB.Constant
+@using System.ComponentModel.DataAnnotations;
+@inject IEventRepository _EventRepository;
+@inject IPaymentRepository _PaymentRepository;
+@inject ISnackbar Snackbar;
+@inject IDialogService DialogService
+
+<h3>ViewPayment</h3>
+@if (IsEdit || IsAdd)
+{
+    <MudCard Elevation="25">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Add / Edit Events</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudItem>
+                <MudTextField @bind-Value="PaymentModel.PaymentMode" Label="PaymentMode" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="PaymentModel.TotalAmount" Label="TotalAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="PaymentModel.ReceivedAmount" Label="ReceivedAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="PaymentModel.RemainingAmount" Label="RemainingAmount " Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="PaymentModel.Transactionid" Label="Transactionid" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="PaymentModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="PaymentModel.EventId" Label="EventId" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="PaymentModel.UserId" Label="UserId" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                
+            </MudItem>
+            <MudItem Class="d-flex justify-end">
+               
+                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Addpayment">
+                    <FontLable FontWeight="500">Add</FontLable>
+                </MudButton>
+            </MudItem>
+        </MudCardContent>
+    </MudCard>
+}
+else
+{
+
+    <MudItem Class="d-flex justify-end">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary " OnClick="ShowAddForm">
+            <FontLable FontWeight="500">Add</FontLable>
+        </MudButton>
+    </MudItem>
+}
+<MudTable Elevation="25" Items="GetAllPayment()" T="Payment" Filter="new Func<Payment, bool>(Search)" Class="w-100" @bind-customer="PaymentList">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Event list</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Action</MudTh>
+        <MudTh>PaymentId</MudTh>
+        <MudTh>Event Name</MudTh>
+        <MudTh>OrganizorName</MudTh>
+        <MudTh>OrganizorNo</MudTh>
+        <MudTh>Operator Name</MudTh>
+        <MudTh>From date</MudTh>
+        <MudTh>Payment method</MudTh>
+        <MudTh>Total Amount</MudTh>
+        <MudTh>ReceivedAmount</MudTh>
+        <MudTh>RemainingAmount</MudTh>
+        <MudTh>transactionId</MudTh>
+        <MudTh>Description</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(() => OpenDialog(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Id">@context.Event.EventName</MudTd>
+        <MudTd DataLabel="Id">@context.Event.OrganizerName</MudTd>
+        <MudTd DataLabel="Id">@context.Event.OrganizerContact</MudTd>
+        <MudTd DataLabel="Id">@context.Event.OperatorName</MudTd>
+        <MudTd DataLabel="Id">@context.Event.FromDate</MudTd>
+        <MudTd DataLabel="Id">@context.PaymentMode</MudTd>
+        <MudTd DataLabel="Id">@context.TotalAmount</MudTd>
+        <MudTd DataLabel="Id">@context.ReceivedAmount</MudTd>
+        <MudTd DataLabel="Id">@context.RemainingAmount</MudTd>
+        <MudTd DataLabel="Id">@context.Transactionid</MudTd>
+        <MudTd DataLabel="Id">@context.Description</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+    </PagerContent>
+</MudTable>
+@code{
+    private List<Payment> PaymentList = new();
+    private Payment PaymentModel = new();
+    private string searchString = "";
+    private bool IsEdit;
+    private bool IsAdd;
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            GetAllPayment();
+            StateHasChanged();
+        }
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+    private List<Payment> GetAllPayment()
+    {
+        PaymentList = _PaymentRepository.GetPaymentList();
+        return PaymentList;
+    }
+    private bool Search(Payment payments)
+    {
+        if (StringValid(payments.PaymentMode)
+            && StringValid(payments.TotalAmount)
+            && StringValid(payments.ReceivedAmount)
+            && StringValid(payments.RemainingAmount)
+            && StringValid(payments.Transactionid)
+            && StringValid(payments.Description)
+            &&
+            payments.PaymentMode.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || payments.TotalAmount.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || payments.ReceivedAmount.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || payments.RemainingAmount.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || payments.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || payments.Transactionid.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
+    }
+    private bool StringValid(string strValue)
+    {
+        if (!string.IsNullOrEmpty(strValue))
+        {
+            return true;
+        }
+
+        return false;
+    }
+    private void Addpayment()
+    {
+        try
+        {
+            _PaymentRepository.Insert(PaymentModel);
+            Snackbar.Add(" record saved", Severity.Success);
+            PaymentModel = new Payment();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+    private void ShowAddForm()
+    {
+        PaymentModel = new Payment();
+        IsAdd = true;
+    }
+    private void Delete(long id)
+    {
+        try
+        {
+            _PaymentRepository.Delete(id);
+            Snackbar.Add("payment Detial Data Deleted.", Severity.Success);
+            GetAllPayment();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+    private void OpenDialog(Payment payments)
+    {
+
+        var parameters = new DialogParameters();
+        parameters.Add("paymentsModel", payments);
+        var options = new DialogOptions()
+        {
+            CloseOnEscapeKey = false,
+            CloseButton = true,
+            MaxWidth = MaxWidth.Large,
+            Position = DialogPosition.TopCenter,
+            DisableBackdropClick = true
+
+        };
+
+        DialogService.Show<AddPaymentDialog>("Edit Payment", parameters, options);
+
+    }
+}

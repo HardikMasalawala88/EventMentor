@@ -6,11 +6,13 @@
 @using System.Reflection
 @using EMS.DB.Repository
 @using EMS.DB.Constant
-@inject IEventRepository _eventService;
+@inject IEventRepository _EventRepository;
 @inject IEventCategoryRepository _EventCategoryRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
+@inject IPaymentRepository  _PaymentRepository;
 @inject ISnackbar Snackbar;
 @inject IDialogService DialogService
+@inject IPaymentRepository IPaymentRepository
 <h3>View Event:</h3>
 
 <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
@@ -60,14 +62,37 @@
                     <MudCard Elevation="10" Style="height: 100%" Class="pa-4 rounded-lg">
                         <MudCardHeader>
                             <CardHeaderContent>
-                                <MudText Typo="Typo.h4">Event payment:</MudText>
+                                <MudText Typo="Typo.h4">
+                                    Event payment:
+                                    @if (PaymentList is not null && PaymentList.Any())
+                                    {
+                                        @ValidCurrency(PaymentList.FirstOrDefault().TotalAmount)
+                                    }
+                                </MudText>
                             </CardHeaderContent>
                             <CardHeaderActions>
-                                <MudIconButton  Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
                             </CardHeaderActions>
                         </MudCardHeader>
                         <MudDivider />
                         <MudCardContent>
+                            <MudGrid >
+                                <MudItem md="2">Mode</MudItem>
+                                <MudItem md="2">Received AMount</MudItem>
+                                <MudItem md="2">Remaining AMount</MudItem>
+                                <MudItem md="2">TransactionId</MudItem>
+                                <MudItem md="4">Date</MudItem>
+                            </MudGrid>
+                            @foreach (var payment in PaymentList)
+                            {
+                        <MudGrid>
+                            <MudItem md="2">@payment.PaymentMode</MudItem>
+                            <MudItem md="2">@ValidCurrency(@payment.ReceivedAmount)</MudItem>
+                            <MudItem md="2">@ValidCurrency(@payment.RemainingAmount)</MudItem>
+                            <MudItem md="2">@payment.Transactionid</MudItem>
+                            <MudItem md="4">@payment.CreatedOn.ToLocalTime()</MudItem>
+                        </MudGrid>
+                            }
 
                         </MudCardContent>
                     </MudCard>
@@ -88,7 +113,7 @@
                 <MudCardContent>
                     <MudText>category :@EventCategoryName.CategoryName</MudText>
                     <MudText>Service :@EventModel.SelectedService</MudText>
-                   
+
 
                 </MudCardContent>
             </MudCard>
@@ -104,24 +129,27 @@
     private CategoryService CategoryServiceModel = new();
     private List<CategoryService> ServiceList = new();
     private List<EventCategory> EventCategoryList = new();
+    private List<Payment> PaymentList = new();
     private List<Event> eventList = new();
     private Event EventModel = new();
+    private Payment PaymentModel = new();
     private EventCategory EventCategoryName = new();
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            EventModel = _eventService.GetById(Convert.ToInt64(EventId));
+            EventModel = _EventRepository.GetById(Convert.ToInt64(EventId));
             EventCategoryName = _EventCategoryRepository.GetById(EventModel.CategoryId);
             GetEventCategoryList();
             GetAll();
             GetAllevents();
+            GetByEventId();
+            GetAllPaymentsByEventId(EventId);
             StateHasChanged();
         }
 
         return base.OnAfterRenderAsync(firstRender);
     }
-
     private List<CategoryService> GetAll()
     {
         ServiceList = _CategoryServiceRepository.GetList();
@@ -132,22 +160,25 @@
     {
         EventCategoryList = _EventCategoryRepository.GetList();
     }
+
     private List<Event> GetAllevents()
     {
-        eventList = _eventService.GetList();
+        eventList = _EventRepository.GetList();
         return eventList;
     }
-
     public List<CategoryService> GetCategoryServices()
     {
 
         return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
     }
+    public List<Payment> GetByEventId()
+    {
 
+        return PaymentList.Where(x => x.EventId == Convert.ToInt64(EventId)).ToList();
+    }
     public void OnEventCategoryChange(long selectedEventCategoryId)
     {
     }
-
     private void EditEventSelectService(Event events)
     {
         var parameters = new DialogParameters();
@@ -160,9 +191,8 @@
             Position = DialogPosition.TopCenter,
             //DisableBackdropClick = true
         };
-        DialogService.Show<AddEventService>("Add Service",parameters, options);
+        DialogService.Show<AddEventService>("Add Service", parameters, options);
     }
-
     private void EditEventDetails(Event events)
     {
         var parameters = new DialogParameters();
@@ -178,4 +208,11 @@
         DialogService.Show<EditEvent>("Update Event", parameters, options);
     }
 
+    List<Payment> GetAllPaymentsByEventId(string eventId)
+    {
+        PaymentList = _PaymentRepository.GetPaymentListByEventId(Convert.ToInt64(eventId));
+        return PaymentList;
+    }
+
+    string ValidCurrency(string value) => string.Format("₹ {0:#.00}", Convert.ToDecimal(value));
 }

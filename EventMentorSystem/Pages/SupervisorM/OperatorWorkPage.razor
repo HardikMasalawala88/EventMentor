@@ -8,7 +8,7 @@
 @using EMS.DB.Constant
 <h3>OperatorWorkPage</h3>
 
-@if (IsEdit || IsAdd)
+@if (IsAdd)
 {
     <MudCard Elevation="25">
         <MudCardHeader>
@@ -38,6 +38,38 @@
         </MudCardContent>
     </MudCard>
 }
+else if (IsEdit)
+{
+    <MudCard Elevation="25">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Operator Work</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudItem>
+                <MudTextField @bind-Value="OperatorWorkModel.EventId" Label="Event Id" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
+                <MudTextField @bind-Value="OperatorWorkModel.Service" Label="Service" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
+                <MudTextField @bind-Value="OperatorWorkModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
+                <MudSelect T="String" @bind-Value="@OperatorWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem Value="@(Status.Workpending.ToString())" />
+                    <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
+                    <MudSelectItem Value="Status.WorkFinish.ToString()" />
+                </MudSelect>
+            </MudItem>
+            <MudItem Class="d-flex justify-end">
+                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
+                    <FontLable FontWeight="500">Cancel</FontLable>
+                </MudButton>
+                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                    <FontLable FontWeight="500">Update</FontLable>
+                </MudButton>
+            </MudItem>
+        </MudCardContent>
+    </MudCard>
+}
+
+
 else
 {
 
@@ -47,6 +79,7 @@ else
         </MudButton>
     </MudItem>
 }
+
 
 <MudTable Elevation="25" Items="GetAllOperatorWork()" T="OperatorWork" Filter="new Func<OperatorWork, bool>(Search)" Class="w-100" @bind-customer="OperatorWorkList">
     <ToolBarContent>
@@ -63,7 +96,6 @@ else
         <MudTh>Slot</MudTh>
         <MudTh>Service</MudTh>
         <MudTh>Description</MudTh>
-        <MudTh>Status</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="">
@@ -76,8 +108,24 @@ else
         <MudTd DataLabel="Id">@context.Event.SlotType</MudTd>
         <MudTd DataLabel="Id">@context.Service</MudTd>
         <MudTd DataLabel="Id">@context.Description</MudTd>
-        <MudTd DataLabel="Id">@context.Status</MudTd>
 
+        @*@if (IsStatus)
+        {
+            <MudTd DataLabel="Id">
+                <MudSelect T="String" @bind-Value="@OperatorWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem Value="@(Status.Workpending.ToString())" />
+                    <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
+                    <MudSelectItem Value="Status.WorkFinish.ToString()" />
+                </MudSelect>
+                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                    <FontLable FontWeight="500">Add</FontLable>
+                </MudButton>
+            </MudTd>
+        }
+        else
+        {
+            <MudTd DataLabel="Id">@context.Status</MudTd>
+        }*@
     </RowTemplate>
     <PagerContent>
         <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
@@ -90,6 +138,7 @@ else
     private OperatorWork OperatorWorkModel = new();
     private bool IsEdit;
     private bool IsAdd;
+    private bool IsStatus;
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -122,7 +171,7 @@ else
                 Snackbar.Add(" record Update sucessfull", Severity.Success);
                 GetAllOperatorWork();
                 OperatorWorkModel = new OperatorWork();
-                IsAdd = false;
+                IsEdit = false;
             }
         }
         catch (Exception ex)

@@ -1,0 +1,59 @@
+﻿@using EMS.DB.Models
+@using  EMS.DB.Repository.Interface
+@inject IPaymentRepository _PaymentRepository;
+@inject ISnackbar Snackbar;
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="PaymentModel.PaymentMode" Label="PaymentMode" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="PaymentModel.TotalAmount" Label="TotalAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="PaymentModel.ReceivedAmount" Label="ReceivedAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="PaymentModel.RemainingAmount" Label="RemainingAmount " Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="PaymentModel.Transactionid" Label="Transactionid" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="PaymentModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="PaymentModel.EventId" Label="EventId" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="PaymentModel.UserId" Label="UserId" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Edit">
+            <FontLable FontWeight="500">Add</FontLable>
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Payment paymentsModel { get; set; } = new Payment();
+    private Payment PaymentModel = new();
+    private bool isReadOnly = false;
+    private List<Payment> PaymentList = new();
+
+    protected override void OnInitialized()
+    {
+        if (paymentsModel is not null && paymentsModel.Id > 0)
+        {
+            isReadOnly = true;
+        }
+        PaymentModel = paymentsModel;
+        base.OnInitialized();
+    }
+
+    private List<Payment> GetAllPayment()
+    {
+        PaymentList = _PaymentRepository.GetPaymentList();
+        return PaymentList;
+    }
+    private void Edit()
+    {
+        try
+        {
+            _PaymentRepository.Update(PaymentModel);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+    void Cancel() => MudDialog.Cancel();
+}

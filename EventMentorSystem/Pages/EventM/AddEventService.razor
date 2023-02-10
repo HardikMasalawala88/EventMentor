@@ -11,13 +11,13 @@
             <MudSelectItem Value="@eventModel.CategoryId">@eventModel.Category.CategoryName</MudSelectItem>
         </MudSelect>
         @*@bind-Value="@(e => SetSelectedServices(e))" @bind-SelectedValues="@GetSelectedServices()"  SelectedValuesChanged="@(e => OnSetSelectedServices((IEnumerable<long>)e))"*@
-        <!--<MudSelect SelectedValues="@GetSelectedServices()"  SelectedValuesChanged="@OnSetSelectedServices"
+        @*<MudSelect SelectedValues="@GetSelectedServices()"  SelectedValuesChanged="@OnSetSelectedServices"
                    MultiSelection="true" Label="select Services" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
             @foreach (var Service in GetCategoryServices())
             {
                 <MudSelectItem T="long" Value="@Service.Id">@Service.ServiceName</MudSelectItem>
             }
-        </MudSelect>-->
+        </MudSelect>*@
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">Cancel</MudButton>
@@ -81,7 +81,6 @@
     {
         try
         {
-
             _eventService.Update(eventModel);
             eventModel = new Event();
             MudDialog.Close();

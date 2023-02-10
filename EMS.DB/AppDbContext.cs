@@ -20,5 +20,6 @@ namespace EMS.DB
         public DbSet<User> Users { get; set; }
         public DbSet<OperatorWork> OperatorWorks { get; set; }
         public DbSet<StaffWork> StaffWorks { get; set; }
+        public DbSet<Payment> Payments { get; set; }
     }
 }

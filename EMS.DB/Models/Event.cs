@@ -40,5 +40,7 @@ namespace EMS.DB.Models
 
         public virtual List<OperatorWork> OperatorWork { get; set; }
 
+        public virtual Payment Payment { get; set; }
+
     }
 }
