@@ -1,0 +1,75 @@
+﻿@using EMS.DB.Models
+@using EMS.DB.Constant
+@using  EMS.DB.Repository.Interface
+@inject IOperatorWorkRepository _OperatorWorkRepository;
+@inject ISnackbar Snackbar;
+
+
+<MudDialog>
+    <DialogContent>
+        @if (operatorWorkModel.Status == "Workpending")
+        {
+            <MudTimeline Class="mb-3" TimelineOrientation=" TimelineOrientation.Horizontal">
+                <MudTimelineItem Color="Color.Error" Variant="Variant.Filled">
+                    <ItemContent>
+                        <MudAlert Class="mt-1" Severity="Severity.Error">@operatorWorkModel.Status</MudAlert>
+                    </ItemContent>
+                </MudTimelineItem>
+
+                <MudTimelineItem Color="Color.Warning" Variant="Variant.Filled">
+
+                </MudTimelineItem>
+                <MudTimelineItem Color="Color.Success" Variant="Variant.Filled">
+
+                </MudTimelineItem>
+            </MudTimeline>
+        }
+        else if (operatorWorkModel.Status == "WorkOnProcess")
+        {
+            <MudTimeline Class="mb-3" TimelineOrientation=" TimelineOrientation.Horizontal">
+                <MudTimelineItem Color="Color.Error" Variant="Variant.Filled">
+                </MudTimelineItem>
+                <MudTimelineItem Color="Color.Warning" Variant="Variant.Filled" Class="mb-1">
+                    <ItemContent>
+                        <MudAlert Class="mt-1" Severity="Severity.Warning">@operatorWorkModel.Status</MudAlert>
+                    </ItemContent>
+                </MudTimelineItem>
+                <MudTimelineItem Color="Color.Success" Variant="Variant.Filled">
+                </MudTimelineItem>
+            </MudTimeline>
+
+        }
+        else
+        {
+            <MudTimeline Class="mb-3" TimelineOrientation=" TimelineOrientation.Horizontal">
+                <MudTimelineItem Color="Color.Error" Variant="Variant.Filled">
+
+                </MudTimelineItem>
+                <MudTimelineItem Color="Color.Warning" Variant="Variant.Filled">
+
+                </MudTimelineItem>
+                <MudTimelineItem Color="Color.Success" Variant="Variant.Filled" Class="mb-1">
+                    <ItemContent>
+                        <MudAlert Severity="Severity.Success">@operatorWorkModel.Status</MudAlert>
+                    </ItemContent>
+                </MudTimelineItem>
+            </MudTimeline>
+        }
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public OperatorWork OperatorWorkModel { get; set; } = new OperatorWork();
+    private OperatorWork operatorWorkModel = new();
+    protected override void OnInitialized()
+    {
+        operatorWorkModel = OperatorWorkModel;
+        base.OnInitialized();
+    }
+    private void CancelForm()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+        operatorWorkModel = new OperatorWork();
+    }
+}

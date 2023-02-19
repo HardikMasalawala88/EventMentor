@@ -1,0 +1,87 @@
+﻿@using EMS.DB.Models
+@using EMS.DB.Constant
+@using  EMS.DB.Repository.Interface
+@inject IOperatorWorkRepository _OperatorWorkRepository;
+@inject ISnackbar Snackbar;
+
+
+<MudDialog>
+    <DialogContent>
+        <MudGrid>
+            <MudItem lg="8" md="8" xs="12">
+                <MudSelect Margin="Margin.Dense" T="String" @bind-Value="@operatorWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem Value="@(Status.Workpending.ToString())" />
+                    <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
+                    <MudSelectItem Value="Status.WorkFinish.ToString()" />
+                </MudSelect>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudButton Color="Color.Primary" OnClick="update" Variant="Variant.Filled">Change</MudButton>
+            </MudItem>
+            <MudTimeline>
+                <MudTimelineItem Color="Color.Error" Elevation="25">
+                    <ItemContent>
+                        <MudPaper Elevation="0" Class="mt-n1">
+                            @if (operatorWorkModel.Status == "Workpending")
+                            {
+                                <MudAlert Severity="Severity.Error">@operatorWorkModel.Status</MudAlert>
+                            }
+                        </MudPaper>
+                    </ItemContent>
+                </MudTimelineItem>
+                <MudTimelineItem Color="Color.Warning" Elevation="25" TimelineAlign="TimelineAlign.End">
+                    
+                    <ItemContent>
+                        <MudPaper Elevation="0" Class="mt-n1">
+                            @if (operatorWorkModel.Status == "WorkOnProcess")
+                            {
+                                <MudAlert Severity="Severity.Warning">@operatorWorkModel.Status</MudAlert>
+                            }
+                        </MudPaper>
+                    </ItemContent>
+                </MudTimelineItem>
+                <MudTimelineItem Color="Color.Success" Elevation="25">
+                    <ItemContent>
+                        <MudPaper Elevation="0" Class="mt-n1">
+                            @if (operatorWorkModel.Status == "WorkFinish")
+                            {
+                                <MudAlert Severity="Severity.Success">@operatorWorkModel.Status</MudAlert>
+                            }
+                        </MudPaper>
+                    </ItemContent>
+                </MudTimelineItem>
+            </MudTimeline>
+        </MudGrid>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public OperatorWork OperatorWorkModel { get; set; } = new OperatorWork();
+    private OperatorWork operatorWorkModel = new();
+    protected override void OnInitialized()
+    {
+        operatorWorkModel = OperatorWorkModel;
+        base.OnInitialized();
+    }
+
+    private void update()
+    {
+        try
+        {
+            _OperatorWorkRepository.Update(OperatorWorkModel);
+            Snackbar.Add("Event work Status Change", Severity.Success);
+            OperatorWorkModel = new OperatorWork();
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+    private void CancelForm()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+        operatorWorkModel = new OperatorWork();
+    }
+}

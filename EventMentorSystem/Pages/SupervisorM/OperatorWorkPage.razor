@@ -5,6 +5,7 @@
 @using System.ComponentModel.DataAnnotations
 @inject IOperatorWorkRepository _OperatorWorkRepository;
 @inject ISnackbar Snackbar;
+@inject IDialogService DialogService
 @using EMS.DB.Constant
 <h3>OperatorWorkPage</h3>
 
@@ -21,11 +22,11 @@
                 <MudTextField @bind-Value="OperatorWorkModel.EventId" Label="Event Id" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
                 <MudTextField @bind-Value="OperatorWorkModel.Service" Label="Service" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
                 <MudTextField @bind-Value="OperatorWorkModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudSelect T="String" @bind-Value="@OperatorWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    <MudSelectItem Value="@(Status.Workpending.ToString())" />
-                    <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
-                    <MudSelectItem Value="Status.WorkFinish.ToString()" />
-                </MudSelect>
+                @*<MudSelect T="String" @bind-Value="@OperatorWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value="@(Status.Workpending.ToString())" />
+                        <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
+                        <MudSelectItem Value="Status.WorkFinish.ToString()" />
+                    </MudSelect>*@
             </MudItem>
             <MudItem Class="d-flex justify-end">
                 <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
@@ -51,11 +52,11 @@ else if (IsEdit)
                 <MudTextField @bind-Value="OperatorWorkModel.EventId" Label="Event Id" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
                 <MudTextField @bind-Value="OperatorWorkModel.Service" Label="Service" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
                 <MudTextField @bind-Value="OperatorWorkModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
-                <MudSelect T="String" @bind-Value="@OperatorWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    <MudSelectItem Value="@(Status.Workpending.ToString())" />
-                    <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
-                    <MudSelectItem Value="Status.WorkFinish.ToString()" />
-                </MudSelect>
+                @*<MudSelect T="String" @bind-Value="@OperatorWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value="@(Status.Workpending.ToString())" />
+                        <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
+                        <MudSelectItem Value="Status.WorkFinish.ToString()" />
+                    </MudSelect>*@
             </MudItem>
             <MudItem Class="d-flex justify-end">
                 <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
@@ -68,8 +69,6 @@ else if (IsEdit)
         </MudCardContent>
     </MudCard>
 }
-
-
 else
 {
 
@@ -89,43 +88,28 @@ else
     </ToolBarContent>
     <HeaderContent>
         <MudTh>Action</MudTh>
-        <MudTh>Id</MudTh>
         <MudTh>Event Name</MudTh>
         <MudTh>Event Venue</MudTh>
         <MudTh>From Date</MudTh>
         <MudTh>Slot</MudTh>
         <MudTh>Service</MudTh>
         <MudTh>Description</MudTh>
+        <MudTh>Status</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="">
             <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
         </MudTd>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Id">@context.Event.EventName</MudTd>
         <MudTd DataLabel="Id">@context.Event.EventVenue</MudTd>
         <MudTd DataLabel="Id">@context.Event.FromDate</MudTd>
         <MudTd DataLabel="Id">@context.Event.SlotType</MudTd>
         <MudTd DataLabel="Id">@context.Service</MudTd>
         <MudTd DataLabel="Id">@context.Description</MudTd>
+        <MudTd DataLabel="Id">
+            <MudButton @onclick="@(() => viewstatus(context))" Variant="Variant.Text">@context.Status </MudButton>
+        </MudTd>
 
-        @*@if (IsStatus)
-        {
-            <MudTd DataLabel="Id">
-                <MudSelect T="String" @bind-Value="@OperatorWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    <MudSelectItem Value="@(Status.Workpending.ToString())" />
-                    <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
-                    <MudSelectItem Value="Status.WorkFinish.ToString()" />
-                </MudSelect>
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
-                    <FontLable FontWeight="500">Add</FontLable>
-                </MudButton>
-            </MudTd>
-        }
-        else
-        {
-            <MudTd DataLabel="Id">@context.Status</MudTd>
-        }*@
     </RowTemplate>
     <PagerContent>
         <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
@@ -235,5 +219,23 @@ else
         {
             Snackbar.Add(ex.Message, Severity.Error);
         }
+    }
+    private void viewstatus(OperatorWork operatorWork)
+    {
+
+        var parameters = new DialogParameters();
+        parameters.Add("OperatorWorkModel", operatorWork);
+        var options = new DialogOptions()
+        {
+            CloseOnEscapeKey = false,
+            CloseButton = true,
+            MaxWidth = MaxWidth.Large,
+            Position = DialogPosition.TopCenter,
+            DisableBackdropClick = true
+
+        };
+
+        DialogService.Show<ViewStatus>("view Status", parameters, options);
+
     }
 }

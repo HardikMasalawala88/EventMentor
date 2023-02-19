@@ -5,6 +5,7 @@
 @using System.ComponentModel.DataAnnotations
 @inject IOperatorWorkRepository _OperatorWorkRepository;
 @inject ISnackbar Snackbar;
+@inject IDialogService DialogService;
 @using EMS.DB.Constant
 <h3>Work List</h3>
 
@@ -53,9 +54,16 @@
         <MudTh>Status</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+
+        <MudTd>
+            <MudFab @onclick="@(() => OpenDialog(context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small">
+                edit
+            </MudFab>
         </MudTd>
+        @*<MudTd >
+            <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />*
+            </MudTd>*@
+
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Id">@context.Event.EventName</MudTd>
         <MudTd DataLabel="Id">@context.Event.EventVenue</MudTd>
@@ -70,92 +78,107 @@
     </PagerContent>
 </MudTable>
 
-@code{ 
-    private string searchString = "";
-    private List<OperatorWork> OperatorWorkList = new();
-    private OperatorWork OperatorWorkModel = new();
-    private bool IsEdit;
-    private bool IsAdd;
-    private bool IsStatus;
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            GetAllOperatorWork();
-        }
+@code{ private string searchString = "";
+            private List<OperatorWork> OperatorWorkList = new();
+            private OperatorWork OperatorWorkModel = new();
+            private bool IsEdit;
+            private bool IsAdd;
+            private bool IsStatus;
+            protected override Task OnAfterRenderAsync(bool firstRender)
+            {
+                if (firstRender)
+                {
+                    GetAllOperatorWork();
+                }
 
-        return base.OnAfterRenderAsync(firstRender);
-    }
-    private List<OperatorWork> GetAllOperatorWork()
-    {
-        OperatorWorkList = _OperatorWorkRepository.GetOperatorWorkList();
-        return OperatorWorkList;
-    }
-    private void Save()
-    {
-        try
-        {
-                _OperatorWorkRepository.Update(OperatorWorkModel);
-                Snackbar.Add(" record Update sucessfull", Severity.Success);
-                GetAllOperatorWork();
-                OperatorWorkModel = new OperatorWork();
-                IsEdit = false;
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-    }
+                return base.OnAfterRenderAsync(firstRender);
+            }
+            private List<OperatorWork> GetAllOperatorWork()
+            {
+                OperatorWorkList = _OperatorWorkRepository.GetOperatorWorkList();
+                return OperatorWorkList;
+            }
+            private void Save()
+            {
+                try
+                {
+                    _OperatorWorkRepository.Update(OperatorWorkModel);
+                    Snackbar.Add(" record Update sucessfull", Severity.Success);
+                    GetAllOperatorWork();
+                    OperatorWorkModel = new OperatorWork();
+                    IsEdit = false;
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add(ex.Message, Severity.Error);
+                }
+            }
 
-    private bool Search(OperatorWork OperatorWorks)
-    {
-        if (StringValid(OperatorWorks.Service)
-            && StringValid(OperatorWorks.Description)
-            && StringValid(OperatorWorks.Status)
-            &&
-            OperatorWorks.Service.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-            || OperatorWorks.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-            || OperatorWorks.Status.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
+            private bool Search(OperatorWork OperatorWorks)
+            {
+                if (StringValid(OperatorWorks.Service)
+                    && StringValid(OperatorWorks.Description)
+                    && StringValid(OperatorWorks.Status)
+                    &&
+                    OperatorWorks.Service.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+                    || OperatorWorks.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+                    || OperatorWorks.Status.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
 
-        return false;
-    }
-    private bool StringValid(string strValue)
-    {
-        if (!string.IsNullOrEmpty(strValue))
-        {
-            return true;
-        }
+                return false;
+            }
+            private bool StringValid(string strValue)
+            {
+                if (!string.IsNullOrEmpty(strValue))
+                {
+                    return true;
+                }
 
-        return false;
-    }
-    private void CancelForm()
-    {
-        try
-        {
-            IsEdit = false;
-            IsAdd = false;
-            OperatorWorkModel = new OperatorWork();
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-    }
-    private void Edit(long id)
-    {
+                return false;
+            }
+            private void CancelForm()
+            {
+                try
+                {
+                    IsEdit = false;
+                    IsAdd = false;
+                    OperatorWorkModel = new OperatorWork();
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add(ex.Message, Severity.Error);
+                }
+            }
+            private void Edit(long id)
+            {
 
-        try
-        {
+                try
+                {
+                    OperatorWorkModel = OperatorWorkList.FirstOrDefault(c => c.Id == id);
+                    IsEdit = true;
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add(ex.Message, Severity.Error);
+                }
+            }
+            private void OpenDialog(OperatorWork operatorWork)
+            {
 
-            OperatorWorkModel = OperatorWorkList.FirstOrDefault(c => c.Id == id);
-            IsEdit = true;
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-    }
-}
+                var parameters = new DialogParameters();
+                parameters.Add("OperatorWorkModel", operatorWork);
+                var options = new DialogOptions()
+                {
+                    CloseOnEscapeKey = false,
+                    CloseButton = true,
+                    MaxWidth = MaxWidth.Large,
+                    Position = DialogPosition.TopCenter,
+                    DisableBackdropClick = true
+
+                };
+
+                DialogService.Show<StaffWorkProcess>("Work Status", parameters, options);
+
+            } }
