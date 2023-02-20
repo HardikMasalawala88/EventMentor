@@ -9,11 +9,6 @@ namespace EMS.DB.Models
     public class CategoryService : BaseEntity
     {
         public String ServiceName{ get; set; }
-
-        public long EventCategoryId { get; set; }
-
-        public EventCategory EventCategory { get; set; }
-
         public virtual List<Inquiry> Inquiry { get; set; }
     }
 }

@@ -7,16 +7,24 @@
 
 <MudDialog>
     <DialogContent>
-        <MudSelect @bind-Value="eventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
-            <MudSelectItem Value="@eventModel.CategoryId">@eventModel.Category.CategoryName</MudSelectItem>
-        </MudSelect>
-        @*@bind-Value="@(e => SetSelectedServices(e))" @bind-SelectedValues="@GetSelectedServices()"  SelectedValuesChanged="@(e => OnSetSelectedServices((IEnumerable<long>)e))"*@
-        <MudSelect  Value="@GetSelectedServices()" MultiSelection="true" Label="select Services" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-            @foreach (var Service in GetCategoryServices())
-            {
-                <MudSelectItem T="long" Value="@Service.Id">@Service.ServiceName</MudSelectItem>
-            }
-        </MudSelect>
+        <MudGrid>
+            <MudItem>
+                <MudSelect @bind-Value="eventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+                    <MudSelectItem Value="@eventModel.CategoryId">@eventModel.Category.CategoryName</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem>
+                <MudSelect T="string"  @bind-Value="@eventModel.SelectedService" MultiSelection="true" Label="select Services" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var Service in GetAllService())
+                    {
+                        <MudSelectItem T="string" Value="@Service.Id.ToString()">@Service.ServiceName</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+           
+           
+           
+        </MudGrid>
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">Cancel</MudButton>
@@ -25,7 +33,7 @@
 </MudDialog>
 
 @code {
-    private String demo { get; set; }
+   
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Event EventModel { get; set; } = new Event();
     private Event eventModel = new();
@@ -34,7 +42,6 @@
     private CategoryService CategoryServiceModel = new();
     private List<CategoryService> ServiceList = new();
     private List<EventCategory> EventCategoryList = new();
-    private List<String> options { get; set; } = new List<string>();
     protected override void OnInitialized()
     {
         if (EventModel is not null && EventModel.Id > 0)
@@ -50,7 +57,7 @@
         {
             EventCategoryName = _EventCategoryRepository.GetById(EventModel.CategoryId);
             GetEventCategoryList();
-            GetCategoryServices();
+            //GetCategoryServices();
             GetAllService();
             StateHasChanged();
         }
@@ -60,12 +67,6 @@
     public void OnEventCategoryChange(long selectedEventCategoryId)
     {
     }
-    public List<CategoryService> GetCategoryServices()
-    {
-
-        return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
-    }
-
     private void GetEventCategoryList()
     {
         EventCategoryList = _EventCategoryRepository.GetList();
@@ -83,17 +84,21 @@
             _eventService.Update(eventModel);
             eventModel = new Event();
             MudDialog.Close();
+            Snackbar.Add("add service successfully.", Severity.Success);
+
         }
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);
         }
     }
-    private IEnumerable<long> GetSelectedServices()
-    {
-        return eventModel.SelectedService.Split(',').Select(x => Convert.ToInt64(x));
 
+    private string GetSelectedServices()
+    {
+        return eventModel.SelectedService;
+        //return eventModel.SelectedService.Split(',').Where(x    => string.IsNullOrEmpty(x)).ToList();
     }
+
     //IEnumerable<long>
     private IEnumerable<long> OnSetSelectedServices(IEnumerable<long> values)
     {

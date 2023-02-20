@@ -18,18 +18,15 @@
     </MudCardHeader>
     <MudCardContent>
         <MudItem>
-            <MudSelect @bind-Value="ServiceModel.EventCategoryId" Label="select categorys" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+            @*<MudSelect @bind-Value="ServiceModel.EventCategoryId" Label="select categorys" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
 
                 @foreach (var eventCategory in EventCategoryList)
                 {
                     <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
 
                 }
-            </MudSelect>
-            @if (ServiceModel.EventCategoryId > 0)
-            {
-                <MudTextField @bind-Value="ServiceModel.ServiceName" Label="Service Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-            }
+            </MudSelect>*@
+                <MudTextField @bind-Value="ServiceModel.ServiceName" Label="Service Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
         </MudItem>
 
         <MudItem Class="d-flex justify-end">
@@ -48,15 +45,11 @@
     <HeaderContent>
         <MudTh>Id</MudTh>
         <MudTh>Service Name</MudTh>
-        <MudTh>Category Id</MudTh>
         <MudTh>Action</MudTh>
-
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Service Name">@context.ServiceName</MudTd>
-        <MudTd DataLabel="Category Id">@context.EventCategoryId</MudTd>
-
         <MudTd DataLabel="">
             <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
             <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />

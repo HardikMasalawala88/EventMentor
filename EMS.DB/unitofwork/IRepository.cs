@@ -9,6 +9,7 @@ namespace EMS.DB.unitofwork
     {
         List<T> GetAll();
         T GetById(long id);
+      
         //params Expression<Func<T, object>>[] includes
         void Insert(T entity);
         void Update(T entity);

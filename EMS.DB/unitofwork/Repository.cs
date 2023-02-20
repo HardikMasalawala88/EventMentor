@@ -33,7 +33,6 @@ namespace EMS.DB.unitofwork
         {
             return entities.FirstOrDefault(x => x.Id == id);
         }
-
         public void Insert(T entity)
         {
             entity.CreatedOn = DateTime.Now;
@@ -69,5 +68,6 @@ namespace EMS.DB.unitofwork
             _applicationDbContext.SaveChanges();
         }
 
+       
     }
 }

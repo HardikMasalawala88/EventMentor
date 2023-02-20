@@ -40,12 +40,11 @@ namespace EMS.DB.Repository
         {
             return _repository.GetById(id);
         }
-     
+       
         public List<Payment> GetPaymentList()
         {
             return _appDbContext.Payments
-                    .Include(x => x.Event).ToList();
-
+                    .Include(x => x.Event).ToList();          
         }
         //_repository.GetAll();
 
@@ -53,7 +52,6 @@ namespace EMS.DB.Repository
         { 
         return   _appDbContext.Payments
                 .Include(x => x.Event).Where(x => x.EventId == eventId).ToList();
-
         } 
         public void Insert(Payment PaymentModel)
         {
@@ -62,9 +60,10 @@ namespace EMS.DB.Repository
             else _repository.Update(PaymentModel);
         }
 
-       
-
-
+        public Payment GetByEventId(long eventId)
+        {
+            return _appDbContext.Payments.FirstOrDefault(x => x.EventId == eventId);
+        }
         #endregion
 
 

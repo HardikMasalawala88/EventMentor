@@ -90,11 +90,11 @@
     {
         EventCategoryList = _EventCategoryRepository.GetList();
     }
-    public List<CategoryService> GetCategoryServices()
-    {
+    //public List<CategoryService> GetCategoryServices()
+    //{
 
-        return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
-    }
+    //    return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
+    //}
     public void OnEventCategoryChange(long selectedEventCategoryId)
     {
     }
@@ -111,7 +111,7 @@
             eventModel.EventVenue = string.Concat(inquiryModel.AddressLine1 + "," + inquiryModel.AddressLine2 + "," + inquiryModel.Landmark + "," + inquiryModel.City + "," + inquiryModel.State + ".");
             eventModel.InquiryId = inquiryModel.Id;
             GetEventCategoryList();
-            GetCategoryServices();
+            //GetCategoryServices();
             StateHasChanged();
 
         }

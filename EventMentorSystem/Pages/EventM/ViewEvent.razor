@@ -24,19 +24,19 @@
                         <MudText Typo="Typo.h4">Event Details</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
-                        <MudIconButton OnClick="@(() => EditEventDetails(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> EditEventDetails(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
                     </CardHeaderActions>
                 </MudCardHeader>
                 <MudDivider />
                 <MudCardContent>
                     <MudText>Event Name : @EventModel.EventName </MudText>
-                    <MudText>Organizor Name:@EventModel.OrganizerName</MudText>
-                    <MudText>Organizor Contact:@EventModel.OrganizerContact</MudText>
-                    <MudText>Event Description:@EventModel.Description</MudText>
-                    <MudText>Event Timeing:@EventModel.SlotType</MudText>
-                    <MudText>Event FromDate:@EventModel.FromDate</MudText>
-                    <MudText>Event ToDate:@EventModel.Todate</MudText>
-                    <MudText>Event Venue:@EventModel.EventVenue</MudText>
+                    <MudText>Organizor Name : @EventModel.OrganizerName</MudText>
+                    <MudText>Organizor Contact : @EventModel.OrganizerContact</MudText>
+                    <MudText>Event Description : @EventModel.Description</MudText>
+                    <MudText>Event Timeing : @EventModel.SlotType</MudText>
+                    <MudText>Event FromDate : @EventModel.FromDate</MudText>
+                    <MudText>Event ToDate : @EventModel.Todate</MudText>
+                    <MudText>Event Venue : @EventModel.EventVenue</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -49,7 +49,7 @@
                                 <MudText Typo="Typo.h4">Event Staff:</MudText>
                             </CardHeaderContent>
                             <CardHeaderActions>
-                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                                @*<MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>*@
                             </CardHeaderActions>
                         </MudCardHeader>
                         <MudDivider />
@@ -71,7 +71,7 @@
                                 </MudText>
                             </CardHeaderContent>
                             <CardHeaderActions>
-                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                                <MudIconButton  @onclick="@(() => OpenDialog(PaymentModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
                             </CardHeaderActions>
                         </MudCardHeader>
                         <MudDivider />
@@ -112,9 +112,9 @@
                 <MudDivider />
                 <MudCardContent>
                     <MudText>category :@EventCategoryName.CategoryName</MudText>
-                    <MudText>Service :@EventModel.SelectedService</MudText>
-
-
+                    <MudText>
+                        Service:@EventModel.SelectedService
+                    </MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -128,17 +128,20 @@
     public string EventId { get; set; }
     private CategoryService CategoryServiceModel = new();
     private List<CategoryService> ServiceList = new();
+    private List<CategoryService> eventservicelist = new();
     private List<EventCategory> EventCategoryList = new();
     private List<Payment> PaymentList = new();
     private List<Event> eventList = new();
     private Event EventModel = new();
     private Payment PaymentModel = new();
     private EventCategory EventCategoryName = new();
+
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             EventModel = _EventRepository.GetById(Convert.ToInt64(EventId));
+            PaymentModel = _PaymentRepository.GetByEventId(Convert.ToInt64(EventId));
             EventCategoryName = _EventCategoryRepository.GetById(EventModel.CategoryId);
             GetEventCategoryList();
             GetAll();
@@ -164,18 +167,16 @@
     private List<Event> GetAllevents()
     {
         eventList = _EventRepository.GetList();
+        StateHasChanged();
         return eventList;
     }
-    public List<CategoryService> GetCategoryServices()
-    {
 
-        return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
-    }
     public List<Payment> GetByEventId()
     {
 
         return PaymentList.Where(x => x.EventId == Convert.ToInt64(EventId)).ToList();
     }
+
     public void OnEventCategoryChange(long selectedEventCategoryId)
     {
     }
@@ -189,7 +190,7 @@
             CloseButton = true,
             MaxWidth = MaxWidth.Medium,
             Position = DialogPosition.TopCenter,
-            //DisableBackdropClick = true
+            DisableBackdropClick = true
         };
         DialogService.Show<AddEventService>("Add Service", parameters, options);
     }
@@ -214,5 +215,30 @@
         return PaymentList;
     }
 
+
     string ValidCurrency(string value) => string.Format("₹ {0:#.00}", Convert.ToDecimal(value));
+
+    //public List<CategoryService> GetCategoryServices()
+    //{
+    //    return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
+    //}
+
+    private void OpenDialog(Payment payments)
+    {
+
+        var parameters = new DialogParameters();
+        parameters.Add("PaymentModel", payments);
+        var options = new DialogOptions()
+        {
+            CloseOnEscapeKey = false,
+            CloseButton = true,
+            MaxWidth = MaxWidth.Large,
+            Position = DialogPosition.TopCenter,
+            DisableBackdropClick = true
+
+        };
+
+        DialogService.Show<EditPaymentDialog>("Edit Payment", parameters, options);
+
+    }
 }

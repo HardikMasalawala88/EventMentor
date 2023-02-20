@@ -15,5 +15,7 @@ namespace EMS.DB.Repository.Interface
         public void Delete(long id);
         public Payment GetById(long id);
         public List<Payment> GetPaymentListByEventId(long eventId);
+        public Payment GetByEventId(long eventId);
+      
     }
 }
