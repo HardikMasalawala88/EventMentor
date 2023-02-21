@@ -54,7 +54,6 @@ namespace EMS.DB.unitofwork
 
         public void Remove(T entity)
         {
-
             entities.Remove(entity);
         }
 

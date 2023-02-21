@@ -10,6 +10,7 @@ namespace  EMS.DB.Repository.Interface
     public interface ICategoryServiceRepository
     {
         public List<CategoryService> GetList();
+        public CategoryService GetById(long id);
         public void Insert(CategoryService categoryService);
         public void Update(CategoryService categoryService);
         public void Delete(long id);

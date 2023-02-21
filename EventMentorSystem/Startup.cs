@@ -3,6 +3,7 @@ using EMS.DB.Repository;
 using EMS.DB.Repository.Interface;
 using EMS.DB.unitofwork;
 using EventMentorSystem.Data;
+using EventMentorSystem.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,7 @@ namespace EventMentorSystem
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddMudServices();
+            services.AddSignalRCore();
             //services.AddSingleton<WeatherForecastService>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
@@ -41,6 +43,7 @@ namespace EventMentorSystem
             services.AddScoped<IStaffWorkRepository, StaffWorkRepository>(); 
             services.AddScoped<IOperatorWorkRepository, OperatorWorkRepository>(); 
             services.AddScoped<IPaymentRepository, PaymentRepository>(); 
+            services.AddScoped<IStaffRepository, StaffRepository>(); 
             #endregion
 
             #region Connection String
@@ -71,6 +74,7 @@ namespace EventMentorSystem
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapHub<ChatHub>("/chatHub");
             });
         }
     }

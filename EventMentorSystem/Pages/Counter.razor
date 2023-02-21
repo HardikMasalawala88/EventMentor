@@ -1,1 +1,52 @@
-﻿
+﻿@page "/demo"
+@using Microsoft.AspNetCore.SignalR.Client
+@using EventMentorSystem.Data
+@inject NavigationManager navigationmanager
+<div id="noti_Container">
+    <div class='ikrNoti_Counter'>@currentuserMlist.Count()</div>
+    <div class='ikrNoti_Button' style="background: #2E467C;" @onclick="NotificationHideShow"></div>
+
+    </div>
+
+
+    @code{
+        private List<NotificationMessage> noti = new List<NotificationMessage>();
+        private List<NotificationMessage> currentuserMlist = new List<NotificationMessage>();
+        private NotificationMessage notificationMessage = new NotificationMessage();
+        private HubConnection hubConnection;
+        private string BoxCss = "none";
+        protected override async Task OnInitializedAsync()
+        {
+            hubConnection = new HubConnectionBuilder().WithUrl(navigationmanager.ToAbsoluteUri("/chatHub")).Build();
+            hubConnection.On<string, string, string, string>("ReceiveMessage", (Sender, Receiver, MsgTitle, MsgBody) =>
+            {
+                noti.Add(new NotificationMessage()
+                {
+                    MsgId = noti.Count() + 1,
+                    SenderName = Sender,
+                    ReceiverName = Receiver,
+                    MsgTitle = MsgTitle,
+                    MsgBody = MsgBody
+                });
+                currentuserMlist = noti.Where(x => x.SenderName != notificationMessage.SenderName).ToList();
+                StateHasChanged();
+            });
+            await hubConnection.StartAsync();
+        }
+        private async Task Send()
+        {
+            await hubConnection.SendAsync("sendMessage", notificationMessage.SenderName,
+                notificationMessage.ReceiverName,
+                notificationMessage.MsgTitle,
+                notificationMessage.MsgBody
+                );
+            notificationMessage.MsgTitle = "";
+            notificationMessage.MsgBody = "";
+        }
+        public bool IsConnected => hubConnection.State == HubConnectionState.Connected;
+        private void NotificationHideShow()
+        {
+            if (BoxCss == "none") BoxCss = "block";
+            else BoxCss = "none";
+        }
+    }

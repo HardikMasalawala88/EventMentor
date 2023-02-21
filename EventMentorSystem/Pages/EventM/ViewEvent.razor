@@ -113,8 +113,13 @@
                 <MudCardContent>
                     <MudText>category :@EventCategoryName.CategoryName</MudText>
                     <MudText>
-                        Service:@EventModel.SelectedService
+                        Service :
+                        @foreach (var servic in selectedServiceList)
+                        {
+                            <MudChip>@servic</MudChip>
+                        }
                     </MudText>
+                   
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -135,6 +140,7 @@
     private Event EventModel = new();
     private Payment PaymentModel = new();
     private EventCategory EventCategoryName = new();
+    List<String> selectedServiceList = new List<String>();
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -143,6 +149,7 @@
             EventModel = _EventRepository.GetById(Convert.ToInt64(EventId));
             PaymentModel = _PaymentRepository.GetByEventId(Convert.ToInt64(EventId));
             EventCategoryName = _EventCategoryRepository.GetById(EventModel.CategoryId);
+            selectedServiceList = EventModel.SelectedService.Split(',').ToList();
             GetEventCategoryList();
             GetAll();
             GetAllevents();
@@ -218,10 +225,10 @@
 
     string ValidCurrency(string value) => string.Format("₹ {0:#.00}", Convert.ToDecimal(value));
 
-    //public List<CategoryService> GetCategoryServices()
-    //{
-    //    return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
-    //}
+    ////public List<CategoryService> GetCategoryServices()
+    ////{
+    ////    return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
+    ////}
 
     private void OpenDialog(Payment payments)
     {

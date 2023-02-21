@@ -34,17 +34,26 @@ namespace EMS.DB.Repository
         {
             _repository.Update(userModel);
         }
-
         public List<User> GetUserList() => _repository.GetAll();
+       
 
+        
         public void Insert(User userModel)
         {
             if (userModel.Id is 0)
+            {
                 _repository.Insert(userModel);
+            }
+            else {
+                _repository.Update(userModel);
+            }
+
+        }
+        public List<User> GetStaffList()
+        {
+            _appDbContext.Users.Include(x => x.Staff).ToList();
+            return _appDbContext.Users.Where(x=>x.Userrole =="staff").ToList();
         }
         #endregion
-
-
-
     }
 }

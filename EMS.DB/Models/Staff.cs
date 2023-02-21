@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace EMS.DB.Models
 {
-    public class EventCategory : BaseEntity
+    public class Staff : BaseEntity
     {
-        public String CategoryName { get; set; }
-
-        public virtual List<Inquiry> InquiryList { get; set; }
+        [Required]
+        public long StaffService { get; set; }
+        public long UserId { get; set; }
+        public User User { get; set; }
     }
 }

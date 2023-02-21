@@ -32,9 +32,6 @@ namespace EMS.DB.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("EventCategoryId")
-                        .HasColumnType("bigint");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -51,8 +48,6 @@ namespace EMS.DB.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EventCategoryId");
 
                     b.ToTable("CategoryServices");
                 });
@@ -374,6 +369,45 @@ namespace EMS.DB.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("EMS.DB.Models.Staff", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("StaffService")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Staffs");
+                });
+
             modelBuilder.Entity("EMS.DB.Models.StaffWork", b =>
                 {
                     b.Property<long>("Id")
@@ -484,13 +518,6 @@ namespace EMS.DB.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("EMS.DB.Models.CategoryService", b =>
-                {
-                    b.HasOne("EMS.DB.Models.EventCategory", null)
-                        .WithMany("CategoryServiceList")
-                        .HasForeignKey("EventCategoryId");
-                });
-
             modelBuilder.Entity("EMS.DB.Models.Event", b =>
                 {
                     b.HasOne("EMS.DB.Models.EventCategory", "Category")
@@ -551,6 +578,17 @@ namespace EMS.DB.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("EMS.DB.Models.Staff", b =>
+                {
+                    b.HasOne("EMS.DB.Models.User", "User")
+                        .WithOne("Staff")
+                        .HasForeignKey("EMS.DB.Models.Staff", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("EMS.DB.Models.CategoryService", b =>
                 {
                     b.Navigation("Inquiry");
@@ -565,14 +603,17 @@ namespace EMS.DB.Migrations
 
             modelBuilder.Entity("EMS.DB.Models.EventCategory", b =>
                 {
-                    b.Navigation("CategoryServiceList");
-
                     b.Navigation("InquiryList");
                 });
 
             modelBuilder.Entity("EMS.DB.Models.Inquiry", b =>
                 {
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("EMS.DB.Models.User", b =>
+                {
+                    b.Navigation("Staff");
                 });
 #pragma warning restore 612, 618
         }
