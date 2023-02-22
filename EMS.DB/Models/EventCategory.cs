@@ -11,6 +11,8 @@ namespace EMS.DB.Models
     {
         public String CategoryName { get; set; }
 
+        public virtual List<CategoryService> CategoryServiceList { get; set; }
+
         public virtual List<Inquiry> InquiryList { get; set; }
     }
 }

@@ -4,14 +4,16 @@ using EMS.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EMS.DB.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230210092453_initial8")]
+    partial class initial8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,7 +34,7 @@ namespace EMS.DB.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("EventCategoryId")
+                    b.Property<long>("EventCategoryId")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -366,8 +368,7 @@ namespace EMS.DB.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId")
-                        .IsUnique();
+                    b.HasIndex("EventId");
 
                     b.HasIndex("UserId");
 
@@ -486,9 +487,13 @@ namespace EMS.DB.Migrations
 
             modelBuilder.Entity("EMS.DB.Models.CategoryService", b =>
                 {
-                    b.HasOne("EMS.DB.Models.EventCategory", null)
+                    b.HasOne("EMS.DB.Models.EventCategory", "EventCategory")
                         .WithMany("CategoryServiceList")
-                        .HasForeignKey("EventCategoryId");
+                        .HasForeignKey("EventCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EventCategory");
                 });
 
             modelBuilder.Entity("EMS.DB.Models.Event", b =>
@@ -535,8 +540,8 @@ namespace EMS.DB.Migrations
             modelBuilder.Entity("EMS.DB.Models.Payment", b =>
                 {
                     b.HasOne("EMS.DB.Models.Event", "Event")
-                        .WithOne("Payment")
-                        .HasForeignKey("EMS.DB.Models.Payment", "EventId")
+                        .WithMany()
+                        .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -559,8 +564,6 @@ namespace EMS.DB.Migrations
             modelBuilder.Entity("EMS.DB.Models.Event", b =>
                 {
                     b.Navigation("OperatorWork");
-
-                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("EMS.DB.Models.EventCategory", b =>

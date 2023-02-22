@@ -1,11 +1,10 @@
-﻿@page "/UpdateStaff"
+﻿@page "/Updatelist"
 @using EMS.DB.Models
 @using EMS.DB.Repository.Interface
 @using System.Globalization
 @using EMS.DB.Constant
 @inject ISnackbar Snackbar;
 @inject IUserRepository _UserRepository;
-@inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject IDialogService DialogService
 
 <MudTable Elevation="25" Items="GetAlluser()" Filter="new Func<User, bool>(Search)" @bind-customer="userList" HorizontalScrollbar="true" Breakpoint="Breakpoint.Sm">
@@ -16,11 +15,10 @@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>Action</MudTh>
-        <MudTh>Staff name</MudTh>
-        <MudTh>Staff MobileNo</MudTh>
-        <MudTh>Staff Email</MudTh>
-        <MudTh>Staff Address</MudTh>
-       
+        <MudTh>StaffFullname</MudTh>
+        <MudTh>StaffMobileNo</MudTh>
+        <MudTh>StaffEmail</MudTh>
+        <MudTh>StaffAddressLine</MudTh>
 
     </HeaderContent>
     <RowTemplate>
@@ -30,22 +28,21 @@
             </MudFab>
             <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
         </MudTd>
-        <MudTd DataLabel="">@context.UserName </MudTd>
+
+        <MudTd DataLabel="Event Name">@context.UserName </MudTd>
         <MudTd DataLabel="">@context.Usercontactno </MudTd>
         <MudTd DataLabel="">@context.Useremail</MudTd>
         <MudTd DataLabel="">@context.Useraddress</MudTd>
-            @*@foreach (var service in Getservice())
-            {
-                if (context.Staff.StaffService == service.Id && context.Staff.StaffService>0) {<MudTd DataLabel="">@service.ServiceName</MudTd> }  
-            }*@
     </RowTemplate>
 </MudTable>
 
 @code{
     private string searchString = "";
     private User userModel = new();
+
     private List<User> userList = new();
-    private List<CategoryService> ServiceList = new();
+
+
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -55,23 +52,19 @@
 
         return base.OnAfterRenderAsync(firstRender);
     }
+
     private List<User> GetAlluser()
     {
-        userList = _UserRepository.GetStaffList();
+        userList = _UserRepository.GetUserList();
         return userList;
     }
-    private List<CategoryService> Getservice()
-    {
-        ServiceList = _CategoryServiceRepository.GetList();
-        return ServiceList;
-    }
+
     private bool Search(User user)
     {
         if (StringValid(user.UserName)
         && StringValid(user.Usercontactno)
         && StringValid(user.Useremail)
         && StringValid(user.Useraddress)
-
         &&
         user.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
         || user.Usercontactno.Contains(searchString, StringComparison.OrdinalIgnoreCase)

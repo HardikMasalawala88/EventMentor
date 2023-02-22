@@ -5,78 +5,96 @@
 @inject ISnackbar Snackbar;
 @inject IUserRepository _UserRepository;
 @inject IEventCategoryRepository _EventCategoryRepository;
-@inject IStaffRepository _StaffRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject IDialogService DialogService
 @*<h3>AddStaffDialog</h3>*@
 <MudDialog>
     <DialogContent>
         <MudGrid>
-            <MudItem lg="6" md="6" xs="12">
-            <MudTextField @bind-Value="userModel.UserName" Class="m-0" Label="Staff Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        </MudItem>
-        <MudItem lg="6" md="6" xs="12">
-            <MudTextField @bind-Value="userModel.Usercontactno" Class="m-0" Label="MobileNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        </MudItem>
-        <MudItem lg="6" md="6" xs="12">
-            <MudTextField @bind-Value="userModel.Useremail" Class="m-0" Label="AltPhoneNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        </MudItem>
-        <MudItem lg="6" md="6" xs="12">
-            <MudTextField @bind-Value="userModel.Useraddress" Class="m-0" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        </MudItem>
-        <MudItem lg="6" md="6" xs="12">
-            @*<MudSelect @bind-Value="StaffModel.StaffService" Label="Staff Service" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-            @foreach (var service in GetService())
-            {
-                <MudSelectItem Value="service.Id">@service.ServiceName</MudSelectItem>
-            }
-        </MudSelect>*@
-            @*<MudSelect @bind-SelectedValues="StaffModel.StaffService" Label="Staff Service" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                @foreach (var service in GetService())
-                {
-                    <MudSelectItem Value="service.Id">@service.ServiceName</MudSelectItem>
-                }
-            </MudSelect>*@
-        </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="userModel.UserName" Class="m-0" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="userModel.Usercontactno" Class="m-0" Label="MobileNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="userModel.Useremail" Class="m-0" Label="AltPhoneNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
+                <MudTextField @bind-Value="userModel.Useraddress" Class="m-0" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem>
+                @*<MudSelect @bind-Value="ServiceModel.EventCategoryId" Label="select categorys" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+
+                    @foreach (var eventCategory in EventCategoryList)
+                    {
+                        <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
+
+                    }
+                </MudSelect>*@
+                @*<MudSelect @bind-Value="ServiceModel.EventCategoryId" Label="select categorys" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+
+                    @foreach (var eventCategory in EventCategoryList)
+                    {
+                        <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
+
+                    }
+                </MudSelect>*@
+            </MudItem>
         </MudGrid>
+
+
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="CancelForm" Variant="Variant.Filled" Color="Color.Error">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Save" Variant="Variant.Filled">Update </MudButton>
+        <MudButton Color="Color.Primary" OnClick="Save" Variant="Variant.Filled">Edit</MudButton>
+
     </DialogActions>
 </MudDialog>
 
 @code {
 
     private CategoryService ServiceModel = new();
-    private Staff StaffModel = new();
     private List<CategoryService> ServiceList = new();
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public User UserModel { get; set; } = new User();
-    private bool isReadOnly = false;
-    private User userModel = new();
-    private List<User> userList = new();
+    private List<EventCategory> EventCategoryList = new();
 
-    void Submit() => MudDialog.Close(DialogResult.Ok(true));
-    void Cancel() => MudDialog.Cancel();
+    private string searchString = "";
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            StaffModel.UserId = UserModel.Id;
-            GetService();
+            GetEventCategoryList();
+            GetAll();
+
         }
 
         return base.OnAfterRenderAsync(firstRender);
     }
 
-    private List<CategoryService> GetService()
+    private List<CategoryService> GetAll()
     {
         ServiceList = _CategoryServiceRepository.GetList();
         return ServiceList;
     }
-  
+
+    private void GetEventCategoryList()
+    {
+        EventCategoryList = _EventCategoryRepository.GetList();
+    }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public User UserModel { get; set; } = new User();
+
+    private bool isReadOnly = false;
+    private User userModel = new();
+    private Event eventModel = new();
+
+    private List<User> userList = new();
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+
     private List<User> GetLists()
     {
         userList = _UserRepository.GetUserList();
@@ -98,12 +116,10 @@
     {
         try
         {
-            _UserRepository.Update(userModel);
-            _StaffRepository.Insert(StaffModel);
+            _UserRepository.Insert(userModel);
             MudDialog.Close(DialogResult.Ok(true));
             userModel = new User();
-            StaffModel = new Staff();
-            Snackbar.Add("staff data updated.", Severity.Success);
+
         }
         catch (Exception ex)
         {
@@ -111,16 +127,17 @@
         }
 
     }
-    private void Edit()
+
+    private void reject(long id)
     {
         try
         {
-           
-            _StaffRepository.Update(StaffModel);
+            _UserRepository.Delete(id);
+            GetLists();
             MudDialog.Close(DialogResult.Ok(true));
             userModel = new User();
-            StaffModel = new Staff();
-            Snackbar.Add("staff data updated.", Severity.Success);
+            Snackbar.Add("Inquiry Rejected Successfull.", Severity.Success);
+
         }
         catch (Exception ex)
         {
@@ -128,11 +145,30 @@
         }
 
     }
-
     private void CancelForm()
     {
         MudDialog.Close(DialogResult.Ok(true));
         userModel = new User();
     }
+
+    private void OpenDialog(Inquiry inquiry, Event events)
+    {
+
+        var parameters = new DialogParameters();
+        parameters.Add("InquiryModel", inquiry);
+        parameters.Add("EventModel", events);
+        var options = new DialogOptions()
+        {
+            CloseOnEscapeKey = false,
+            CloseButton = true,
+            MaxWidth = MaxWidth.Large,
+            Position = DialogPosition.TopCenter,
+            DisableBackdropClick = true
+        };
+
+
+
+    }
+
 
 }

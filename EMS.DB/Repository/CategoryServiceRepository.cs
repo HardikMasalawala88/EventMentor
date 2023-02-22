@@ -20,10 +20,7 @@ namespace EMS.DB.Repository
         }
 
         public List<CategoryService> GetList() => _repository.GetAll();
-        public CategoryService GetById(long id)
-        {
-            return _repository.GetById(id);
-        }
+
         public void Insert(CategoryService categoryService)
         {
             _repository.Insert(categoryService);

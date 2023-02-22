@@ -14,17 +14,16 @@
                 </MudSelect>
             </MudItem>
             <MudItem>
-
-                <CustomMudSelect PlaceHolder="Select Priority" MultiSelection="true" Variant="Variant.Outlined" Class="mb-2" Value="@eventModel.SelectedService"
-                                 ValueChangedCallBack="@(e => OnSelectedPriorityChange(e))" SelectedValues="selectedServiceList">
-                    <MudSelectItems>
-                        @foreach (var Service in GetAllService())
-                        {
-                            <MudSelectItem T="string" Value="@Service.ServiceName.ToString()">@Service.ServiceName</MudSelectItem>
-                        }
-                    </MudSelectItems>
-                </CustomMudSelect>
+                <MudSelect T="string"  @bind-Value="@eventModel.SelectedService" MultiSelection="true" Label="select Services" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var Service in GetAllService())
+                    {
+                        <MudSelectItem T="string" Value="@Service.Id.ToString()">@Service.ServiceName</MudSelectItem>
+                    }
+                </MudSelect>
             </MudItem>
+           
+           
+           
         </MudGrid>
     </DialogContent>
     <DialogActions>
@@ -34,7 +33,7 @@
 </MudDialog>
 
 @code {
-
+   
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Event EventModel { get; set; } = new Event();
     private Event eventModel = new();
@@ -43,8 +42,6 @@
     private CategoryService CategoryServiceModel = new();
     private List<CategoryService> ServiceList = new();
     private List<EventCategory> EventCategoryList = new();
-    List<String> selectedServiceList = new List<String>();
-    List<long> selectedServiceIdList = new List<long>();
     protected override void OnInitialized()
     {
         if (EventModel is not null && EventModel.Id > 0)
@@ -54,38 +51,32 @@
         eventModel = EventModel;
         base.OnInitialized();
     }
-
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             EventCategoryName = _EventCategoryRepository.GetById(EventModel.CategoryId);
             GetEventCategoryList();
-
+            //GetCategoryServices();
             GetAllService();
             StateHasChanged();
         }
 
         return base.OnAfterRenderAsync(firstRender);
     }
-
     public void OnEventCategoryChange(long selectedEventCategoryId)
     {
     }
-
     private void GetEventCategoryList()
     {
         EventCategoryList = _EventCategoryRepository.GetList();
     }
-
     private List<CategoryService> GetAllService()
     {
         ServiceList = _CategoryServiceRepository.GetList();
         return ServiceList;
     }
-
     void Cancel() => MudDialog.Close(DialogResult.Ok(false));
-
     private void AddService()
     {
         try
@@ -102,22 +93,15 @@
         }
     }
 
-    private void OnSelectedPriorityChange(string selectedValue)
+    private string GetSelectedServices()
     {
-        if (!string.IsNullOrEmpty(selectedValue))
-        {
+        return eventModel.SelectedService;
+        //return eventModel.SelectedService.Split(',').Where(x    => string.IsNullOrEmpty(x)).ToList();
+    }
 
-            selectedServiceList = selectedValue.Split(",").Select(val => val.Trim()).ToList();
-            var listing = selectedValue.Split(",").Select(val => val.Trim()).ToList();
-            var strq= "";
-            var d1 = GetAllService().Where(x => listing.Contains(x.ServiceName)).ToList().Select(x => x.Id).ToList();
-            strq = string.Join(",", d1);
-            eventModel.SelectedService = selectedValue;
-        }
-        else
-        {
-            eventModel.SelectedService= string.Empty;
-            selectedServiceList = new List<string>();
-        }
+    //IEnumerable<long>
+    private IEnumerable<long> OnSetSelectedServices(IEnumerable<long> values)
+    {
+        return eventModel.SelectedService.Split(',').Select(x => Convert.ToInt64(x)).ToList();
     }
 }

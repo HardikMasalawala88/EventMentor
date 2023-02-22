@@ -10,9 +10,7 @@ namespace EMS.DB.Repository.Interface
     public interface IUserRepository
     {
         public List<User> GetUserList();
-        public List<User> GetStaffList();
         public void Insert(User userModel);
-        public void Update(User userModel);
         public void Delete(long id);
 
     }
