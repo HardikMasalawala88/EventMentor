@@ -14,12 +14,14 @@
                 </MudSelect>
             </MudItem>
             <MudItem>
-                <MudSelect T="string"  @bind-Value="@eventModel.SelectedService" MultiSelection="true" Label="select Services" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    @foreach (var Service in GetAllService())
-                    {
-                        <MudSelectItem T="string" Value="@Service.Id.ToString()">@Service.ServiceName</MudSelectItem>
-                    }
-                </MudSelect>
+                <CustomMudSelect PlaceHolder="Select Service" MultiSelection="true" Variant="Variant.Outlined" Class="mb-2" Value="@eventModel.SelectedService"
+                                 ValueChangedCallBack="@(e => OnSelectedPriorityChange(e))" SelectedValues="selectedServiceList">
+                    <MudSelectItems>
+                        @foreach (var Service in GetAllService())
+                        {
+                <MudSelectItem T="string" Value="@Service.ServiceName.ToString()">@Service.ServiceName</MudSelectItem>}
+                    </MudSelectItems>
+                </CustomMudSelect>
             </MudItem>
            
            
@@ -33,7 +35,7 @@
 </MudDialog>
 
 @code {
-   
+
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Event EventModel { get; set; } = new Event();
     private Event eventModel = new();
@@ -42,6 +44,9 @@
     private CategoryService CategoryServiceModel = new();
     private List<CategoryService> ServiceList = new();
     private List<EventCategory> EventCategoryList = new();
+    List<String> selectedServiceList = new List<String>();
+    List<long> selectedServiceIdList = new List<long>();
+
     protected override void OnInitialized()
     {
         if (EventModel is not null && EventModel.Id > 0)
@@ -103,5 +108,24 @@
     private IEnumerable<long> OnSetSelectedServices(IEnumerable<long> values)
     {
         return eventModel.SelectedService.Split(',').Select(x => Convert.ToInt64(x)).ToList();
+    }
+
+    private void OnSelectedPriorityChange(string selectedValue)
+    {
+        if (!string.IsNullOrEmpty(selectedValue))
+        {
+
+            selectedServiceList = selectedValue.Split(",").Select(val => val.Trim()).ToList();
+            var listing = selectedValue.Split(",").Select(val => val.Trim()).ToList();
+            var strq = "";
+            var d1 = GetAllService().Where(x => listing.Contains(x.ServiceName)).ToList().Select(x => x.Id).ToList();
+            strq = string.Join(",", d1);
+            eventModel.SelectedService = selectedValue;
+        }
+        else
+        {
+            eventModel.SelectedService = string.Empty;
+            selectedServiceList = new List<string>();
+        }
     }
 }

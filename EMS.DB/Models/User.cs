@@ -24,5 +24,7 @@ namespace EMS.DB.Models
         [Required]
         public DateTime UserJoiningDate { get; set; } = DateTime.Today;
 
+        public virtual Staff Staffs { get; set; }
+
     }
 }

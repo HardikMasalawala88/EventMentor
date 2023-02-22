@@ -42,6 +42,11 @@ namespace EMS.DB.Repository
             if (userModel.Id is 0)
                 _repository.Insert(userModel);
         }
+        public List<User> GetStaffList()
+        {
+            _appDbContext.Users.Include(x => x.Staffs).ToList();
+            return _appDbContext.Users.Where(x => x.Userrole == "staff").ToList();
+        }
         #endregion
 
 
