@@ -2,7 +2,6 @@ using EMS.DB;
 using EMS.DB.Repository;
 using EMS.DB.Repository.Interface;
 using EMS.DB.unitofwork;
-using EventMentorSystem.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +9,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MudBlazor.Services;
+using Microsoft.AspNetCore.ResponseCompression;
+using BlazorServerSignalRApp.Server.SignalRHubs;
+using System.Linq;
 
 namespace EventMentorSystem
 {
@@ -40,8 +42,14 @@ namespace EventMentorSystem
             services.AddScoped<IUserRepository, UserRepository>(); 
             services.AddScoped<IStaffWorkRepository, StaffWorkRepository>(); 
             services.AddScoped<IOperatorWorkRepository, OperatorWorkRepository>(); 
-            services.AddScoped<IPaymentRepository, PaymentRepository>(); 
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
             #endregion
+
+            services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+            });
 
             #region Connection String
             services.AddDbContext<AppDbContext>(item => item.UseSqlServer(Configuration.GetConnectionString("myconn")));
@@ -51,6 +59,8 @@ namespace EventMentorSystem
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseResponseCompression();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -70,6 +80,7 @@ namespace EventMentorSystem
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
+                endpoints.MapHub<ChatHub>("/chathub");
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

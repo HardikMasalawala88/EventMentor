@@ -5,14 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Pages\Counter.razor" />
     <None Include="Pages\Error.cshtml" />
     <None Include="Pages\AddEventCategoryAndService\EventCategorys.razor" />
     <None Include="Pages\EventM\Index.razor" />
     <None Include="Pages\AddEventCategoryAndService\ServicesList.razor" />
     <None Include="Pages\EventM\ShowInquiryData.razor" />
     <None Include="Pages\EventM\ViewEvent.razor" />
-    <None Include="Pages\FetchData.razor" />
     <None Include="Pages\Index.razor" />
     <None Include="Pages\InquiryM\AddEventDialog.razor" />
     <None Include="Pages\InquiryM\AddInquiryDialog.razor" />
@@ -24,6 +22,8 @@
 
   <ItemGroup>
     <PackageReference Include="EASendMail" Version="7.9.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Connections.Client" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.17">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -33,6 +33,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EMS.DB\EMS.DB.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>

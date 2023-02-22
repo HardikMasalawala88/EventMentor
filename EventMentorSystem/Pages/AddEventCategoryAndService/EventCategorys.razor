@@ -5,7 +5,9 @@
 @using EMS.DB.Constant
 @inject ISnackbar Snackbar;
 @inject IEventCategoryRepository _IEventCategoryRepository;
-@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
 
 <h3>Category List</h3>
 <MudCard Elevation="25">
@@ -67,6 +69,22 @@
     private string searchString = "";
     private string str { get; set; }
     private string error { get; set; }
+    private HubConnection hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+            .Build();
+
+        hubConnection.On<EventCategory>("ServiceAddUpdate", (eventCategory) =>
+        {
+            GetAll();
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+    }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -85,7 +103,7 @@
     }
 
 
-    private void Save()
+    private async Task Save()
     {
         try
         {
@@ -100,6 +118,7 @@
                 Snackbar.Add(" record saved", Severity.Success);
                 showLeaveAlert = false;
                 GetAll();
+                await hubConnection.SendAsync("ServiceAddUpdate", EventCategoryModel);
                 EventCategoryModel = new EventCategory();
             }
         }
@@ -157,6 +176,12 @@
         return false;
     }
 
-
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
 }
 
