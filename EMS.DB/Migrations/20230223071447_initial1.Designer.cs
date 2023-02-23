@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMS.DB.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230209104149_initial7")]
-    partial class initial7
+    [Migration("20230223071447_initial1")]
+    partial class initial1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -34,9 +34,6 @@ namespace EMS.DB.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("EventCategoryId")
-                        .HasColumnType("bigint");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -53,8 +50,6 @@ namespace EMS.DB.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EventCategoryId");
 
                     b.ToTable("CategoryServices");
                 });
@@ -205,6 +200,7 @@ namespace EMS.DB.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("EventCategoryId")
@@ -266,6 +262,47 @@ namespace EMS.DB.Migrations
                     b.ToTable("Inquiries");
                 });
 
+            modelBuilder.Entity("EMS.DB.Models.NotificationMessages", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("NotificationMessages");
+                });
+
             modelBuilder.Entity("EMS.DB.Models.OperatorWork", b =>
                 {
                     b.Property<long>("Id")
@@ -308,6 +345,111 @@ namespace EMS.DB.Migrations
                     b.HasIndex("EventId");
 
                     b.ToTable("OperatorWorks");
+                });
+
+            modelBuilder.Entity("EMS.DB.Models.Payment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("EventId")
+                        .IsRequired()
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PaymentMode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReceivedAmount")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RemainingAmount")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TotalAmount")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Transactionid")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("UserId")
+                        .IsRequired()
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("EMS.DB.Models.Staff", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("StaffService")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Staffs");
                 });
 
             modelBuilder.Entity("EMS.DB.Models.StaffWork", b =>
@@ -420,17 +562,6 @@ namespace EMS.DB.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("EMS.DB.Models.CategoryService", b =>
-                {
-                    b.HasOne("EMS.DB.Models.EventCategory", "EventCategory")
-                        .WithMany("CategoryServiceList")
-                        .HasForeignKey("EventCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EventCategory");
-                });
-
             modelBuilder.Entity("EMS.DB.Models.Event", b =>
                 {
                     b.HasOne("EMS.DB.Models.EventCategory", "Category")
@@ -463,6 +594,17 @@ namespace EMS.DB.Migrations
                     b.Navigation("EventCategory");
                 });
 
+            modelBuilder.Entity("EMS.DB.Models.NotificationMessages", b =>
+                {
+                    b.HasOne("EMS.DB.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("EMS.DB.Models.OperatorWork", b =>
                 {
                     b.HasOne("EMS.DB.Models.Event", "Event")
@@ -470,6 +612,36 @@ namespace EMS.DB.Migrations
                         .HasForeignKey("EventId");
 
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("EMS.DB.Models.Payment", b =>
+                {
+                    b.HasOne("EMS.DB.Models.Event", "Event")
+                        .WithOne("Payment")
+                        .HasForeignKey("EMS.DB.Models.Payment", "EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EMS.DB.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EMS.DB.Models.Staff", b =>
+                {
+                    b.HasOne("EMS.DB.Models.User", "User")
+                        .WithOne("Staffs")
+                        .HasForeignKey("EMS.DB.Models.Staff", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EMS.DB.Models.CategoryService", b =>
@@ -480,18 +652,23 @@ namespace EMS.DB.Migrations
             modelBuilder.Entity("EMS.DB.Models.Event", b =>
                 {
                     b.Navigation("OperatorWork");
+
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("EMS.DB.Models.EventCategory", b =>
                 {
-                    b.Navigation("CategoryServiceList");
-
                     b.Navigation("InquiryList");
                 });
 
             modelBuilder.Entity("EMS.DB.Models.Inquiry", b =>
                 {
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("EMS.DB.Models.User", b =>
+                {
+                    b.Navigation("Staffs");
                 });
 #pragma warning restore 612, 618
         }

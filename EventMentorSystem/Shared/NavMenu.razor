@@ -1,4 +1,4 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
+﻿@*<div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">EventMentorSystem</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
@@ -55,4 +55,20 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }
-}
+}*@
+
+
+<MudPaper Width="250px" Class="d-inline-flex py-3" Elevation="0">
+    <MudNavMenu Class="mud-width-full">
+        <MudText Typo="Typo.h6" Class="px-4">User name</MudText>
+        <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">UserRole</MudText>
+        <MudDivider Class="my-2" />
+        <MudNavLink Href="/dashboard" Icon="fas fa-chart-line">Dashboard</MudNavLink>
+        <MudNavLink Href="/AddUser" Icon="fas fa-users">Users</MudNavLink>
+        <MudNavLink Href="/eventlist" Icon="fas fa-server">Events</MudNavLink>
+        <MudNavLink Href="/Inqurylist" Icon="fas fa-server">Inquiries</MudNavLink>
+        <MudNavLink Href="/ViewPayment" Icon="fas fa-server">Payments</MudNavLink>
+        <MudNavLink Href="/EventCategorys" Icon="fas fa-server">Categories</MudNavLink>
+        <MudNavLink Href="/ServiceList" Icon="fas fa-server">Category Services</MudNavLink> 
+    </MudNavMenu>
+</MudPaper>

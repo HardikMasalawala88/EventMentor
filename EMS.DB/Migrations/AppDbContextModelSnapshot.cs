@@ -198,6 +198,7 @@ namespace EMS.DB.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("EventCategoryId")
@@ -257,6 +258,47 @@ namespace EMS.DB.Migrations
                     b.HasIndex("EventCategoryId");
 
                     b.ToTable("Inquiries");
+                });
+
+            modelBuilder.Entity("EMS.DB.Models.NotificationMessages", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("NotificationMessages");
                 });
 
             modelBuilder.Entity("EMS.DB.Models.OperatorWork", b =>
@@ -548,6 +590,17 @@ namespace EMS.DB.Migrations
                         .IsRequired();
 
                     b.Navigation("EventCategory");
+                });
+
+            modelBuilder.Entity("EMS.DB.Models.NotificationMessages", b =>
+                {
+                    b.HasOne("EMS.DB.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EMS.DB.Models.OperatorWork", b =>

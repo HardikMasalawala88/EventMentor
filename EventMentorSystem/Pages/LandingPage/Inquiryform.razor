@@ -5,6 +5,7 @@
 @using System.Reflection
 @using EMS.DB.Repository
 @using EMS.DB.Constant
+@using System.ComponentModel.DataAnnotations
 @inject ISnackbar Snackbar;
 @inject IEventCategoryRepository _EventCategoryRepository;
 @inject IInquiryRepository _InquiryRepository;
@@ -17,11 +18,12 @@
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
+       
         <MudItem>
-            <MudTextField @bind-Value="inquiryModel.Fullname" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="inquiryModel.Fullname" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal" ></MudTextField>
             <MudTextField @bind-Value="inquiryModel.MobileNo" Label="MobileNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             <MudTextField @bind-Value="inquiryModel.AltPhoneNo" Label="AltPhoneNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-            <MudTextField @bind-Value="inquiryModel.Email" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="inquiryModel.Email" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal" ></MudTextField>
             <MudTextField @bind-Value="inquiryModel.AddressLine1" Label="AddressLine1" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             <MudTextField @bind-Value="inquiryModel.AddressLine2" Label="AddressLine2" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             <MudTextField @bind-Value="inquiryModel.Landmark" Label="Landmark" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
@@ -111,7 +113,5 @@
 
         inquiryModel = new Inquiry();
     }
-
-
 
 }

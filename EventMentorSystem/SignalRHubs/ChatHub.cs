@@ -10,5 +10,10 @@ namespace BlazorServerSignalRApp.Server.SignalRHubs
         {
             await Clients.All.SendAsync("ServiceAddUpdate", eventCategory);
         }
+
+        public async Task SendMessage(long userId, string message, string title)
+        {
+            await Clients.All.SendAsync("ReceiveMessage", userId, message, title);
+        }
     }
 }

@@ -9,6 +9,7 @@ namespace EMS.DB.Models
 {
     public class Inquiry : BaseEntity
     {
+    
         [Required]
         public string Fullname { get; set; }
 
@@ -17,6 +18,8 @@ namespace EMS.DB.Models
 
         [Required]
         public string AltPhoneNo { get; set; }
+
+        [Required]
         public string Email { get; set; }
 
         [Required]

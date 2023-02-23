@@ -9,7 +9,6 @@
 
 <h1>Inquiry Listing</h1>
 
-
 <MudTable Elevation="25" Items="GetAllinquiry()" Filter="new Func<Inquiry, bool>(Search)" @bind-customer="inquiryList" HorizontalScrollbar="true" Breakpoint="Breakpoint.Sm">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Inquiry list</MudText>
@@ -58,8 +57,7 @@
     private Inquiry inquiryModel = new();
 
     private List<Inquiry> inquiryList = new();
-
-
+    private string BoxCss = "none";
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

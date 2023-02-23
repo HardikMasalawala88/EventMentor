@@ -43,6 +43,8 @@ namespace EventMentorSystem
             services.AddScoped<IStaffWorkRepository, StaffWorkRepository>(); 
             services.AddScoped<IOperatorWorkRepository, OperatorWorkRepository>(); 
             services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IStaffRepository, StaffRepository>();
+            services.AddScoped<INotificationMessagesRepository, NotificationMessagesRepository>();
             #endregion
 
             services.AddResponseCompression(opts =>

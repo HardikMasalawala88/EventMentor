@@ -5,7 +5,10 @@
 @inject ISnackbar Snackbar;
 @inject IEventCategoryRepository _EventCategoryRepository;
 @inject IInquiryRepository _InquiryRepository;
+@inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject IDialogService DialogService
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager _NavigationManager
 <MudDialog>
     <DialogContent>
         <MudGrid>
@@ -76,6 +79,7 @@
     private bool isReadOnly = false;
     private Inquiry inquiryModel = new();
     private Event eventModel = new();
+    private NotificationMessages NotificationMessageModel = new();
     private List<CategoryService> ServiceList = new();
     private List<Inquiry> inquiryList = new();
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
@@ -90,11 +94,7 @@
     {
         EventCategoryList = _EventCategoryRepository.GetList();
     }
-    //public List<CategoryService> GetCategoryServices()
-    //{
 
-    //    return ServiceList.Where(x => x.EventCategoryId == EventModel.CategoryId).ToList();
-    //}
     public void OnEventCategoryChange(long selectedEventCategoryId)
     {
     }
@@ -140,15 +140,22 @@
         return eventList;
     }
 
-    private void Save()
+    private async Task Save()
     {
         try
         {
+            NotificationMessageModel.UserId = 1;
+            NotificationMessageModel.Message = "This is demo";
+            NotificationMessageModel.Title = "demo";
             _EventRepository.Insert(eventModel);
             Snackbar.Add(" record saved", Severity.Success);
             GetAllevents();
             eventModel = new Event();
             MudDialog.Close();
+            _NotificationMessagesRepository.Insert(NotificationMessageModel);
+            await hubConnection.SendAsync("sendMessage", notificationMessage.UserId, notificationMessage.Message, notificationMessage.Title);
+            notificationMessage.Message = "";
+            notificationMessage.Title = "";
         }
         catch (Exception ex)
         {
@@ -163,5 +170,39 @@
         inquiryModel = new Inquiry();
     }
     #endregion
+    private List<NotificationMessages> allNotificationMgs = new List<NotificationMessages>();
+    private List<NotificationMessages> currentUserMsgList = new List<NotificationMessages>();
+    private NotificationMessages notificationMessage = new NotificationMessages();
+    private HubConnection hubConnection;
+    private string BoxCss = "none";
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(_NavigationManager.ToAbsoluteUri("/chathub"))
+            .Build();
+
+        hubConnection.On<long, string, string>("ReceiveMessage", (userId, message, title) =>
+        {
+            allNotificationMgs.Add(new NotificationMessages()
+            {
+                UserId = userId,
+                Message = message,
+                Title = title,
+            });
+            currentUserMsgList = allNotificationMgs.Where(x => x.UserId != notificationMessage.UserId).ToList();
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+    }
+    public bool IsConnected =>
+       hubConnection?.State == HubConnectionState.Connected;
+
+    private void NotificationHideShoe()
+    {
+        if (BoxCss == "none") BoxCss = "block";
+        else BoxCss = "none";
+    }
 
 }

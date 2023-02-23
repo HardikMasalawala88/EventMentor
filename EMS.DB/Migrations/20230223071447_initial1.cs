@@ -3,17 +3,19 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace EMS.DB.Migrations
 {
-    public partial class initial2 : Migration
+    public partial class initial1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Supervisors",
+                name: "NotificationMessages",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<long>(type: "bigint", nullable: false),
@@ -23,9 +25,9 @@ namespace EMS.DB.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Supervisors", x => x.Id);
+                    table.PrimaryKey("PK_NotificationMessages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Supervisors_Users_UserId",
+                        name: "FK_NotificationMessages_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -33,15 +35,15 @@ namespace EMS.DB.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Supervisors_UserId",
-                table: "Supervisors",
+                name: "IX_NotificationMessages_UserId",
+                table: "NotificationMessages",
                 column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Supervisors");
+                name: "NotificationMessages");
         }
     }
 }
