@@ -2,54 +2,80 @@
 using EMS.DB.Repository.Interface;
 using EMS.DB.unitofwork;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EMS.DB.Repository
 {
-     public class UserRepository : IUserRepository
+    public class UserRepository : BaseRepository, IUserRepository
     {
-        #region Property
-        private IRepository<User> _repository;
-        private AppDbContext _appDbContext;
+       
+        #region property
+        private readonly AppDbContext _applicationDbContext;
+        private DbSet<User> entities;
         #endregion
 
         #region Constructor
-        public UserRepository(IRepository<User> repository, AppDbContext appDbContext)
+        public UserRepository(AppDbContext applicationDbContext, IServiceScopeFactory serviceScopeFactor) : base(serviceScopeFactor)
         {
-            _repository = repository;
-            _appDbContext = appDbContext;
-        }
-
-        public void Delete(long id)
-        {
-            User users = _appDbContext.Users.FirstOrDefault(c => c.Id.Equals(id));
-            _repository.Remove(users);
-            _repository.SaveChanges();
-        }
-        public void Update(User userModel)
-        {
-            _repository.Update(userModel);
-        }
-
-        public List<User> GetUserList() => _repository.GetAll();
-
-        public void Insert(User userModel)
-        {
-            if (userModel.Id is 0)
-                _repository.Insert(userModel);
-        }
-        public List<User> GetStaffList()
-        {
-            _appDbContext.Users.Include(x => x.Staffs).ToList();
-            return _appDbContext.Users.Where(x => x.Userrole == "staff").ToList();
+            _applicationDbContext = applicationDbContext;
+            entities = _applicationDbContext.Set<User>();
         }
         #endregion
 
+        public List<User> GetAllUser()
+        {
+            using AppDbContext _myContext = base.GetContext();
+            return _myContext.Users.ToList();
+        }
 
+        public void Insert(User userModel)
+        {
+            if (!string.IsNullOrEmpty(userModel.Id))
+            {
+                using AppDbContext _myContext = base.GetContext();
+                _myContext.Users.Add(userModel);
+                _myContext.SaveChanges();
+            }
+        }
+        public void Delete(string id)
+        {
+            if (!string.IsNullOrEmpty(id))
+            {
+                using AppDbContext _myContext = base.GetContext();
+                User userModel = _myContext.Users.FirstOrDefault(c => c.Id.Equals(id));
+                if (userModel is not null)
+                { 
+                    _myContext.Users.Update(userModel);
+                    _myContext.SaveChanges();
+                }
+            }
+        }
 
+        public List<User> GetById(string id)
+        {
+            //throw new NotImplementedException();
+            try
+            {
+                using AppDbContext _myContext = base.GetContext();
+                return _myContext.Users.Where(x => x.Id == id).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        public void Update(User UserModel)
+        {
+            using AppDbContext _myContext = base.GetContext();
+            if (UserModel.Id is null)
+                _myContext.Users.Add(UserModel);
+            else
+                _myContext.Users.Update(UserModel);
+
+            _myContext.SaveChanges();
+        }
     }
 }

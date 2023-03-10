@@ -1,109 +1,138 @@
 ﻿@page "/ViewPayment"
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
-@using System.Globalization
-@using System.Reflection
-@using EMS.DB.Repository
-@using EMS.DB.Constant
-@using System.ComponentModel.DataAnnotations;
 @inject IEventRepository _EventRepository;
+@inject INotificationMessagesRepository _NotificationMessagesRepository;
+@inject IUserRepository _UserRepository;
 @inject IPaymentRepository _PaymentRepository;
 @inject ISnackbar Snackbar;
 @inject IDialogService DialogService
 
-<h3>ViewPayment</h3>
-@if (IsEdit || IsAdd)
-{
-    <MudCard Elevation="25">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h6">Add / Edit Events</MudText>
-            </CardHeaderContent>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudItem>
-                <MudTextField @bind-Value="PaymentModel.PaymentMode" Label="PaymentMode" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="PaymentModel.TotalAmount" Label="TotalAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="PaymentModel.ReceivedAmount" Label="ReceivedAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="PaymentModel.RemainingAmount" Label="RemainingAmount " Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="PaymentModel.Transactionid" Label="Transactionid" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="PaymentModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="PaymentModel.EventId" Label="EventId" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="PaymentModel.UserId" Label="UserId" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                
-            </MudItem>
+<AuthorizeView Roles="Admin" Context="data">
+    <Authorized>
+        @if (IsEdit || IsAdd)
+        {
+            <MudCard Elevation="25">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Add / Edit Events</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudItem>
+                        <MudTextField @bind-Value="PaymentModel.PaymentMode" Label="PaymentMode" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                        <MudTextField @bind-Value="PaymentModel.TotalAmount" Label="TotalAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                        <MudTextField @bind-Value="PaymentModel.ReceivedAmount" Label="ReceivedAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                        <MudTextField @bind-Value="PaymentModel.RemainingAmount" Label="RemainingAmount " Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                        <MudTextField @bind-Value="PaymentModel.Transactionid" Label="Transactionid" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                        <MudTextField @bind-Value="PaymentModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                        <MudSelect @bind-Value="PaymentModel.EventId" T="long" Label="select Event" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @foreach (var events in GetAllEvent())
+                            {
+                                <MudSelectItem Value="@events.Id">@events.EventName</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudSelect @bind-Value="PaymentModel.UserId"  Label="User name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @foreach (var events in GetAllUser())
+                            {
+                                <MudSelectItem Value="@events.Id">@events.UserName</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                    </MudItem>
+                    <MudItem Class="d-flex justify-end">
+
+                        <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Addpayment">
+                            <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
+                        </MudButton>
+                    </MudItem>
+                </MudCardContent>
+            </MudCard>
+        }
+        else
+        {
+
             <MudItem Class="d-flex justify-end">
-               
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Addpayment">
-                    <FontLable FontWeight="500">Add</FontLable>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary " OnClick="ShowAddForm">
+                    <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
                 </MudButton>
             </MudItem>
-        </MudCardContent>
-    </MudCard>
-}
-else
-{
+        }
+        <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<Payment>>>(ServerReload))" T="Payment" Filter="new Func<Payment, bool>(Search)" Class="w-100" @bind-customer="PaymentList">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Payment list</MudText>
+                <MudSpacer />
+                <MudTextField Value="searchString" T=" string" ValueChanged="@(s => OnSearch(s))" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Action</MudTh>
+                <MudTh>PaymentId</MudTh>
+                <MudTh>Event Name</MudTh>
+                <MudTh>OrganizorName</MudTh>
+                <MudTh>OrganizorNo</MudTh>
+                <MudTh>Operator Name</MudTh>
+                <MudTh>From date</MudTh>
+                <MudTh>Payment method</MudTh>
+                <MudTh>Total Amount</MudTh>
+                <MudTh>ReceivedAmount</MudTh>
+                <MudTh>RemainingAmount</MudTh>
+                <MudTh>transactionId</MudTh>
+                <MudTh>Description</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="">
+                    <MudFab @onclick="@(() => OpenDialog(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Id">@context.Event.EventName</MudTd>
+                <MudTd DataLabel="Id">@context.Event.OrganizerName</MudTd>
+                <MudTd DataLabel="Id">@context.Event.OrganizerContact</MudTd>
+                <MudTd DataLabel="Id">@context.Event.OperatorName</MudTd>
+                <MudTd DataLabel="Id">@context.Event.FromDate</MudTd>
+                <MudTd DataLabel="Id">@context.PaymentMode</MudTd>
+                <MudTd DataLabel="Id">@context.TotalAmount</MudTd>
+                <MudTd DataLabel="Id">@context.ReceivedAmount</MudTd>
+                <MudTd DataLabel="Id">@context.RemainingAmount</MudTd>
+                <MudTd DataLabel="Id">@context.Transactionid</MudTd>
+                <MudTd DataLabel="Id">@context.Description</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+            </PagerContent>
+        </MudTable>
+    </Authorized>
+    <NotAuthorized>
+        <MudAlert Severity="Severity.Error">please <MudLink Href="/login">login</MudLink></MudAlert>
+    </NotAuthorized>
+</AuthorizeView>
 
-    <MudItem Class="d-flex justify-end">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary " OnClick="ShowAddForm">
-            <FontLable FontWeight="500">Add</FontLable>
-        </MudButton>
-    </MudItem>
-}
-<MudTable Elevation="25" Items="GetAllPayment()" T="Payment" Filter="new Func<Payment, bool>(Search)" Class="w-100" @bind-customer="PaymentList">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Payment list</MudText>
-        <MudSpacer />
-        <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Action</MudTh>
-        <MudTh>PaymentId</MudTh>
-        <MudTh>Event Name</MudTh>
-        <MudTh>OrganizorName</MudTh>
-        <MudTh>OrganizorNo</MudTh>
-        <MudTh>Operator Name</MudTh>
-        <MudTh>From date</MudTh>
-        <MudTh>Payment method</MudTh>
-        <MudTh>Total Amount</MudTh>
-        <MudTh>ReceivedAmount</MudTh>
-        <MudTh>RemainingAmount</MudTh>
-        <MudTh>transactionId</MudTh>
-        <MudTh>Description</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(() => OpenDialog(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-        </MudTd>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="Id">@context.Event.EventName</MudTd>
-        <MudTd DataLabel="Id">@context.Event.OrganizerName</MudTd>
-        <MudTd DataLabel="Id">@context.Event.OrganizerContact</MudTd>
-        <MudTd DataLabel="Id">@context.Event.OperatorName</MudTd>
-        <MudTd DataLabel="Id">@context.Event.FromDate</MudTd>
-        <MudTd DataLabel="Id">@context.PaymentMode</MudTd>
-        <MudTd DataLabel="Id">@context.TotalAmount</MudTd>
-        <MudTd DataLabel="Id">@context.ReceivedAmount</MudTd>
-        <MudTd DataLabel="Id">@context.RemainingAmount</MudTd>
-        <MudTd DataLabel="Id">@context.Transactionid</MudTd>
-        <MudTd DataLabel="Id">@context.Description</MudTd>
-    </RowTemplate>
-    <PagerContent>
-        <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
-    </PagerContent>
-</MudTable>
 @code{
+    [CascadingParameter(Name = "cascadeParameters")]
+    public GlobalParameter _parameters { get; set; }
+
     private List<Payment> PaymentList = new();
+    private List<Event> EventList = new();
+    private List<User> UserList = new();
     private Payment PaymentModel = new();
+    private NotificationMessages NotificationMessagesModel = new();
     private string searchString = "";
+    private MudTable<Payment> tableRef;
+    private IEnumerable<Payment> pagedData;
+    private DateTime? startDate;
+    //private HubConnection HubConnection;
+    private DateTime? endDate;
     private bool IsEdit;
     private bool IsAdd;
+    private int totalItems;
+    private int totalItemsOperator;
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             GetAllPayment();
+            GetAllEvent();
+            GetAllUser();
             StateHasChanged();
         }
 
@@ -114,9 +143,20 @@ else
         PaymentList = _PaymentRepository.GetPaymentList();
         return PaymentList;
     }
+    private List<Event> GetAllEvent()
+    {
+        EventList = _EventRepository.GetList();
+        return EventList;
+    }
+    private List<User> GetAllUser()
+    {
+        UserList = _UserRepository.GetAllUser();
+        return UserList;
+    }
     private bool Search(Payment payments)
     {
-        if (StringValid(payments.PaymentMode)
+        if (string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(searchString)
+            && StringValid(payments.PaymentMode)
             && StringValid(payments.TotalAmount)
             && StringValid(payments.ReceivedAmount)
             && StringValid(payments.RemainingAmount)
@@ -135,6 +175,23 @@ else
 
         return false;
     }
+
+    private async Task<TableData<Payment>> ServerReload(TableState state)
+    {
+        IEnumerable<Payment> data;
+
+        //get all data of current month
+        data = _PaymentRepository.GetPaymentList();
+
+        data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
+        data = data.OrderByDirection(state.SortDirection, o => o.Event.FromDate.Value);
+        totalItemsOperator = data.Count();
+
+        pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<Payment>() { TotalItems = totalItemsOperator, Items = pagedData };
+    }
+
+
     private bool StringValid(string strValue)
     {
         if (!string.IsNullOrEmpty(strValue))
@@ -144,13 +201,20 @@ else
 
         return false;
     }
-    private void Addpayment()
+    private async Task Addpayment()
     {
         try
         {
             _PaymentRepository.Insert(PaymentModel);
             Snackbar.Add(" record saved", Severity.Success);
+            NotificationMessagesModel.Message = $"payment update by Event Id:{PaymentModel.EventId}.";
+            NotificationMessagesModel.Title = "payment";
+            NotificationMessagesModel.UserId = PaymentModel.UserId;
+            _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
+            await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
             PaymentModel = new Payment();
+            tableRef.ReloadServerData();
+
         }
         catch (Exception ex)
         {
@@ -168,7 +232,8 @@ else
         {
             _PaymentRepository.Delete(id);
             Snackbar.Add("payment Detial Data Deleted.", Severity.Success);
-            GetAllPayment();
+            //GetAllPayment();
+            tableRef.ReloadServerData();
         }
         catch (Exception ex)
         {
@@ -192,5 +257,11 @@ else
 
         DialogService.Show<AddPaymentDialog>("Edit Payment", parameters, options);
 
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        tableRef.ReloadServerData();
     }
 }

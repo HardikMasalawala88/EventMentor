@@ -1,166 +1,206 @@
 ﻿@page "/ServiceList"
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
-@using System.Globalization
-@using System.Reflection
-@using EMS.DB.Repository
 @using System.Collections.Generic;
-@using EMS.DB.Constant
 @inject ISnackbar Snackbar;
 @inject IEventCategoryRepository _EventCategoryRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
-<h3>Service List</h3>
-<MudCard Elevation="25">
-    <MudCardHeader>
-        <CardHeaderContent>
-            <MudText Typo="Typo.h6">Add / Edit Service </MudText>
-        </CardHeaderContent>
-    </MudCardHeader>
-    <MudCardContent>
-        <MudItem>
-            @*<MudSelect @bind-Value="ServiceModel.EventCategoryId" Label="select categorys" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+@inject NavigationManager _NavigationManager
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using Microsoft.AspNetCore.SignalR.Client
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <MudCard Elevation="25">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Add / Edit Service </MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudItem>
+                    @*<MudSelect @bind-Value="ServiceModel.EventCategoryId" Label="select categorys" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
 
-                @foreach (var eventCategory in EventCategoryList)
-                {
-                    <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
+                            @foreach (var eventCategory in EventCategoryList)
+                            {
+                                <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
 
-                }
-            </MudSelect>*@
-                <MudTextField @bind-Value="ServiceModel.ServiceName" Label="Service Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        </MudItem>
-
-        <MudItem Class="d-flex justify-end">
-            <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
-                <FontLable FontWeight="500">Add</FontLable>
-            </MudButton>
-        </MudItem>
-    </MudCardContent>
-</MudCard>
-<MudTable Elevation="25" Items="GetAll()" Filter="new Func<CategoryService, bool>(Search)">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Service list</MudText>
-        <MudSpacer />
-        <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Service..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Id</MudTh>
-        <MudTh>Service Name</MudTh>
-        <MudTh>Action</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="Service Name">@context.ServiceName</MudTd>
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-            <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-        </MudTd>
-    </RowTemplate>
-    <PagerContent>
-        <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
-    </PagerContent>
-</MudTable>
+                            }
+                        </MudSelect>*@
+                    <MudTextField @bind-Value="ServiceModel.ServiceName" Label="Service Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                </MudItem>
+                <MudItem Class="d-flex justify-end">
+                    <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                        <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
+                    </MudButton>
+                </MudItem>
+            </MudCardContent>
+        </MudCard>
+        <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<CategoryService>>>(ServerReload))" Filter="new Func<CategoryService, bool>(Search)">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Service list</MudText>
+                <MudSpacer />
+                <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search for Service..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>Service Name</MudTh>
+                <MudTh>Action</MudTh>
+            </HeaderContent>
+            <RowTemplate Context="data">
+                <MudTd DataLabel="Id">@data.Id</MudTd>
+                <MudTd DataLabel="Service Name">@data.ServiceName</MudTd>
+                <MudTd DataLabel="">
+                    <MudFab @onclick="@(()=>Edit(@data.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(()=>Delete(@data.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+            </PagerContent>
+        </MudTable>
+    </Authorized>
+    <NotAuthorized>
+        <MudAlert Severity="Severity.Error">please <MudLink Href="/login">login</MudLink></MudAlert>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
-
     private CategoryService ServiceModel = new();
     private List<CategoryService> ServiceList = new();
     private List<EventCategory> EventCategoryList = new();
-
-
+    private List<NotificationMessages> allNotificationMgs = new List<NotificationMessages>();
+    private List<NotificationMessages> currentUserMsgList = new List<NotificationMessages>();
+    private NotificationMessages notificationMessage = new NotificationMessages();
+    private MudTable<CategoryService> tableRef;
+    private IEnumerable<CategoryService> pagedData;
+    private int totalItems;
+    private int totalItemsOperator;
+    private HubConnection hubConnection;
+    private NotificationMessages NotificationModel = new();
+    private string BoxCss = "none";
     private string searchString = "";
+    private string userid;
+    private string username;
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider
+          .GetAuthenticationStateAsync();
+        var user = authState.User;
 
+        if (user.Identity.IsAuthenticated)
+        {
+            claims = user.Claims;
+            userid = user.FindFirst(c => c.Type == ClaimTypes.Sid)?.Value;
+            username = user.FindFirst(c => c.Type == ClaimTypes.Sid)?.Value;
+        }
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(_NavigationManager.ToAbsoluteUri("/chathub"))
+        .Build();
+        hubConnection.On<CategoryService>("ServiceAddUpdate", (categoryService) =>
+        {
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+    }
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            GetEventCategoryList();
-            GetAll();
 
         }
-
         return base.OnAfterRenderAsync(firstRender);
     }
-
-    private List<CategoryService> GetAll()
+    private async Task<TableData<CategoryService>> ServerReload(TableState state)
     {
-        ServiceList = _CategoryServiceRepository.GetList();
-        return ServiceList;
+        IEnumerable<CategoryService> data;
+        data = _CategoryServiceRepository.GetList();
+        data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
+        data = data.OrderByDirection(state.SortDirection, o => o.ServiceName);
+        totalItemsOperator = data.Count();
+        pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<CategoryService>() { TotalItems = totalItemsOperator, Items = pagedData };
     }
-
-    private void GetEventCategoryList()
-    {
-        EventCategoryList = _EventCategoryRepository.GetList();
-    }
-
-
-    private void Save()
+    private async Task Save()
     {
         if (ServiceModel.Id > 0)
         {
-
             _CategoryServiceRepository.Update(ServiceModel);
             Snackbar.Add("Record updated", Severity.Success);
+            await hubConnection.SendAsync("ServiceAddUpdate", ServiceModel);
+            NotificationModel.Message = $"{username} is add {ServiceModel.ServiceName}.";
+            NotificationModel.Title = "add category";
+            NotificationModel.UserId = userid;
+            await hubConnection.SendAsync("SendMessage", NotificationModel);
+            ServiceModel = new CategoryService();
         }
         else
         {
             _CategoryServiceRepository.Insert(ServiceModel);
             Snackbar.Add("Record saved", Severity.Success);
+            ServiceModel = new CategoryService();
         }
-        GetAll();
-
-        ServiceModel = new CategoryService();
+        //GetAll();
+        tableRef.ReloadServerData();
     }
-
-
-    private void Edit(long id)
+    private async Task Edit(long id)
     {
-
         try
         {
-
-            ServiceModel = ServiceList.FirstOrDefault(c => c.Id == id);
+            ServiceModel = _CategoryServiceRepository.GetList().FirstOrDefault(c => c.Id == id);
+            await hubConnection.SendAsync("ServiceAddUpdate", ServiceModel);
+            NotificationModel.Message = $"{username} is Edit {ServiceModel.ServiceName}.";
+            NotificationModel.Title = "add category";
+            NotificationModel.UserId = userid;
+            await hubConnection.SendAsync("SendMessage", NotificationModel);
+            tableRef.ReloadServerData();
         }
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);
         }
     }
-
-
-    private void Delete(long id)
+    private async Task Delete(long id)
     {
         try
         {
             _CategoryServiceRepository.Delete(id);
             Snackbar.Add("Category Data Deleted.", Severity.Success);
-            GetAll();
+            tableRef.ReloadServerData();
+            //GetAll();
+            await hubConnection.SendAsync("ServiceAddUpdate", ServiceModel);
+            NotificationModel.Message = $"{username} is delete service.";
+            NotificationModel.Title = "add category";
+            NotificationModel.UserId = userid;
+            await hubConnection.SendAsync("SendMessage", NotificationModel);
         }
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);
         }
     }
-
     private bool Search(CategoryService services)
     {
-        if (StringValid(services.ServiceName) && services.ServiceName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(searchString) && StringValid(services.ServiceName) && services.ServiceName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
-
         return false;
     }
-
     private bool StringValid(string strValue)
     {
         if (!string.IsNullOrEmpty(strValue))
         {
             return true;
         }
-
         return false;
     }
-
-
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        tableRef.ReloadServerData();
+    }
 }
-

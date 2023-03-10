@@ -10,6 +10,6 @@ namespace EMS.DB.Repository.Interface
     public interface INotificationMessagesRepository
     {
         public List<NotificationMessages> GetMessages();
-        public void Insert(NotificationMessages NotificationMessageModel);
+        public Task InsertAsync(NotificationMessages NotificationMessageModel);
     }
 }

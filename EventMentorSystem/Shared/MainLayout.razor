@@ -1,119 +1,174 @@
-﻿@inherits LayoutComponentBase
-@using Microsoft.AspNetCore.SignalR.Client
-@using EMS.DB.Models
-@using EMS.DB.Constant
-@using  EMS.DB.Repository.Interface
+﻿@using Microsoft.AspNetCore.Authentication;
+@using Microsoft.AspNetCore.Components;
+@using Microsoft.AspNetCore.Identity;
+@inherits LayoutComponentBase
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject NavigationManager _NavigationManager
-@*<div class="page">
-        <div class="sidebar">
-            <NavMenu />
-        </div>
-        <div id="noti_Container">
-            <div class='ikrNoti_Counter'>@currentUserMsgList.Count()</div>
-            <div class='ikrNoti_Button' style="background: #2E467C;" @onclick="NotificationHideShoe"></div>
-            <div class='ikrNotifications' style="display:@BoxCss !important" @onclick="NotificationHideShoe">
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudLayout>
+    <CascadingValue Value="_parameters" Name="cascadeParameters">
+        <MudAppBar Elevation="1">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            <MudText Typo="Typo.h5" Class="ml-3">Event Mentor</MudText>
+            <MudSpacer />
+            <MudBadge Content="@allNotificationMgs.Count()" Color="Color.Dark" Overlap="true" Class="mx-6 my-4 cursor-pointer">
+                <MudIconButton @onclick="NotificationHideShow" Icon="@Icons.Material.Filled.Notifications" Color="Color.Secondary" />
+            </MudBadge>
+            <div class='ikrNotifications' style="display:@BoxCss !important" @onclick="NotificationHideShow">
                 <h3>Notifications (<span class='notiCounterOnHead'>@currentUserMsgList.Count()</span>)</h3>
-                <div class='ikrNotificationItems'>
-                    @foreach (var nmobj in currentUserMsgList)
+                <div class='ikrNotificationItems' style="color:black">
+                    @foreach (var nmobj in allNotificationMgs.OrderByDescending(x => x.CreatedOn))
                     {
-                        <div class='ikrsingleNotiDiv' notiId="@nmobj.UserId">
-                            <h4 class='ikrNotiFromPropName'>Sender : @nmobj.Message</h4>
-                            <h5 class='ikrNotificationTitle'>@nmobj.Title</h5>
+                        <div class='ikrsingleNotiDiv' notiId="@nmobj.Id">
+                            <h4 class='ikrNotiFromPropName'>Title : @nmobj.Title</h4>
+                            <h5 class='ikrNotificationTitle'>Mesddage :@nmobj.Message</h5>
+                            <div class='ikrNotiCreatedDate'>@nmobj.CreatedOn</div>
                         </div>
                     }
                 </div>
                 <div class="ikrSeeAll"><a href="#">see all</a></div>
             </div>
-        </div>
-        <div class="main">
-            <div class="top-row px-4">
-                <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-            </div>
-
-            <div class="content px-4">
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" Edge="Edge.End" @onclick="Logout" />
+            <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        </MudAppBar>
+        <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+            <NavMenu />
+        </MudDrawer>
+        <MudMainContent>
+            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
                 @Body
-            </div>
-        </div>
-    </div>
-    <MudThemeProvider />
-    <MudDialogProvider />
-    <MudSnackbarProvider />
-    @code{
-        private List<NotificationMessages> allNotificationMgs = new List<NotificationMessages>();
-        private List<NotificationMessages> currentUserMsgList = new List<NotificationMessages>();
-        private NotificationMessages notificationMessage = new NotificationMessages();
-        private HubConnection hubConnection;
-        private string BoxCss = "none";
-        public bool IsConnected =>
-          hubConnection?.State == HubConnectionState.Connected;
-
-        private void NotificationHideShoe()
-        {
-            if (BoxCss == "none") BoxCss = "block";
-            else BoxCss = "none";
-        }
-
-    }*@
-
-<MudThemeProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
-<MudLayout>
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">Event Mentor</MudText>
-        <MudSpacer />
-            <MudBadge Content="@currentUserMsgList.Count()" Color="Color.Dark" Overlap="true" Class="mx-6 my-4 cursor-pointer">
-                <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="Color.Secondary" @onclick="@NotificationHideShoe" />
-            </MudBadge>
-
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
-    </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        @*NavMenu*@
-        <NavMenu />
-    </MudDrawer>
-    <MudMainContent>
-        @*Body*@
-        <MudContainer>
-            @Body
-        </MudContainer>
-    </MudMainContent>
+            </MudContainer>
+        </MudMainContent>
+    </CascadingValue>
 </MudLayout>
 @code {
+    [Inject]
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    [Inject] UserManager<User> UserManager { get; set; }
+
+    private readonly GlobalParameter _parameters = new();
+    private bool isUserLoggedIn = false;
     private List<NotificationMessages> allNotificationMgs = new List<NotificationMessages>();
     private List<NotificationMessages> currentUserMsgList = new List<NotificationMessages>();
     private NotificationMessages notificationMessage = new NotificationMessages();
-    private HubConnection hubConnection;
+    //private HubConnection hubConnection;
     private string BoxCss = "none";
-    public bool IsConnected =>
-      hubConnection?.State == HubConnectionState.Connected;
-
-    private List<NotificationMessages> GetNotificationMessages()
+    public bool IsConnected => _parameters.hubConnection?.State == HubConnectionState.Connected;
+    private string authMessage;
+    private string surname;
+    private string Userid;
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+    bool _drawerOpen = true;
+    protected override async Task OnInitializedAsync()
     {
-        allNotificationMgs = _NotificationMessagesRepository.GetMessages();
-        return allNotificationMgs;
+
+        _parameters.hubConnection = new HubConnectionBuilder()
+.WithUrl(_NavigationManager.ToAbsoluteUri("/chathub"))
+.Build();
+
+        _parameters.hubConnection.On<NotificationMessages>("SendMessage", (notificationMessages) =>
+        {
+            allNotificationMgs = _NotificationMessagesRepository.GetMessages();
+            allNotificationMgs = allNotificationMgs.Where(x=>x.UserId == _parameters.UserId).ToList();
+            InvokeAsync(StateHasChanged);
+        });
+
+        await _parameters.hubConnection.StartAsync();
     }
-    private void NotificationHideShoe()
+    protected override async Task OnParametersSetAsync()
+    {
+
+        allNotificationMgs = _NotificationMessagesRepository.GetMessages();
+        allNotificationMgs = allNotificationMgs.Where(x => x.UserId == _parameters.UserId).ToList();
+        StateHasChanged();
+        AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        if (authState.User.Identity is { IsAuthenticated: false })
+        {
+            isUserLoggedIn = false;
+            RedirectToLogin();
+        }
+        else
+        {
+            string nameIdentifier = authState.User.Identity.Name;
+            if (!string.IsNullOrEmpty(nameIdentifier))
+            {
+                isUserLoggedIn = true;
+                string userId = string.Empty;
+                var userIdClaim = authState.User.Claims.Where(c => c.Type == "UserId").FirstOrDefault();
+                var roleClaim = authState.User.Claims.Where(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role").FirstOrDefault();
+                if (userIdClaim != null)
+                {
+                    userId = userIdClaim.Value;
+                }
+                else
+                {
+                    var claim = authState.User.Claims.Where(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").FirstOrDefault();
+                    if (claim != null)
+                    {
+                        userId = claim.Value;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    RedirectToLogin();
+                }
+
+                if (string.IsNullOrEmpty(_parameters.UserId))
+                {
+                    await FetchUserData(userId);
+                }
+            }
+            else
+            {
+                RedirectToLogin();
+            }
+        }
+    }
+
+
+    private async Task FetchUserData(string userId)
+    {
+        try
+        {
+            _parameters.UserId = userId;
+            _parameters.LoggedInUser = await UserManager.FindByIdAsync(userId);
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+    }
+
+
+
+    private void RedirectToLogin()
+    {
+
+        _NavigationManager.NavigateTo($"/identity/account/login");
+    }
+
+
+    private void NotificationHideShow()
     {
         if (BoxCss == "none") BoxCss = "block";
         else BoxCss = "none";
     }
-    bool _drawerOpen = true;
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
-    protected override Task OnAfterRenderAsync(bool firstRender)
+
+    private async Task Logout()
     {
-        if (firstRender)
-        {
-            GetNotificationMessages();
-
-        }
-
-        return base.OnAfterRenderAsync(firstRender);
+        //
+        _NavigationManager.NavigateTo($"/identity/account/logout", true);
     }
+
 }

@@ -1,0 +1,129 @@
+﻿@page "/EditEvent/{EventId}"
+<AuthorizeView Roles="Admin" Context="data">
+    <Authorized>
+        <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+            <MudBreadcrumbs Items="_items"></MudBreadcrumbs>
+            <MudGrid>
+                <MudItem xs="12" sm="12">
+                    <MudCard Elevation="10" Style="height: 100%" Class="pa-4 rounded-lg">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h4">Event Details</MudText>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudIconButton OnClick="@(()=> EditEventDetails(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudDivider />
+                        <MudCardContent>
+                            <MudText>Event Name : @EventModel.EventName </MudText>
+                            <MudText>Organizor Name : @EventModel.OrganizerName</MudText>
+                            <MudText>Organizor Contact : @EventModel.OrganizerContact</MudText>
+                            <MudText>Event Description : @EventModel.Description</MudText>
+                            <MudText>Event Timeing : @EventModel.SlotType</MudText>
+                            <MudText>Event FromDate : @EventModel.FromDate</MudText>
+                            <MudText>Event ToDate : @EventModel.Todate</MudText>
+                            <MudText>Event Venue : @EventModel.EventVenue</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <MudCard Class="pa-4 rounded-lg" Style="height: 100%" Elevation="10">
+                                <MudCardHeader>
+                                    <CardHeaderContent>
+                                        <MudText Typo="Typo.h4">Event Service:</MudText>
+                                    </CardHeaderContent>
+                                    <CardHeaderActions>
+                                        <MudIconButton OnClick="@(() => EditEventSelectService(EventModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                                    </CardHeaderActions>
+                                </MudCardHeader>
+                                <MudDivider />
+                                <MudCardContent>
+                                    <MudText>category :@EventCategoryName.CategoryName</MudText>
+                                    <MudText>
+                                        Service:
+                                        @if (EventModel.SelectedService != null) { selectedServiceList = EventModel.SelectedService.Split(',').ToList(); }
+                                        @foreach (var service in selectedServiceList)
+                                        {<MudChip>@service</MudChip>}
+                                    </MudText>
+                                </MudCardContent>
+                            </MudCard>
+
+
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudCard Elevation="10" Style="height: 100%" Class="pa-4 rounded-lg">
+                                <MudCardHeader>
+                                    <CardHeaderContent>
+                                        <MudText Typo="Typo.h4">
+                                            Event payment:
+                                            @if (PaymentList is not null && PaymentList.Any())
+                                            {
+                                                @ValidCurrency(PaymentList.FirstOrDefault().TotalAmount)
+                                            }
+                                        </MudText>
+                                    </CardHeaderContent>
+                                    <CardHeaderActions>
+                                        <MudIconButton @onclick="@(() => OpenDialog(PaymentModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                                    </CardHeaderActions>
+                                </MudCardHeader>
+                                <MudDivider />
+                                <MudCardContent>
+                                    <MudGrid>
+                                        <MudItem md="2">Mode</MudItem>
+                                        <MudItem md="2">Received AMount</MudItem>
+                                        <MudItem md="2">Remaining AMount</MudItem>
+                                        <MudItem md="2">TransactionId</MudItem>
+                                        <MudItem md="4">Date</MudItem>
+                                    </MudGrid>
+                                    @foreach (var payment in PaymentList)
+                                    {
+                                        <MudGrid>
+                                            <MudItem md="2">@payment.PaymentMode</MudItem>
+                                            <MudItem md="2">@ValidCurrency(@payment.ReceivedAmount)</MudItem>
+                                            <MudItem md="2">@ValidCurrency(@payment.RemainingAmount)</MudItem>
+                                            <MudItem md="2">@payment.Transactionid</MudItem>
+                                            <MudItem md="4">@payment.CreatedOn.ToLocalTime()</MudItem>
+                                        </MudGrid>
+                                    }
+
+                                </MudCardContent>
+                            </MudCard>
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudCard Elevation="10" Style="height: 100%" Class="pa-4 rounded-lg">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h4">Event Staff:</MudText>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                @*<MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>*@
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudDivider />
+                        <MudCardContent>
+                            @foreach (var OperatorWork in GetEventStaffWork())
+                            {
+                                <MudText>@OperatorWork.Service</MudText>
+                                <MudText>@OperatorWork.Status</MudText>
+                                staffId = OperatorWork.StaffId;
+                                foreach (var staff in Getstaff())
+                                {
+                                    <MudText>@staff.User.UserName</MudText>
+                                }
+                            }
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>  
+
+            </MudGrid>
+        </MudContainer>
+    </Authorized>
+    <NotAuthorized>
+        <MudAlert Severity="Severity.Error">please <MudLink Href="/login">login</MudLink></MudAlert>
+    </NotAuthorized>
+</AuthorizeView>

@@ -1,4 +1,5 @@
 ﻿using EMS.DB.Models;
+using System;
 using System.Collections.Generic;
 
 namespace  EMS.DB.Repository.Interface
@@ -11,5 +12,6 @@ namespace  EMS.DB.Repository.Interface
         public void Update(Event eventModel);
         public void Delete(long id);
         public void SaveChanges();
+        public List<Event> GetListFromDashboard(DateTime? startDate, DateTime? endDate);
     }
 }

@@ -15,6 +15,7 @@ namespace EMS.DB.Models
         public string EventVenue { get; set; }
         public string OrganizerName { get; set; }
         public string OrganizerContact { get; set; }
+        public string Email { get; set; }
         public string Description { get; set; }
 
         public string SlotType { get;set; }
@@ -38,7 +39,7 @@ namespace EMS.DB.Models
         public long CategoryId { get; set; } = 0;
         public EventCategory Category { get; set; }
 
-        public virtual List<OperatorWork> OperatorWork { get; set; }
+        public virtual List<EventStaffWork> EventStaffWork { get; set; }
 
         public virtual Payment Payment { get; set; }
 

@@ -28,6 +28,9 @@
                 <MudTextField Class="mt-0" @bind-Value="eventModel.OrganizerContact" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
+                <MudTextField Class="mt-0" @bind-Value="eventModel.Email" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem lg="4" md="4" xs="12">
                 <MudSelect @bind-Value="@eventModel.SlotType" Class="m-0" T="string" Label="slot" Variant="Variant.Outlined">
                     <MudSelectItem Value="@(EventSlotType.Morning.ToString())" />
                     <MudSelectItem Value="@(EventSlotType.Evening.ToString())" />
@@ -36,12 +39,13 @@
                 </MudSelect>
             </MudItem>
             <MudItem lg="2" md="3" xs="12">
-                <MudDatePicker Label="From Date" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy" />
+                <MudDatePicker Label="From Date" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy"  Variant="Variant.Outlined" />
             </MudItem>
+            @if (eventModel.SlotType== EventSlotType.MultipleDay.ToString()) {
             <MudItem lg="2" md="3" xs="12">
-                <MudDatePicker Label="To Date" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" />
+                <MudDatePicker Label="To Date" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" />
             </MudItem>
-
+            }
             <MudItem lg="4" md="4" xs="12">
                 <MudSelect @bind-Value="eventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                     @foreach (var eventCategory in EventCategoryList)
@@ -104,6 +108,8 @@
         if (firstRender)
         {
             eventModel.OrganizerName = inquiryModel.Fullname;
+            eventModel.SlotType = inquiryModel.SlotType;
+            eventModel.Email = inquiryModel.Email;
             eventModel.OrganizerContact = inquiryModel.MobileNo;
             eventModel.FromDate = inquiryModel.FromDate;
             eventModel.Todate = inquiryModel.ToDate;
@@ -144,7 +150,7 @@
     {
         try
         {
-            NotificationMessageModel.UserId = 1;
+            NotificationMessageModel.UserId = Guid.NewGuid().ToString();//Live user data
             NotificationMessageModel.Message = "This is demo";
             NotificationMessageModel.Title = "demo";
             _EventRepository.Insert(eventModel);
@@ -152,7 +158,7 @@
             GetAllevents();
             eventModel = new Event();
             MudDialog.Close();
-            _NotificationMessagesRepository.Insert(NotificationMessageModel);
+            _NotificationMessagesRepository.InsertAsync(NotificationMessageModel);
             await hubConnection.SendAsync("sendMessage", notificationMessage.UserId, notificationMessage.Message, notificationMessage.Title);
             notificationMessage.Message = "";
             notificationMessage.Title = "";
@@ -182,7 +188,7 @@
             .WithUrl(_NavigationManager.ToAbsoluteUri("/chathub"))
             .Build();
 
-        hubConnection.On<long, string, string>("ReceiveMessage", (userId, message, title) =>
+        hubConnection.On<string, string, string>("ReceiveMessage", (userId, message, title) =>
         {
             allNotificationMgs.Add(new NotificationMessages()
             {

@@ -12,6 +12,15 @@ using MudBlazor.Services;
 using Microsoft.AspNetCore.ResponseCompression;
 using BlazorServerSignalRApp.Server.SignalRHubs;
 using System.Linq;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.Components.Authorization;
+using EventMentorSystem.Authentication;
+using EMS.DB.Models;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Threading.Tasks;
 
 namespace EventMentorSystem
 {
@@ -28,10 +37,41 @@ namespace EventMentorSystem
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication("Identity.Application").AddCookie();
+            #region Connection String
+            services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
+            services.AddDbContext<AppDbContext>(item => item.UseSqlServer(Configuration.GetConnectionString("myconn")));
+            // 3 : Cookie Options  
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.AccessDeniedPath = "/Error/AccessDenied";
+                options.Cookie.Name = "MyAPP";
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                options.LoginPath = "/";
+                //options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+                options.SlidingExpiration = true;
+            });
+            services.AddHttpContextAccessor();
+            #endregion
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddMudServices();
-            //services.AddSingleton<WeatherForecastService>();
+            services.AddSignalRCore();
+            services.AddAuthenticationCore();
+            services.AddScoped<ProtectedSessionStorage>();
+            //services.AddScoped<CustomAuthenticationStateProvider>();
+            //services.AddScoped<AuthenticationStateProvider>(provider =>
+            //provider.GetRequiredService<CustomAuthenticationStateProvider>());
+
+
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
             #region Register service
@@ -39,12 +79,14 @@ namespace EventMentorSystem
             services.AddScoped<IInquiryRepository, InquiryRepository>();
             services.AddScoped<IEventCategoryRepository, EventCategoryRepository>();
             services.AddScoped<ICategoryServiceRepository, CategoryServiceRepository>(); 
-            services.AddScoped<IUserRepository, UserRepository>(); 
-            services.AddScoped<IStaffWorkRepository, StaffWorkRepository>(); 
-            services.AddScoped<IOperatorWorkRepository, OperatorWorkRepository>(); 
+            services.AddScoped<IUserRepository, UserRepository>();  
+            services.AddScoped<IEventStaffWorkRepository, EventStaffWorkRepository>(); 
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IStaffRepository, StaffRepository>();
             services.AddScoped<INotificationMessagesRepository, NotificationMessagesRepository>();
+            services.AddScoped<ISupervisorRepository, SupervisorRepository>();
+            services.AddScoped<IOperatorRepository, OperatorRepository>();
+            services.AddScoped<IAdminRepository, AdminRepository>();
             #endregion
 
             services.AddResponseCompression(opts =>
@@ -53,15 +95,17 @@ namespace EventMentorSystem
                     new[] { "application/octet-stream" });
             });
 
-            #region Connection String
-            services.AddDbContext<AppDbContext>(item => item.UseSqlServer(Configuration.GetConnectionString("myconn")));
-            #endregion
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
+               RoleManager<IdentityRole> roleManager,
+               UserManager<User> userManager)
         {
             app.UseResponseCompression();
+            ApplicationDbInitialiser.SeedRoles(roleManager);
+            ApplicationDbInitialiser.SeedUsers(userManager);
 
             if (env.IsDevelopment())
             {
@@ -74,6 +118,8 @@ namespace EventMentorSystem
                 app.UseHsts();
             }
 
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -86,5 +132,25 @@ namespace EventMentorSystem
                 endpoints.MapFallbackToPage("/_Host");
             });
         }
+
+        //public static class RolesData
+        //{
+        //    private static readonly string[] Roles = new string[] { "Admin", "Manager", "Member" };
+
+        //    public static async Task SeedRoles(IServiceProvider serviceProvider)
+        //    {
+        //        using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
+        //        {
+        //            var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        //            foreach (var role in Roles)
+        //            {
+        //                if (!await roleManager.RoleExistsAsync(role))
+        //                {
+        //                    await roleManager.CreateAsync(new IdentityRole(role));
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
     }
 }

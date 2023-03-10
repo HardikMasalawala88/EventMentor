@@ -1,30 +1,27 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace EMS.DB.Models
 {
-    public class User : BaseEntity
+    public class User : IdentityUser
     {
-        [Required]
-        public string UserName { get; set; }
-        [Required]
-        public string Usercontactno { get; set; }
-        [Required]
-        public string Useremail { get; set; }
-        [Required]
-        public string Userpassword { get; set; }
-        [Required]
+        public string FullName { get; set; }
+        public string ContactNo { get; set; }
+        public string Password { get; set; }
         public string Useraddress { get; set; }
-        [Required]
         public string Userrole { get; set; }
-        [Required]
         public DateTime UserJoiningDate { get; set; } = DateTime.Today;
 
-        public virtual Staff Staffs { get; set; }
+        public bool IsActive { get; set; }
 
+        public virtual Staff Staffs { get; set; }
+        public virtual Operator Operators { get; set; }
+        public virtual Supervisor Supervisors { get; set; }
     }
 }

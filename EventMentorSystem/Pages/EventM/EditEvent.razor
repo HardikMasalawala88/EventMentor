@@ -69,11 +69,11 @@
 
         base.OnInitialized();
     }
+
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-
             GetAllevents();
             StateHasChanged();
         }
@@ -95,7 +95,7 @@
             eventModel = new Event();
             MudDialog.Close(DialogResult.Ok(true));
             Snackbar.Add("Data Update Successfull.", Severity.Success);
-            _EventRepository.SaveChanges();
+            StateHasChanged();
         }
         catch (Exception ex)
         {

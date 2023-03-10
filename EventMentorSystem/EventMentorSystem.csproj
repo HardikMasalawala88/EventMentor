@@ -1,32 +1,50 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Shared\Components\**" />
+    <Content Remove="Shared\Components\**" />
+    <EmbeddedResource Remove="Shared\Components\**" />
+    <None Remove="Shared\Components\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="Pages\Error.cshtml" />
     <None Include="Pages\AddEventCategoryAndService\EventCategorys.razor" />
-    <None Include="Pages\EventM\Index.razor" />
     <None Include="Pages\AddEventCategoryAndService\ServicesList.razor" />
-    <None Include="Pages\EventM\ShowInquiryData.razor" />
-    <None Include="Pages\EventM\ViewEvent.razor" />
     <None Include="Pages\InquiryM\AddEventDialog.razor" />
     <None Include="Pages\InquiryM\AddInquiryDialog.razor" />
     <None Include="Pages\InquiryM\Index.razor" />
     <None Include="Pages\LandingPage\Home.razor" />
     <None Include="Pages\LandingPage\Inquiryform.razor" />
     <None Include="Pages\_Host.cshtml" />
+    <None Include="Shared\Common\CustomControlLabel\CustomControlLabel.razor" />
+    <None Include="Shared\Common\CustomMudDate\CustomMudDate.razor" />
+    <None Include="Shared\Common\CustomMudDialog\CustomMudDialog.razor" />
+    <None Include="Shared\Common\CustomMudDialog\CustomMudDialogTitle.razor" />
+    <None Include="Shared\Common\CustomMudSelect\CustomMudSelect.razor" />
+    <None Include="Shared\Common\CustomMudTextField\CustomMudTextField.razor" />
+    <None Include="Shared\Common\FontLabel\FontLabel.razor" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EASendMail" Version="7.9.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Connections.Client" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.17" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.17">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.17" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.17">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="MudBlazor" Version="5.2.5" />
   </ItemGroup>
 
@@ -35,7 +53,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
+    <Folder Include="obj\" />
   </ItemGroup>
 
 </Project>

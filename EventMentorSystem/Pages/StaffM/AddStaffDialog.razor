@@ -4,6 +4,7 @@
 @inject IEventRepository _EventRepository;
 @inject ISnackbar Snackbar;
 @inject IUserRepository _UserRepository;
+@inject IStaffRepository _StaffRepository;
 @inject IEventCategoryRepository _EventCategoryRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject IDialogService DialogService
@@ -12,34 +13,23 @@
     <DialogContent>
         <MudGrid>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="userModel.UserName" Class="m-0" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="staffModel.User.UserName" Class="m-0" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="userModel.Usercontactno" Class="m-0" Label="MobileNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="staffModel.User.ContactNo" Class="m-0" Label="MobileNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="userModel.Useremail" Class="m-0" Label="AltPhoneNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-            </MudItem>
-            <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="userModel.Useraddress" Class="m-0" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="staffModel.User.Email" Class="m-0" Label="AltPhoneNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             </MudItem>
             <MudItem>
-                @*<MudSelect @bind-Value="ServiceModel.EventCategoryId" Label="select categorys" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+                <MudSelect @bind-Value="staffModel.StaffService" Label="select Service" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
 
-                    @foreach (var eventCategory in EventCategoryList)
+                    @foreach (var data in ServiceList)
                     {
-                        <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
+                        <MudSelectItem Value="@data.Id">@data.ServiceName</MudSelectItem>
 
                     }
-                </MudSelect>*@
-                @*<MudSelect @bind-Value="ServiceModel.EventCategoryId" Label="select categorys" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
-
-                    @foreach (var eventCategory in EventCategoryList)
-                    {
-                        <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
-
-                    }
-                </MudSelect>*@
+                </MudSelect>
             </MudItem>
         </MudGrid>
 
@@ -56,17 +46,13 @@
 
     private CategoryService ServiceModel = new();
     private List<CategoryService> ServiceList = new();
-    private List<EventCategory> EventCategoryList = new();
-
     private string searchString = "";
-
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            GetEventCategoryList();
             GetAll();
-
+            StateHasChanged();
         }
 
         return base.OnAfterRenderAsync(firstRender);
@@ -77,66 +63,30 @@
         ServiceList = _CategoryServiceRepository.GetList();
         return ServiceList;
     }
-
-    private void GetEventCategoryList()
-    {
-        EventCategoryList = _EventCategoryRepository.GetList();
-    }
-
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public User UserModel { get; set; } = new User();
+    [Parameter] public Staff StaffModel { get; set; } = new Staff();
 
     private bool isReadOnly = false;
-    private User userModel = new();
-    private Event eventModel = new();
-
-    private List<User> userList = new();
-
+    private Staff staffModel = new();
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
 
-    private List<User> GetLists()
-    {
-        userList = _UserRepository.GetUserList();
-        return userList;
-    }
-
     protected override void OnInitialized()
     {
-        if (UserModel is not null && UserModel.Id > 0)
+        if (StaffModel is not null && StaffModel.Id >0)
         {
             isReadOnly = true;
         }
-        userModel = UserModel;
+        staffModel = StaffModel;
         base.OnInitialized();
     }
-
-
     private void Save()
     {
         try
         {
-            _UserRepository.Insert(userModel);
+            _StaffRepository.Update(staffModel);
             MudDialog.Close(DialogResult.Ok(true));
-            userModel = new User();
-
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-
-    }
-
-    private void reject(long id)
-    {
-        try
-        {
-            _UserRepository.Delete(id);
-            GetLists();
-            MudDialog.Close(DialogResult.Ok(true));
-            userModel = new User();
-            Snackbar.Add("Inquiry Rejected Successfull.", Severity.Success);
+            staffModel = new Staff();
 
         }
         catch (Exception ex)
@@ -148,27 +98,7 @@
     private void CancelForm()
     {
         MudDialog.Close(DialogResult.Ok(true));
-        userModel = new User();
+        staffModel = new Staff();
     }
-
-    private void OpenDialog(Inquiry inquiry, Event events)
-    {
-
-        var parameters = new DialogParameters();
-        parameters.Add("InquiryModel", inquiry);
-        parameters.Add("EventModel", events);
-        var options = new DialogOptions()
-        {
-            CloseOnEscapeKey = false,
-            CloseButton = true,
-            MaxWidth = MaxWidth.Large,
-            Position = DialogPosition.TopCenter,
-            DisableBackdropClick = true
-        };
-
-
-
-    }
-
-
 }
+

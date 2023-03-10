@@ -1,18 +1,18 @@
 ﻿@using EMS.DB.Models
 @using EMS.DB.Constant
 @using  EMS.DB.Repository.Interface
-@inject IOperatorWorkRepository _OperatorWorkRepository;
+@inject IEventStaffWorkRepository _EventStaffWorkRepository;
 @inject ISnackbar Snackbar;
 
 
 <MudDialog>
     <DialogContent>
-        @if (operatorWorkModel.Status == "Workpending")
+        @if (eventStaffWorkModel.Status == "Workpending")
         {
             <MudTimeline Class="mb-3" TimelineOrientation=" TimelineOrientation.Horizontal">
                 <MudTimelineItem Color="Color.Error" Variant="Variant.Filled">
                     <ItemContent>
-                        <MudAlert Class="mt-1" Severity="Severity.Error">@operatorWorkModel.Status</MudAlert>
+                        <MudAlert Class="mt-1" Severity="Severity.Error">@eventStaffWorkModel.Status</MudAlert>
                     </ItemContent>
                 </MudTimelineItem>
 
@@ -24,14 +24,14 @@
                 </MudTimelineItem>
             </MudTimeline>
         }
-        else if (operatorWorkModel.Status == "WorkOnProcess")
+        else if (eventStaffWorkModel.Status == "WorkOnProcess")
         {
             <MudTimeline Class="mb-3" TimelineOrientation=" TimelineOrientation.Horizontal">
                 <MudTimelineItem Color="Color.Error" Variant="Variant.Filled">
                 </MudTimelineItem>
                 <MudTimelineItem Color="Color.Warning" Variant="Variant.Filled" Class="mb-1">
                     <ItemContent>
-                        <MudAlert Class="mt-1" Severity="Severity.Warning">@operatorWorkModel.Status</MudAlert>
+                        <MudAlert Class="mt-1" Severity="Severity.Warning">@eventStaffWorkModel.Status</MudAlert>
                     </ItemContent>
                 </MudTimelineItem>
                 <MudTimelineItem Color="Color.Success" Variant="Variant.Filled">
@@ -50,7 +50,7 @@
                 </MudTimelineItem>
                 <MudTimelineItem Color="Color.Success" Variant="Variant.Filled" Class="mb-1">
                     <ItemContent>
-                        <MudAlert Severity="Severity.Success">@operatorWorkModel.Status</MudAlert>
+                        <MudAlert Severity="Severity.Success">@eventStaffWorkModel.Status</MudAlert>
                     </ItemContent>
                 </MudTimelineItem>
             </MudTimeline>
@@ -60,16 +60,16 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public OperatorWork OperatorWorkModel { get; set; } = new OperatorWork();
-    private OperatorWork operatorWorkModel = new();
+    [Parameter] public EventStaffWork EventStaffWorkModel { get; set; }
+    private EventStaffWork eventStaffWorkModel = new();
     protected override void OnInitialized()
     {
-        operatorWorkModel = OperatorWorkModel;
+        eventStaffWorkModel = EventStaffWorkModel;
         base.OnInitialized();
     }
     private void CancelForm()
     {
         MudDialog.Close(DialogResult.Ok(true));
-        operatorWorkModel = new OperatorWork();
+        eventStaffWorkModel = new EventStaffWork();
     }
 }

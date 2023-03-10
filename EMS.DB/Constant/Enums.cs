@@ -22,9 +22,9 @@ namespace EMS.DB.Constant
     public enum Userrole
     {
         Admin,
-        staff,
-        operators,
-        supervisor
+        Staff,
+        Operator,
+        Supervisor
     }
 
     public enum InquiryStatusType

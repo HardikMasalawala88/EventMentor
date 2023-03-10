@@ -9,7 +9,9 @@ namespace EMS.DB.Models
     {
         public string Message { get; set; } = "";
         public string Title { get; set; } = "";
-        public long UserId { get; set; }
+        public string UserId { get; set; }
+        public long EventId { get; set; }
+        public bool MarkAsRead { get; set; }
         public User User { get; set; }
     }
 }

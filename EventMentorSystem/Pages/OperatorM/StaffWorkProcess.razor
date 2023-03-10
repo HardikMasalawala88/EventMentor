@@ -1,7 +1,7 @@
 ﻿@using EMS.DB.Models
 @using EMS.DB.Constant
 @using  EMS.DB.Repository.Interface
-@inject IOperatorWorkRepository _OperatorWorkRepository;
+@inject IEventStaffWorkRepository _EventStaffWorkRepository;
 @inject ISnackbar Snackbar;
 
 
@@ -9,7 +9,7 @@
     <DialogContent>
         <MudGrid>
             <MudItem lg="8" md="8" xs="12">
-                <MudSelect Margin="Margin.Dense" T="String" @bind-Value="@operatorWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelect Margin="Margin.Dense" T="String" @bind-Value="@eventStaffWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                     <MudSelectItem Value="@(Status.Workpending.ToString())" />
                     <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
                     <MudSelectItem Value="Status.WorkFinish.ToString()" />
@@ -22,9 +22,9 @@
                 <MudTimelineItem Color="Color.Error" Elevation="25">
                     <ItemContent>
                         <MudPaper Elevation="0" Class="mt-n1">
-                            @if (operatorWorkModel.Status == "Workpending")
+                            @if (eventStaffWorkModel.Status == "Workpending")
                             {
-                                <MudAlert Severity="Severity.Error">@operatorWorkModel.Status</MudAlert>
+                                <MudAlert Severity="Severity.Error">@eventStaffWorkModel.Status</MudAlert>
                             }
                         </MudPaper>
                     </ItemContent>
@@ -33,9 +33,9 @@
                     
                     <ItemContent>
                         <MudPaper Elevation="0" Class="mt-n1">
-                            @if (operatorWorkModel.Status == "WorkOnProcess")
+                            @if (eventStaffWorkModel.Status == "WorkOnProcess")
                             {
-                                <MudAlert Severity="Severity.Warning">@operatorWorkModel.Status</MudAlert>
+                                <MudAlert Severity="Severity.Warning">@eventStaffWorkModel.Status</MudAlert>
                             }
                         </MudPaper>
                     </ItemContent>
@@ -43,9 +43,9 @@
                 <MudTimelineItem Color="Color.Success" Elevation="25">
                     <ItemContent>
                         <MudPaper Elevation="0" Class="mt-n1">
-                            @if (operatorWorkModel.Status == "WorkFinish")
+                            @if (eventStaffWorkModel.Status == "WorkFinish")
                             {
-                                <MudAlert Severity="Severity.Success">@operatorWorkModel.Status</MudAlert>
+                                <MudAlert Severity="Severity.Success">@eventStaffWorkModel.Status</MudAlert>
                             }
                         </MudPaper>
                     </ItemContent>
@@ -57,11 +57,11 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public OperatorWork OperatorWorkModel { get; set; } = new OperatorWork();
-    private OperatorWork operatorWorkModel = new();
+    [Parameter] public EventStaffWork EventStaffWorkModel { get; set; } = new EventStaffWork();
+    private EventStaffWork eventStaffWorkModel = new();
     protected override void OnInitialized()
     {
-        operatorWorkModel = OperatorWorkModel;
+        eventStaffWorkModel = EventStaffWorkModel;
         base.OnInitialized();
     }
 
@@ -69,9 +69,9 @@
     {
         try
         {
-            _OperatorWorkRepository.Update(OperatorWorkModel);
+            _EventStaffWorkRepository.Update(eventStaffWorkModel);
             Snackbar.Add("Event work Status Change", Severity.Success);
-            OperatorWorkModel = new OperatorWork();
+            eventStaffWorkModel = new EventStaffWork();
 
         }
         catch (Exception ex)
@@ -82,6 +82,6 @@
     private void CancelForm()
     {
         MudDialog.Close(DialogResult.Ok(true));
-        operatorWorkModel = new OperatorWork();
+        eventStaffWorkModel = new EventStaffWork();
     }
 }

@@ -5,49 +5,80 @@
 @using EMS.DB.Constant
 @inject ISnackbar Snackbar;
 @inject IUserRepository _UserRepository;
+@inject IStaffRepository _StaffRepository;
+@inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject IDialogService DialogService
+<AuthorizeView Roles="Admin" Context="data">
+    <Authorized>
+        @*Filter="new Func<User, bool>(Search)"*@
+        <MudTable Elevation="25" Items="GetAllstaff()" @bind-customer="StaffList" HorizontalScrollbar="true" Breakpoint="Breakpoint.Sm">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Update Staff list</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Action</MudTh>
+                <MudTh>Id</MudTh>
+                <MudTh>StaffFullname</MudTh>
+                <MudTh>StaffEmail</MudTh>
+                <MudTh>StaffMobileNo</MudTh>
+                <MudTh>Staff Service</MudTh>
 
-<MudTable Elevation="25" Items="GetAlluser()" Filter="new Func<User, bool>(Search)" @bind-customer="userList" HorizontalScrollbar="true" Breakpoint="Breakpoint.Sm">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Update Staff list</MudText>
-        <MudSpacer />
-        <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Action</MudTh>
-        <MudTh>StaffFullname</MudTh>
-        <MudTh>StaffMobileNo</MudTh>
-        <MudTh>StaffEmail</MudTh>
-        <MudTh>StaffAddressLine</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="">
+                    <MudFab @onclick="@(() => OpenDialog(context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small">
+                        edit
+                    </MudFab>
+                    <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+                <MudTd DataLabel="">@context.Id </MudTd>
+                <MudTd DataLabel="">@context.User.UserName</MudTd>
+                <MudTd DataLabel="">@context.User.Email</MudTd>
+                <MudTd DataLabel="">@context.User.ContactNo</MudTd>
+                @if (context.StaffService >0)
+                {
+                    foreach (var data in GetAll())
+                    {
+                        if (data.Id == context.StaffService)
+                        {
+                            <MudTd DataLabel="">@data.ServiceName</MudTd>
+                        }
+                    }
+                }
+                else
+                {
+                    <MudTd DataLabel="">Not Selected yet.</MudTd>
+                }
+            </RowTemplate>
+        </MudTable>
+    </Authorized>
+    <NotAuthorized>
+        <MudAlert Severity="Severity.Error">please <MudLink Href="/login">login</MudLink></MudAlert>
+    </NotAuthorized>
+</AuthorizeView>
 
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(() => OpenDialog(context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small">
-                edit
-            </MudFab>
-            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-        </MudTd>
-
-        <MudTd DataLabel="Event Name">@context.UserName </MudTd>
-        <MudTd DataLabel="">@context.Usercontactno </MudTd>
-        <MudTd DataLabel="">@context.Useremail</MudTd>
-        <MudTd DataLabel="">@context.Useraddress</MudTd>
-    </RowTemplate>
-</MudTable>
 
 @code{
     private string searchString = "";
     private User userModel = new();
-
+    private Staff StaffModel = new();
+    private List<CategoryService> Servicelist = new();
     private List<User> userList = new();
+    private List<Staff> StaffList = new();
 
-
+    private List<CategoryService> GetAll()
+    {
+        Servicelist = _CategoryServiceRepository.GetList();
+        return Servicelist;
+    }
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             GetAlluser();
+            GetAllstaff();
         }
 
         return base.OnAfterRenderAsync(firstRender);
@@ -55,28 +86,33 @@
 
     private List<User> GetAlluser()
     {
-        userList = _UserRepository.GetStaffList();
+        userList = _UserRepository.GetAllUser();
         return userList;
     }
-
-    private bool Search(User user)
+    private List<Staff> GetAllstaff()
     {
-        if (StringValid(user.UserName)
-        && StringValid(user.Usercontactno)
-        && StringValid(user.Useremail)
-        && StringValid(user.Useraddress)
-        &&
-        user.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-        || user.Usercontactno.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-        || user.Useremail.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-        || user.Useraddress.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-        )
-        {
-            return true;
-        }
-
-        return false;
+        StaffList = _StaffRepository.GetList();
+        return StaffList;
     }
+
+    //private bool Search(User user)
+    //{
+    //    if (StringValid(user.UserName)
+    //    && StringValid(user.ContactNo)
+    //    && StringValid(user.Email)
+    //    && StringValid(user.Useraddress)
+    //    &&
+    //    user.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+    //    || user.ContactNo.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+    //    || user.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+    //    || user.Useraddress.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+    //    )
+    //    {
+    //        return true;
+    //    }
+
+    //    return false;
+    //}
 
     private bool StringValid(string strValue)
     {
@@ -92,9 +128,9 @@
     {
         try
         {
-            _UserRepository.Insert(userModel);
-            GetAlluser();
-            userModel = new User();
+            _StaffRepository.Insert(StaffModel);
+            GetAllstaff();
+            StaffModel = new Staff();
         }
         catch (Exception ex)
         {
@@ -112,7 +148,7 @@
     {
         try
         {
-            userModel = userList.FirstOrDefault(c => c.Id == id);
+            StaffModel = StaffList.FirstOrDefault(c => c.Id == id);
         }
         catch (Exception ex)
         {
@@ -130,7 +166,7 @@
     {
         try
         {
-            _UserRepository.Delete(id);
+            _StaffRepository.Delete(id);
             GetAlluser();
         }
         catch (Exception ex)
@@ -138,11 +174,11 @@
             Snackbar.Add(ex.Message, Severity.Error);
         }
     }
-    private void OpenDialog(User user)
+    private void OpenDialog(Staff staff)
     {
 
         var parameters = new DialogParameters();
-        parameters.Add("userModel", user);
+        parameters.Add("staffModel", staff);
         var options = new DialogOptions()
         {
             CloseOnEscapeKey = false,
@@ -155,4 +191,3 @@
         DialogService.Show<AddStaffDialog>("AddStaffDialog", parameters, options);
     }
 }
-

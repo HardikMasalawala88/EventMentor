@@ -1,74 +1,28 @@
-﻿@*<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">EventMentorSystem</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
-
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="AddUser">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Add User
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="eventlist">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> event list
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="Inqurylist">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Inquiry list
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="ViewPayment">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Payment List
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="EventCategorys">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Categorys List
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="ServiceList">
-                <span class="oi oi-list-rich" aria-hidden="true"></span>Category Services
-            </NavLink>
-        </li>
-
-    </ul>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}*@
-
+﻿@inject IUserRepository _UserRepository;
 
 <MudPaper Width="250px" Class="d-inline-flex py-3" Elevation="0">
     <MudNavMenu Class="mud-width-full">
-        <MudText Typo="Typo.h6" Class="px-4">User name</MudText>
-        <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">UserRole</MudText>
+        @foreach (var data in Getuser()) {
+        <PersonCard UserName="@data.FullName" UserRole="@data.Userrole" Style="background-color: var(--mud-palette-drawer-background);color: var(--mud-palette-drawer-text);" />
+        }
         <MudDivider Class="my-2" />
-        <MudNavLink Href="/dashboard" Icon="fas fa-chart-line">Dashboard</MudNavLink>
-        <MudNavLink Href="/AddUser" Icon="fas fa-users">Users</MudNavLink>
-        <MudNavLink Href="/eventlist" Icon="fas fa-server">Events</MudNavLink>
-        <MudNavLink Href="/Inqurylist" Icon="fas fa-server">Inquiries</MudNavLink>
-        <MudNavLink Href="/ViewPayment" Icon="fas fa-server">Payments</MudNavLink>
-        <MudNavLink Href="/EventCategorys" Icon="fas fa-server">Categories</MudNavLink>
-        <MudNavLink Href="/ServiceList" Icon="fas fa-server">Category Services</MudNavLink> 
+        <MudNavLink Href="/dashboard" Match="NavLinkMatch.All"
+                    Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
+        <MudNavLink Href="/userlist" Icon="@Icons.Material.TwoTone.AccountBox">Users</MudNavLink>
+        <MudNavLink Href="/eventlist" Icon="@Icons.Material.TwoTone.Event">Events</MudNavLink>
+        <MudNavLink Href="/Inqurylist" Icon="@Icons.Material.TwoTone.AppRegistration">Inquiries</MudNavLink>
+        <MudNavLink Href="/ViewPayment" Icon="@Icons.Material.TwoTone.Payment">Payments</MudNavLink>
+        <MudNavLink Href="/EventCategorys" Icon="@Icons.Material.TwoTone.ViewList">Categories</MudNavLink>
+        <MudNavLink Href="/ServiceList" Icon="@Icons.Material.TwoTone.Category">Category Services</MudNavLink>
+        <MudNavLink Href="/Updatelist" Icon="@Icons.Material.TwoTone.Category">Staffs</MudNavLink>
+        <MudNavLink Href="/staffworkgiven" Icon="@Icons.Material.TwoTone.Category">Staff work given</MudNavLink>
     </MudNavMenu>
 </MudPaper>
+@code{
+    [CascadingParameter(Name = "cascadeParameters")]
+    public GlobalParameter _parameters { get; set; }
+    private List<User> Getuser()
+    {
+        return _UserRepository.GetById(_parameters.UserId);
+    }
+}

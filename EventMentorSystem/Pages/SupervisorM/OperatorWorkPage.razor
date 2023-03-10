@@ -3,126 +3,140 @@
 @using  EMS.DB.Repository.Interface
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
-@inject IOperatorWorkRepository _OperatorWorkRepository;
+@inject IEventStaffWorkRepository _EventStaffWorkRepository;
 @inject ISnackbar Snackbar;
 @inject IDialogService DialogService
 @using EMS.DB.Constant
 <h3>OperatorWorkPage</h3>
-
-@if (IsAdd)
-{
-    <MudCard Elevation="25">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h6">Operator Work</MudText>
-            </CardHeaderContent>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudItem>
-                <MudTextField @bind-Value="OperatorWorkModel.EventId" Label="Event Id" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="OperatorWorkModel.Service" Label="Service" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="OperatorWorkModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                @*<MudSelect T="String" @bind-Value="@OperatorWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                        <MudSelectItem Value="@(Status.Workpending.ToString())" />
-                        <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
-                        <MudSelectItem Value="Status.WorkFinish.ToString()" />
-                    </MudSelect>*@
-            </MudItem>
+<AuthorizeView Roles="Admin" Context="data">
+    <Authorized>
+        @if (IsAdd)
+        {
+            <MudCard Elevation="25">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Operator Work</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudItem>
+                        <MudTextField @bind-Value="EventStaffWorkModel.EventId" Label="Event Id" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                        <MudTextField @bind-Value="EventStaffWorkModel.Service" Label="Service" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                        <MudTextField @bind-Value="EventStaffWorkModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                        @*<MudSelect T="String" @bind-Value="@EventStaffWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                <MudSelectItem Value="@(Status.Workpending.ToString())" />
+                                <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
+                                <MudSelectItem Value="Status.WorkFinish.ToString()" />
+                            </MudSelect>*@
+                    </MudItem>
+                    <MudItem Class="d-flex justify-end">
+                        <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
+                            <FontLabel Fontweight="500"  FontColor="#FFF">Cancel</FontLabel>
+                        </MudButton>
+                        <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                            <FontLabel Fontweight="500"  FontColor="#FFF">Add</FontLabel>
+                        </MudButton>
+                    </MudItem>
+                </MudCardContent>
+            </MudCard>
+        }
+        else if (IsEdit)
+        {
+            <MudCard Elevation="25">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Operator Work</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudItem>
+                        <MudTextField @bind-Value="EventStaffWorkModel.EventId" Label="Event Id" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
+                        <MudTextField @bind-Value="EventStaffWorkModel.Service" Label="Service" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
+                        <MudTextField @bind-Value="EventStaffWorkModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
+                        @*<MudSelect T="String" @bind-Value="@EventStaffWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                <MudSelectItem Value="@(Status.Workpending.ToString())" />
+                                <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
+                                <MudSelectItem Value="Status.WorkFinish.ToString()" />
+                            </MudSelect>*@
+                    </MudItem>
+                    <MudItem Class="d-flex justify-end">
+                        <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
+                            <FontLabel Fontweight="500">Cancel</FontLabel>
+                        </MudButton>
+                        <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                            <FontLabel Fontweight="500"  FontColor="#FFF">Update</FontLabel>
+                        </MudButton>
+                    </MudItem>
+                </MudCardContent>
+            </MudCard>
+        }
+        else
+        {
             <MudItem Class="d-flex justify-end">
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
-                    <FontLable FontWeight="500">Cancel</FontLable>
-                </MudButton>
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
-                    <FontLable FontWeight="500">Add</FontLable>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary " OnClick="ShowAddForm">
+                    <FontLabel Fontweight="500"  FontColor="#FFF">Add</FontLabel>
                 </MudButton>
             </MudItem>
-        </MudCardContent>
-    </MudCard>
-}
-else if (IsEdit)
-{
-    <MudCard Elevation="25">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h6">Operator Work</MudText>
-            </CardHeaderContent>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudItem>
-                <MudTextField @bind-Value="OperatorWorkModel.EventId" Label="Event Id" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
-                <MudTextField @bind-Value="OperatorWorkModel.Service" Label="Service" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
-                <MudTextField @bind-Value="OperatorWorkModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="true"></MudTextField>
-                @*<MudSelect T="String" @bind-Value="@OperatorWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                        <MudSelectItem Value="@(Status.Workpending.ToString())" />
-                        <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
-                        <MudSelectItem Value="Status.WorkFinish.ToString()" />
-                    </MudSelect>*@
-            </MudItem>
-            <MudItem Class="d-flex justify-end">
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
-                    <FontLable FontWeight="500">Cancel</FontLable>
-                </MudButton>
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
-                    <FontLable FontWeight="500">Update</FontLable>
-                </MudButton>
-            </MudItem>
-        </MudCardContent>
-    </MudCard>
-}
-else
-{
-
-    <MudItem Class="d-flex justify-end">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary " OnClick="ShowAddForm">
-            <FontLable FontWeight="500">Add</FontLable>
-        </MudButton>
-    </MudItem>
-}
+        }
 
 
-<MudTable Elevation="25" Items="GetAllOperatorWork()" T="OperatorWork" Filter="new Func<OperatorWork, bool>(Search)" Class="w-100" @bind-customer="OperatorWorkList">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6"> list</MudText>
-        <MudSpacer />
-        <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Action</MudTh>
-        <MudTh>Event Name</MudTh>
-        <MudTh>Event Venue</MudTh>
-        <MudTh>From Date</MudTh>
-        <MudTh>Slot</MudTh>
-        <MudTh>Service</MudTh>
-        <MudTh>Description</MudTh>
-        <MudTh>Status</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-        </MudTd>
-        <MudTd DataLabel="Id">@context.Event.EventName</MudTd>
-        <MudTd DataLabel="Id">@context.Event.EventVenue</MudTd>
-        <MudTd DataLabel="Id">@context.Event.FromDate</MudTd>
-        <MudTd DataLabel="Id">@context.Event.SlotType</MudTd>
-        <MudTd DataLabel="Id">@context.Service</MudTd>
-        <MudTd DataLabel="Id">@context.Description</MudTd>
-        <MudTd DataLabel="Id">
-            <MudButton @onclick="@(() => viewstatus(context))" Variant="Variant.Text">@context.Status </MudButton>
-        </MudTd>
+        <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<EventStaffWork>>>(ServerReload))"
+                  T="EventStaffWork"
+                  Filter="new Func<EventStaffWork, bool>(Search)" Class="w-100" @bind-customer="EventStaffWorkList">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6"> list</MudText>
+                <MudSpacer />
+                <MudTextField Value="searchString" T=" string" ValueChanged="@(s => OnSearch(s))" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Action</MudTh>
+                <MudTh>Event</MudTh>
+                <MudTh>Venue</MudTh>
+                <MudTh>From Date</MudTh>
+                <MudTh>Slot</MudTh>
+                <MudTh>Service</MudTh>
+                <MudTh>Description</MudTh>
+                <MudTh>Status</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="">
+                    <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+                <MudTd DataLabel="Id">@context.Event.EventName</MudTd>
+                <MudTd DataLabel="Id">@context.Event.EventVenue</MudTd>
+                <MudTd DataLabel="Id">@context.Event.FromDate</MudTd>
+                <MudTd DataLabel="Id">@context.Event.SlotType</MudTd>
+                <MudTd DataLabel="Id">@context.Service</MudTd>
+                <MudTd DataLabel="Id">@context.Description</MudTd>
+                <MudTd DataLabel="Id">
+                    <MudButton @onclick="@(() => viewstatus(context))" Variant="Variant.Text">@context.Status </MudButton>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+            </PagerContent>
+        </MudTable>
+    </Authorized>
+    <NotAuthorized>
+        <MudAlert Severity="Severity.Error">please <MudLink Href="/login">login</MudLink></MudAlert>
+    </NotAuthorized>
+</AuthorizeView>
 
-    </RowTemplate>
-    <PagerContent>
-        <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
-    </PagerContent>
-</MudTable>
 
 @code {
     private string searchString = "";
-    private List<OperatorWork> OperatorWorkList = new();
-    private OperatorWork OperatorWorkModel = new();
+    private List<EventStaffWork> EventStaffWorkList = new();
+    private EventStaffWork EventStaffWorkModel = new();
+    private MudTable<EventStaffWork> tableRef;
+    private IEnumerable<EventStaffWork> pagedData;
+    private DateTime? startDate;
+    private DateTime? endDate;
     private bool IsEdit;
     private bool IsAdd;
     private bool IsStatus;
+    private int totalItems;
+    private int totalItemsOperator;
+
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -132,29 +146,32 @@ else
 
         return base.OnAfterRenderAsync(firstRender);
     }
-    private List<OperatorWork> GetAllOperatorWork()
+    private List<EventStaffWork> GetAllOperatorWork()
     {
-        OperatorWorkList = _OperatorWorkRepository.GetOperatorWorkList();
-        return OperatorWorkList;
+        EventStaffWorkList = _EventStaffWorkRepository.GetEventStaffWorkList();
+        return EventStaffWorkList;
     }
     private void Save()
     {
         try
         {
-            if (OperatorWorkModel.Id < 0)
+            if (EventStaffWorkModel.Id < 0)
             {
-                _OperatorWorkRepository.Insert(OperatorWorkModel);
+                _EventStaffWorkRepository.Insert(EventStaffWorkModel);
                 Snackbar.Add(" record Given SucessFull", Severity.Success);
-                GetAllOperatorWork();
-                OperatorWorkModel = new OperatorWork();
+                //GetAllOperatorWork();
+                tableRef.ReloadServerData();
+                EventStaffWorkModel = new EventStaffWork();
                 IsAdd = false;
             }
             else
             {
-                _OperatorWorkRepository.Update(OperatorWorkModel);
+                _EventStaffWorkRepository.Update(EventStaffWorkModel);
                 Snackbar.Add(" record Update sucessfull", Severity.Success);
-                GetAllOperatorWork();
-                OperatorWorkModel = new OperatorWork();
+                //GetAllOperatorWork();
+                tableRef.ReloadServerData();
+
+                EventStaffWorkModel = new EventStaffWork();
                 IsEdit = false;
             }
         }
@@ -164,15 +181,16 @@ else
         }
     }
 
-    private bool Search(OperatorWork OperatorWorks)
+    private bool Search(EventStaffWork EventStaffWorks)
     {
-        if (StringValid(OperatorWorks.Service)
-            && StringValid(OperatorWorks.Description)
-            && StringValid(OperatorWorks.Status)
+        if (string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(searchString)
+            && StringValid(EventStaffWorks.Service)
+            && StringValid(EventStaffWorks.Description)
+            && StringValid(EventStaffWorks.Status)
             &&
-            OperatorWorks.Service.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-            || OperatorWorks.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-            || OperatorWorks.Status.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+               EventStaffWorks.Service.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || EventStaffWorks.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || EventStaffWorks.Status.Contains(searchString, StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
@@ -194,7 +212,7 @@ else
         {
             IsEdit = false;
             IsAdd = false;
-            OperatorWorkModel = new OperatorWork();
+            EventStaffWorkModel = new EventStaffWork();
         }
         catch (Exception ex)
         {
@@ -203,7 +221,7 @@ else
     }
     private void ShowAddForm()
     {
-        OperatorWorkModel = new OperatorWork();
+        EventStaffWorkModel = new EventStaffWork();
         IsAdd = true;
     }
     private void Edit(long id)
@@ -211,8 +229,7 @@ else
 
         try
         {
-
-            OperatorWorkModel = OperatorWorkList.FirstOrDefault(c => c.Id == id);
+            EventStaffWorkModel = EventStaffWorkList.FirstOrDefault(c => c.Id == id);
             IsEdit = true;
         }
         catch (Exception ex)
@@ -220,11 +237,35 @@ else
             Snackbar.Add(ex.Message, Severity.Error);
         }
     }
-    private void viewstatus(OperatorWork operatorWork)
+
+    private async Task<TableData<EventStaffWork>> ServerReload(TableState state)
+    {
+        IEnumerable<EventStaffWork> data;
+        if (startDate.HasValue && endDate.HasValue)
+        {
+            data = _EventStaffWorkRepository.GetListFromWork(startDate, endDate);
+        }
+        else
+        {
+            //get all data of current month
+            data = _EventStaffWorkRepository.GetEventStaffWorkList();
+        }
+
+        data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
+        data = data.OrderByDirection(state.SortDirection, o => o.Event.FromDate.Value);
+        totalItemsOperator = data.Count();
+
+        pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<EventStaffWork>() { TotalItems = totalItemsOperator, Items = pagedData };
+    }
+
+
+
+    private void viewstatus(EventStaffWork EventStaffWorks)
     {
 
         var parameters = new DialogParameters();
-        parameters.Add("OperatorWorkModel", operatorWork);
+        parameters.Add("EventStaffWorkModel", EventStaffWorks);
         var options = new DialogOptions()
         {
             CloseOnEscapeKey = false,
@@ -237,5 +278,11 @@ else
 
         DialogService.Show<ViewStatus>("view Status", parameters, options);
 
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        tableRef.ReloadServerData();
     }
 }

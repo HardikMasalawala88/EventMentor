@@ -8,24 +8,24 @@
 <MudDialog>
     <DialogContent>
         <MudGrid>
-            <MudItem>
-                <MudSelect @bind-Value="eventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+            @*<MudItem>
+                <MudSelect @bind-Value="eventModel.CategoryId" T="long" 
+                    SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" 
+                    Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
                     <MudSelectItem Value="@eventModel.CategoryId">@eventModel.Category.CategoryName</MudSelectItem>
                 </MudSelect>
-            </MudItem>
+            </MudItem>*@
             <MudItem>
                 <CustomMudSelect PlaceHolder="Select Service" MultiSelection="true" Variant="Variant.Outlined" Class="mb-2" Value="@eventModel.SelectedService"
                                  ValueChangedCallBack="@(e => OnSelectedPriorityChange(e))" SelectedValues="selectedServiceList">
                     <MudSelectItems>
                         @foreach (var Service in GetAllService())
                         {
-                <MudSelectItem T="string" Value="@Service.ServiceName.ToString()">@Service.ServiceName</MudSelectItem>}
+                            <MudSelectItem T="string" Value="@Service.ServiceName.ToString()">@Service.ServiceName</MudSelectItem>
+                        }
                     </MudSelectItems>
                 </CustomMudSelect>
             </MudItem>
-           
-           
-           
         </MudGrid>
     </DialogContent>
     <DialogActions>
@@ -47,19 +47,17 @@
     List<String> selectedServiceList = new List<String>();
     List<long> selectedServiceIdList = new List<long>();
 
-    protected override void OnInitialized()
-    {
-        if (EventModel is not null && EventModel.Id > 0)
-        {
-            isReadOnly = true;
-        }
-        eventModel = EventModel;
-        base.OnInitialized();
-    }
+
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            if (EventModel is not null && EventModel.Id > 0)
+            {
+                isReadOnly = true;
+            }
+            eventModel = EventModel;
+
             EventCategoryName = _EventCategoryRepository.GetById(EventModel.CategoryId);
             GetEventCategoryList();
             //GetCategoryServices();

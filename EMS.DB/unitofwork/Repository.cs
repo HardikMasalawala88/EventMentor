@@ -1,5 +1,7 @@
 ﻿using EMS.DB.Models;
+using EMS.DB.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace EMS.DB.unitofwork
 { 
-    public class Repository<T> : IRepository<T> where T : BaseEntity
+    public class Repository<T> : BaseRepository, IRepository<T> where T : BaseEntity
     {
         #region property
         private readonly AppDbContext _applicationDbContext;
@@ -17,10 +19,11 @@ namespace EMS.DB.unitofwork
         #endregion
 
         #region Constructor
-        public Repository(AppDbContext applicationDbContext)
+        public Repository(AppDbContext applicationDbContext, IServiceScopeFactory serviceScopeFactor) : base(serviceScopeFactor)
         {
-            _applicationDbContext = applicationDbContext;
-            entities = _applicationDbContext.Set<T>();
+            AppDbContext _myContext = base.GetContext();
+            applicationDbContext = _myContext;
+            entities = applicationDbContext.Set<T>();
         }
         #endregion
         
@@ -35,9 +38,10 @@ namespace EMS.DB.unitofwork
         }
         public void Insert(T entity)
         {
+            AppDbContext _myContext = base.GetContext();
             entity.CreatedOn = DateTime.Now;
             entities.Add(entity);
-            _applicationDbContext.SaveChanges();
+            _myContext.SaveChanges();
         }
 
         public void Update(T entity)

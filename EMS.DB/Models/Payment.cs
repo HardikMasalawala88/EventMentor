@@ -26,12 +26,12 @@ namespace EMS.DB.Models
         public string Description { get; set; }
 
         [Required]
-        public Nullable<long> EventId { get; set; }
+        public long EventId { get; set; }
 
         public Event Event { get; set; }
 
         [Required]
-        public Nullable<long> UserId { get; set; }
+        public string UserId { get; set; }
 
         public User User { get; set; }
 
