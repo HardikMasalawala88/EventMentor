@@ -26,7 +26,7 @@
                 <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.Layers" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
-                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Staff</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Users</MudText>
                         <MudText Typo="Typo.h5">@Totaluser</MudText>
                     </div>
                 </MudPaper>
@@ -75,8 +75,8 @@
                             <MudTh>Event Venue</MudTh>
                             <MudTh>Organizer Name</MudTh>
                             <MudTh>Organizer contact </MudTh>
-                            <MudTh>From Date</MudTh>
-                            <MudTh>To Date</MudTh>
+                            <MudTh>Event Date</MudTh>
+                            
                         </HeaderContent>
                         <RowTemplate Context="data">
 
@@ -85,8 +85,14 @@
                             <MudTd DataLabel="">@data.EventVenue</MudTd>
                             <MudTd DataLabel="">@data.OrganizerName</MudTd>
                             <MudTd DataLabel="">@data.OrganizerContact</MudTd>
-                            <MudTd DataLabel="">@data.FromDate</MudTd>
-                            <MudTd DataLabel="">@data.Todate</MudTd>
+                            <MudTd DataLabel="">
+                                @data.FromDate?.ToLongDateString()
+                                @if (@data.Todate.HasValue)
+                                {
+                                    @(" To ")
+                                    @data.Todate?.ToLongDateString()
+                                }
+                            </MudTd>
                         </RowTemplate>
                         <PagerContent>
                             <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
@@ -121,7 +127,7 @@
 
                             <MudTd DataLabel="Id">@data.Event.EventName</MudTd>
                             <MudTd DataLabel="Id">@data.Event.EventVenue</MudTd>
-                            <MudTd DataLabel="Id">@data.Event.FromDate</MudTd>
+                            <MudTd DataLabel="Id">@data.Event.FromDate?.ToLongDateString()</MudTd>
                             <MudTd DataLabel="Id">@data.Service</MudTd>
                             <MudTd DataLabel="Id">@data.Status</MudTd>
                         </RowTemplate>

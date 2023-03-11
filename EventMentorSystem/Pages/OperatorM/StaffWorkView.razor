@@ -1,46 +1,18 @@
 ﻿@page "/ViewStaffwork"
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
-@using System.Text.RegularExpressions
-@using System.ComponentModel.DataAnnotations
 @inject IEventStaffWorkRepository _EventStaffWorkRepository;
+@inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
 @inject IDialogService DialogService;
 @using EMS.DB.Constant
 <AuthorizeView Roles="Admin" Context="data">
     <Authorized>
-        @if (IsEdit)
-        {
-<MudCard Elevation="25">
-    <MudCardHeader>
-        <CardHeaderContent>
-            <MudText Typo="Typo.h6">Work Update</MudText>
-        </CardHeaderContent>
-    </MudCardHeader>
-    <MudCardContent>
-        <MudItem>
-            <MudSelect T="String" @bind-Value="@EventStaffWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                <MudSelectItem Value="@(Status.Workpending.ToString())" />
-                <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
-                <MudSelectItem Value="Status.WorkFinish.ToString()" />
-            </MudSelect>
-        </MudItem>
-        <MudItem Class="d-flex justify-end">
-            <MudButton Class="mx-1 m-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
-                <FontLabel Fontweight="500">Cancel</FontLabel>
-            </MudButton>
-            <MudButton Class="mx-1 m-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
-                <FontLabel Fontweight="500">Update</FontLabel>
-            </MudButton>
-        </MudItem>
-    </MudCardContent>
-</MudCard>}
-
         <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<EventStaffWork>>>(ServerReload))" T="EventStaffWork" Filter="new Func<EventStaffWork, bool>(Search)" Class="w-100" @bind-customer="EventStaffWorkList">
             <ToolBarContent>
                 <MudText Typo="Typo.h6"> list</MudText>
                 <MudSpacer />
-                <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search for Work..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search for Work" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Action</MudTh>
@@ -60,10 +32,6 @@
                         edit
                     </MudFab>
                 </MudTd>
-                @*<MudTd >
-                    <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />*
-                    </MudTd>*@
-
                 <MudTd DataLabel="Id">@context.Id</MudTd>
                 <MudTd DataLabel="Id">@context.Event.EventName</MudTd>
                 <MudTd DataLabel="Id">@context.Event.EventVenue</MudTd>
@@ -94,6 +62,9 @@
     private bool IsStatus;
     private int totalItems;
     private int totalItemsOperator;
+    [CascadingParameter(Name = "cascadeParameters")]
+    public GlobalParameter _parameters { get; set; }
+    public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -109,23 +80,6 @@
         EventStaffWorkList = _EventStaffWorkRepository.GetEventStaffWorkList();
         return EventStaffWorkList;
     }
-    private void Save()
-    {
-        try
-        {
-            _EventStaffWorkRepository.Update(EventStaffWorkModel);
-            Snackbar.Add(" record Update sucessfull", Severity.Success);
-            //GetAllEventStaffWork();
-            tableRef.ReloadServerData();
-            EventStaffWorkModel = new EventStaffWork();
-            IsEdit = false;
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-    }
-
     private bool Search(EventStaffWork EventStaffWorks)
     {
         if (string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(searchString)
@@ -199,6 +153,7 @@
 
         var parameters = new DialogParameters();
         parameters.Add("EventStaffWorkModel", EventStaffWork);
+        parameters.Add("_parameters", _parameters);
         var options = new DialogOptions()
         {
             CloseOnEscapeKey = false,

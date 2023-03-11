@@ -2,6 +2,7 @@
 @using EMS.DB.Constant
 @using  EMS.DB.Repository.Interface
 @inject IEventStaffWorkRepository _EventStaffWorkRepository;
+@inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
 
 
@@ -10,9 +11,9 @@
         <MudGrid>
             <MudItem lg="8" md="8" xs="12">
                 <MudSelect Margin="Margin.Dense" T="String" @bind-Value="@eventStaffWorkModel.Status" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    <MudSelectItem Value="@(Status.Workpending.ToString())" />
-                    <MudSelectItem Value="Status.WorkOnProcess.ToString()" />
-                    <MudSelectItem Value="Status.WorkFinish.ToString()" />
+                    <MudSelectItem Value="@(Status.pending.ToString())" />
+                    <MudSelectItem Value="Status.OnProcess.ToString()" />
+                    <MudSelectItem Value="Status.Finish.ToString()" />
                 </MudSelect>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
@@ -59,20 +60,29 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public EventStaffWork EventStaffWorkModel { get; set; } = new EventStaffWork();
     private EventStaffWork eventStaffWorkModel = new();
+    [Parameter]
+    public GlobalParameter _parameters { get; set; }
+    public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
+
     protected override void OnInitialized()
     {
         eventStaffWorkModel = EventStaffWorkModel;
         base.OnInitialized();
     }
 
-    private void update()
+    private async Task update()
     {
         try
         {
             _EventStaffWorkRepository.Update(eventStaffWorkModel);
             Snackbar.Add("Event work Status Change", Severity.Success);
+            NotificationMessagesModel.Message = $"staff:{EventStaffWorkModel.StaffId}has change Event Status.";
+            NotificationMessagesModel.Title = "Edit Event Status";
+            NotificationMessagesModel.UserId = _parameters.UserId;
+            NotificationMessagesModel.EventId = EventStaffWorkModel.EventId;
+            await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
+            await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
             eventStaffWorkModel = new EventStaffWork();
-
         }
         catch (Exception ex)
         {

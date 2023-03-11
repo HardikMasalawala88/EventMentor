@@ -5,6 +5,7 @@
 @inject IEventRepository _EventRepository;
 @inject IStaffRepository _StaffRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
+@inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
 @inject IDialogService DialogService
 <AuthorizeView Roles="Admin" Context="data">
@@ -19,8 +20,9 @@
                 </MudCardHeader>
                 <MudCardContent>
                     <MudItem>
-                        <MudSelect T="long" @bind-Value="EventStaffWorkModel.EventId" Label="Event" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                            @foreach (var data in GetAllevents())
+                        @*@bind-Value="EventStaffWorkModel.EventId"*@
+                        <MudSelect T="long" Value="EventStaffWorkModel.EventId" ValueChanged="@(e => EventSelectionChange(e))" Label="Event" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @foreach (var data in EventList)
                             {
                                 <MudSelectItem T="long" Value="data.Id">@data.EventName</MudSelectItem>
                             }
@@ -29,9 +31,9 @@
                         <MudSelect @bind-Value="EventStaffWorkModel.Service" Label="Event Service" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                             @if (EventStaffWorkModel.EventId > 0)
                                 {
-                                    foreach (var data in GetAllevents())
+                                    foreach (var data in EventList)
                                     {
-                                        if (EventStaffWorkModel.EventId == data.Id)
+                                        if (EventStaffWorkModel.EventId == data.Id && data.SelectedService is not null)
                                         {
                                             ServiceList = data.SelectedService.Split(",").ToList();
 
@@ -205,6 +207,9 @@
     private int totalItems;
     private int totalItemsOperator;
     private long demo;
+    [CascadingParameter(Name = "cascadeParameters")]
+    public GlobalParameter _parameters { get; set; }
+    public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
 
     private List<Staff> GetAlluser()
     {
@@ -226,6 +231,7 @@
     {
         if (firstRender)
         {
+            GetAllevents();
             GetAllEventStaffWork();
         }
 
@@ -236,12 +242,18 @@
         EventStaffWorkList = _EventStaffWorkRepository.GetEventStaffWorkList();
         return EventStaffWorkList;
     }
-    private void Save()
+    private async Task Save()
     {
         try
         {
-
+            EventStaffWorkModel.Status = "pending";
             _EventStaffWorkRepository.Insert(EventStaffWorkModel);
+            NotificationMessagesModel.Message = $"Event {EventStaffWorkModel.EventId} work  give to {EventStaffWorkModel.StaffId}.";
+            NotificationMessagesModel.Title = "Event work";
+            NotificationMessagesModel.UserId = _parameters.UserId;
+            NotificationMessagesModel.EventId = EventStaffWorkModel.EventId;
+            await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
+            await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
             Snackbar.Add(" record Given SucessFull", Severity.Success);
             tableRef.ReloadServerData();
             //GetAllOperatorWork();
@@ -370,4 +382,13 @@
         tableRef.ReloadServerData();
     }
 
+    private void EventSelectionChange(long eventId)
+    {
+        EventStaffWorkModel.EventId = eventId;
+        var selectedEventServices = EventList is not null && EventList.Any() ? EventList.FirstOrDefault(data => data.Id == EventStaffWorkModel.EventId).SelectedService : string.Empty;
+        if (string.IsNullOrEmpty(selectedEventServices))
+        {
+            Snackbar.Add("No selected services found for selected event", Severity.Error);
+        }
+    }
 }

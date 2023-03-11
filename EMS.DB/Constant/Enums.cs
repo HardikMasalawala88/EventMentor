@@ -15,9 +15,9 @@ namespace EMS.DB.Constant
     }
     public enum Status
     {
-        Workpending,
-        WorkOnProcess,
-        WorkFinish
+        pending,
+        OnProcess,
+        Finish
     }
     public enum Userrole
     {

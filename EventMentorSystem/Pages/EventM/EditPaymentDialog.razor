@@ -1,6 +1,7 @@
 ﻿@using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
 @inject IPaymentRepository _PaymentRepository;
+@inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
 
 <MudDialog>
@@ -27,7 +28,9 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Payment PaymentModel { get; set; } = new Payment();
     private Payment paymentModel = new();
-
+    [Parameter]
+    public GlobalParameter _parameters { get; set; }
+    public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
     private bool isReadOnly = false;
     private List<Payment> PaymentList = new();
 
@@ -45,15 +48,21 @@
         PaymentList = _PaymentRepository.GetPaymentList();
         return PaymentList;
     }
-    private void Edit()
+    private async Task Edit()
     {
         try
         {
             _PaymentRepository.Update(paymentModel);
+            NotificationMessagesModel.Message = $"Edit Event payment {paymentModel.EventId}: By {paymentModel.UserId}.";
+            NotificationMessagesModel.Title = "add payment";
+            NotificationMessagesModel.UserId = _parameters.UserId;
+            NotificationMessagesModel.EventId = paymentModel.EventId;
+            await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
+            await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
             paymentModel = new Payment();
             MudDialog.Close(DialogResult.Ok(true));
             Snackbar.Add("PayMent detail Update successfully.", Severity.Success);
-            
+
         }
         catch (Exception ex)
         {

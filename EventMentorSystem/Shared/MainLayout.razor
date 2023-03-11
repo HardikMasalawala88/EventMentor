@@ -16,6 +16,7 @@
             <MudBadge Content="@allNotificationMgs.Count()" Color="Color.Dark" Overlap="true" Class="mx-6 my-4 cursor-pointer">
                 <MudIconButton @onclick="NotificationHideShow" Icon="@Icons.Material.Filled.Notifications" Color="Color.Secondary" />
             </MudBadge>
+            
             <div class='ikrNotifications' style="display:@BoxCss !important" @onclick="NotificationHideShow">
                 <h3>Notifications (<span class='notiCounterOnHead'>@currentUserMsgList.Count()</span>)</h3>
                 <div class='ikrNotificationItems' style="color:black">
@@ -30,6 +31,8 @@
                 </div>
                 <div class="ikrSeeAll"><a href="#">see all</a></div>
             </div>
+
+        
             <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" Edge="Edge.End" @onclick="Logout" />
             <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
         </MudAppBar>
@@ -46,9 +49,7 @@
 @code {
     [Inject]
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-
     [Inject] UserManager<User> UserManager { get; set; }
-
     private readonly GlobalParameter _parameters = new();
     private bool isUserLoggedIn = false;
     private List<NotificationMessages> allNotificationMgs = new List<NotificationMessages>();
@@ -64,15 +65,13 @@
     bool _drawerOpen = true;
     protected override async Task OnInitializedAsync()
     {
-
         _parameters.hubConnection = new HubConnectionBuilder()
 .WithUrl(_NavigationManager.ToAbsoluteUri("/chathub"))
 .Build();
 
-        _parameters.hubConnection.On<NotificationMessages>("SendMessage", (notificationMessages) =>
+        _parameters.hubConnection.On<NotificationMessages>("SendMessage", async (notificationMessages) =>
         {
-            allNotificationMgs = _NotificationMessagesRepository.GetMessages();
-            allNotificationMgs = allNotificationMgs.Where(x=>x.UserId == _parameters.UserId).ToList();
+            await RefreshNotification();
             InvokeAsync(StateHasChanged);
         });
 
@@ -81,8 +80,7 @@
     protected override async Task OnParametersSetAsync()
     {
 
-        allNotificationMgs = _NotificationMessagesRepository.GetMessages();
-        allNotificationMgs = allNotificationMgs.Where(x => x.UserId == _parameters.UserId).ToList();
+        await RefreshNotification();
         StateHasChanged();
         AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
@@ -159,7 +157,7 @@
         if (BoxCss == "none") BoxCss = "block";
         else BoxCss = "none";
     }
-
+  
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -171,4 +169,11 @@
         _NavigationManager.NavigateTo($"/identity/account/logout", true);
     }
 
+    private async Task RefreshNotification()
+    {
+        allNotificationMgs = new List<NotificationMessages>();
+
+        if (_parameters is not null && !string.IsNullOrEmpty(_parameters.UserId))
+            allNotificationMgs = await _NotificationMessagesRepository.GetMessages(_parameters.UserId);
+    }
 }

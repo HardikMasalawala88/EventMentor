@@ -4,6 +4,7 @@
 @inject IEventRepository _EventRepository;
 @inject ISnackbar Snackbar;
 @inject IInquiryRepository _InquiryRepository;
+@inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject IDialogService DialogService
 <MudDialog>
     <DialogContent>
@@ -12,41 +13,41 @@
                 <MudTextField @bind-Value="inquiryModel.Id" Class="m-0" Label="Id" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.Fullname" Class="m-0" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.Fullname" Class="m-0" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.MobileNo" Class="m-0" Label="MobileNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.MobileNo" Class="m-0" Label="MobileNo" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.AltPhoneNo" Class="m-0" Label="AltPhoneNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.AltPhoneNo" Class="m-0" Label="AltPhoneNo" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.Email" Class="m-0" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.Email" Class="m-0" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.NoOfAttendee" Class="m-0" Label="NoOfAttendee" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.NoOfAttendee" Class="m-0" Label="NoOfAttendee" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.AddressLine1" Class="m-0" Label="AddressLine1" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.AddressLine1" Class="m-0" Label="AddressLine1" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.AddressLine2" Class="m-0" Label="AddressLine2" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.AddressLine2" Class="m-0" Label="AddressLine2" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.Landmark" Class="m-0" Label="Landmark" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.Landmark" Class="m-0" Label="Landmark" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.Pincode" Class="m-0" Label="Pincode" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.Pincode" Class="m-0" Label="Pincode" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.City" Class="m-0" Label="city" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.City" Class="m-0" Label="city" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.State" Class="m-0" Label="State" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.State" Class="m-0" Label="State" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
                 <MudText>SlotType</MudText>
-                <MudRadioGroup  @bind-SelectedOption="@inquiryModel.SlotType">
+                <MudRadioGroup  @bind-SelectedOption="@inquiryModel.SlotType" >
                     <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
                     <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
                     <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
@@ -54,11 +55,13 @@
                 </MudRadioGroup>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudDatePicker Label="From Date" Class="m-0" @bind-Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" />
+                <MudDatePicker Label="From Date" Class="m-0" @bind-Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" ReadOnly="isReadOnly"/>
             </MudItem>
+            @if (inquiryModel.SlotType== "MultipleDay") {
             <MudItem lg="4" md="4" xs="12">
-                <MudDatePicker Label="To Date" Class="m-0" @bind-Date="inquiryModel.ToDate" DateFormat="dd.MM.yyyy" />
+                <MudDatePicker Label="To Date" Class="m-0" @bind-Date="inquiryModel.ToDate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" ReadOnly="isReadOnly" />
             </MudItem>
+            }
             <MudItem lg="12" md="12" xs="12">
                 <MudTextField T="string" Class="m-0" Label="Additional notes" Variant="Variant.Outlined" @bind-Text="inquiryModel.Additionalnotes" Lines="5" />
             </MudItem>
@@ -79,7 +82,8 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Inquiry InquiryModel { get; set; } = new Inquiry();
-
+    [CascadingParameter(Name = "cascadeParameters")]
+    public GlobalParameter _parameters { get; set; }
     private bool isReadOnly = false;
     private Inquiry inquiryModel = new();
     private Event eventModel = new();
@@ -128,6 +132,12 @@
         {
             _InquiryRepository.Delete(id);
             GetLists();
+            //NotificationMessagesModel.Message = $"Add Event  {eventModel.EventName}: By {eventModel.OperatorName}.";
+            //NotificationMessagesModel.Title = "add category";
+            //NotificationMessagesModel.UserId = _parameters.UserId;
+            //NotificationMessagesModel.EventId = eventModel.Id;
+            //await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
+            //await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
             MudDialog.Close(DialogResult.Ok(true));
             inquiryModel = new Inquiry();
             Snackbar.Add("Inquiry Rejected Successfull.", Severity.Success);
@@ -151,6 +161,7 @@
         var parameters = new DialogParameters();
         parameters.Add("InquiryModel", inquiry);
         parameters.Add("EventModel", events);
+        parameters.Add("_parameters", _parameters);
         var options = new DialogOptions()
         {
             CloseOnEscapeKey = false,

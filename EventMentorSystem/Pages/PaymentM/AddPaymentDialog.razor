@@ -1,6 +1,9 @@
 ﻿@using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
 @inject IPaymentRepository _PaymentRepository;
+@inject IEventRepository _EventRepository;
+@inject IUserRepository _UserRepository;
+@inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
 
 <MudDialog>
@@ -11,8 +14,18 @@
         <MudTextField @bind-Value="PaymentModel.RemainingAmount" Label="RemainingAmount " Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
         <MudTextField @bind-Value="PaymentModel.Transactionid" Label="Transactionid" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
         <MudTextField @bind-Value="PaymentModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.EventId" Label="EventId" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.UserId" Label="UserId" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <MudSelect @bind-Value="PaymentModel.EventId" T="long" Label="select Event" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+            @foreach (var events in GetAllEvent())
+            {
+                <MudSelectItem Value="@events.Id">@events.EventName</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect @bind-Value="PaymentModel.UserId" Label="User name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+            @foreach (var events in GetAllUser())
+            {
+                <MudSelectItem Value="@events.Id">@events.UserName</MudSelectItem>
+            }
+        </MudSelect>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
@@ -24,31 +37,47 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public Payment paymentsModel { get; set; } = new Payment();
+    [Parameter]public string EventId { get; set; }
+    [Parameter]
+    public GlobalParameter _parameters { get; set; }
     private Payment PaymentModel = new();
     private bool isReadOnly = false;
-    private List<Payment> PaymentList = new();
+    private List<Event> EventList = new();
+    private List<User> userList = new();
+    public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
+
 
     protected override void OnInitialized()
     {
-        if (paymentsModel is not null && paymentsModel.Id > 0)
-        {
-            isReadOnly = true;
-        }
-        PaymentModel = paymentsModel;
+
+
+        PaymentModel.EventId =Convert.ToInt64(EventId) ;
         base.OnInitialized();
     }
-
-    private List<Payment> GetAllPayment()
+    private List<Event> GetAllEvent()
     {
-        PaymentList = _PaymentRepository.GetPaymentList();
-        return PaymentList;
+        EventList = _EventRepository.GetList();
+        return EventList;
     }
-    private void Edit()
+    private List<User> GetAllUser()
+    {
+        userList = _UserRepository.GetAllUser();
+        return userList;
+    }
+
+    private async Task Edit()
     {
         try
         {
             _PaymentRepository.Update(PaymentModel);
+            NotificationMessagesModel.Message = $"Add Event  {PaymentModel.EventId}: By {PaymentModel.UserId}.";
+            NotificationMessagesModel.Title = "add category";
+            NotificationMessagesModel.UserId = _parameters.UserId;
+            NotificationMessagesModel.EventId = PaymentModel.EventId;
+            await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
+            await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
+            Snackbar.Add("payment update",Severity.Success);
+            PaymentModel = new Payment();
         }
         catch (Exception ex)
         {

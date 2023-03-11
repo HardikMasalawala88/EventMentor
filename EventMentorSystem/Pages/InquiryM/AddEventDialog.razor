@@ -19,19 +19,19 @@
                 <MudTextField @bind-Value="eventModel.OperatorName" Label="OperatorName" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="eventModel.EventVenue" Label="Event Venue" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="eventModel.EventVenue" Label="Event Venue" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="eventModel.OrganizerName" Label="Organizer Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="eventModel.OrganizerName" Label="Organizer Name" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField Class="mt-0" @bind-Value="eventModel.OrganizerContact" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField Class="mt-0" @bind-Value="eventModel.OrganizerContact" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField Class="mt-0" @bind-Value="eventModel.Email" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField Class="mt-0" @bind-Value="eventModel.Email" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudSelect @bind-Value="@eventModel.SlotType" Class="m-0" T="string" Label="slot" Variant="Variant.Outlined">
+                <MudSelect @bind-Value="@eventModel.SlotType" Class="m-0" T="string" Label="slot" Variant="Variant.Outlined" ReadOnly="isReadOnly">
                     <MudSelectItem Value="@(EventSlotType.Morning.ToString())" />
                     <MudSelectItem Value="@(EventSlotType.Evening.ToString())" />
                     <MudSelectItem Value="@(EventSlotType.FullDay.ToString())" />
@@ -39,11 +39,11 @@
                 </MudSelect>
             </MudItem>
             <MudItem lg="2" md="3" xs="12">
-                <MudDatePicker Label="From Date" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy"  Variant="Variant.Outlined" />
+                <MudDatePicker Label="From Date" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy"  Variant="Variant.Outlined" ReadOnly="isReadOnly"/>
             </MudItem>
             @if (eventModel.SlotType== EventSlotType.MultipleDay.ToString()) {
             <MudItem lg="2" md="3" xs="12">
-                <MudDatePicker Label="To Date" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" />
+                <MudDatePicker Label="To Date" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" ReadOnly="isReadOnly"/>
             </MudItem>
             }
             <MudItem lg="4" md="4" xs="12">
@@ -78,6 +78,9 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Inquiry InquiryModel { get; set; } = new Inquiry();
     [Parameter] public Event EventModel { get; set; } = new Event();
+    [Parameter]
+    public GlobalParameter _parameters { get; set; }
+    public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
     private List<EventCategory> EventCategoryList = new();
     private List<Event> eventList = new();
     private bool isReadOnly = false;
@@ -150,18 +153,18 @@
     {
         try
         {
-            NotificationMessageModel.UserId = Guid.NewGuid().ToString();//Live user data
-            NotificationMessageModel.Message = "This is demo";
-            NotificationMessageModel.Title = "demo";
+
             _EventRepository.Insert(eventModel);
             Snackbar.Add(" record saved", Severity.Success);
+            NotificationMessagesModel.Message = $"Add Event  {eventModel.EventName}: By {eventModel.OperatorName}.";
+            NotificationMessagesModel.Title = "add Event";
+            NotificationMessagesModel.UserId = _parameters.UserId;
+            NotificationMessagesModel.EventId = eventModel.Id;
+            await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
+            await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
             GetAllevents();
             eventModel = new Event();
             MudDialog.Close();
-            _NotificationMessagesRepository.InsertAsync(NotificationMessageModel);
-            await hubConnection.SendAsync("sendMessage", notificationMessage.UserId, notificationMessage.Message, notificationMessage.Title);
-            notificationMessage.Message = "";
-            notificationMessage.Title = "";
         }
         catch (Exception ex)
         {
@@ -176,39 +179,6 @@
         inquiryModel = new Inquiry();
     }
     #endregion
-    private List<NotificationMessages> allNotificationMgs = new List<NotificationMessages>();
-    private List<NotificationMessages> currentUserMsgList = new List<NotificationMessages>();
-    private NotificationMessages notificationMessage = new NotificationMessages();
-    private HubConnection hubConnection;
-    private string BoxCss = "none";
 
-    protected override async Task OnInitializedAsync()
-    {
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl(_NavigationManager.ToAbsoluteUri("/chathub"))
-            .Build();
-
-        hubConnection.On<string, string, string>("ReceiveMessage", (userId, message, title) =>
-        {
-            allNotificationMgs.Add(new NotificationMessages()
-            {
-                UserId = userId,
-                Message = message,
-                Title = title,
-            });
-            currentUserMsgList = allNotificationMgs.Where(x => x.UserId != notificationMessage.UserId).ToList();
-            InvokeAsync(StateHasChanged);
-        });
-
-        await hubConnection.StartAsync();
-    }
-    public bool IsConnected =>
-       hubConnection?.State == HubConnectionState.Connected;
-
-    private void NotificationHideShoe()
-    {
-        if (BoxCss == "none") BoxCss = "block";
-        else BoxCss = "none";
-    }
 
 }

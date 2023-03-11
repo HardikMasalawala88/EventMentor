@@ -2,6 +2,7 @@
 @using EMS.DB.Constant
 @using  EMS.DB.Repository.Interface
 @inject IEventRepository _EventRepository;
+@inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
 <MudDialog>
     <DialogContent>
@@ -53,7 +54,10 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter]
+    public GlobalParameter _parameters { get; set; }
     [Parameter] public Event eventModel { get; set; } = new Event();
+    public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
     private bool isReadOnly = false;
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
@@ -87,14 +91,20 @@
         return eventList;
     }
 
-    private void Save()
+    private async Task Save()
     {
         try
         {
             _EventRepository.Update(eventModel);
-            eventModel = new Event();
             MudDialog.Close(DialogResult.Ok(true));
+            NotificationMessagesModel.Message = $"Edit Event  {eventModel.EventName}: By {eventModel.OperatorName}.";
+            NotificationMessagesModel.Title = "Edit Event";
+            NotificationMessagesModel.UserId = _parameters.UserId;
+            NotificationMessagesModel.EventId = eventModel.Id;
+            await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
+            await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
             Snackbar.Add("Data Update Successfull.", Severity.Success);
+            eventModel = new Event();
             StateHasChanged();
         }
         catch (Exception ex)

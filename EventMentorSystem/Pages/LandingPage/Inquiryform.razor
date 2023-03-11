@@ -20,10 +20,10 @@
     <MudCardContent>
        
         <MudItem>
-            <MudTextField @bind-Value="inquiryModel.Fullname" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal" ></MudTextField>
+            <MudTextField @bind-Value="inquiryModel.Fullname" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             <MudTextField @bind-Value="inquiryModel.MobileNo" Label="MobileNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             <MudTextField @bind-Value="inquiryModel.AltPhoneNo" Label="AltPhoneNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-            <MudTextField @bind-Value="inquiryModel.Email" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal" ></MudTextField>
+            <MudTextField @bind-Value="inquiryModel.Email" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             <MudTextField @bind-Value="inquiryModel.AddressLine1" Label="AddressLine1" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             <MudTextField @bind-Value="inquiryModel.AddressLine2" Label="AddressLine2" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             <MudTextField @bind-Value="inquiryModel.Landmark" Label="Landmark" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
@@ -44,10 +44,11 @@
                 <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
                 <MudRadio Option="@(EventSlotType.MultipleDay.ToString())" Color="Color.Primary">@EventSlotType.MultipleDay.ToString()</MudRadio>
             </MudRadioGroup>
-            <MudDatePicker Variant="Variant.Outlined" Label="From Date" @bind-Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" />
+            
+            <MudDatePicker Variant="Variant.Outlined" Label="From Date" Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" />
             @if (inquiryModel.SlotType == "MultipleDay")
             {
-                <MudDatePicker Variant="Variant.Outlined" Label="To Date" @bind-Date="inquiryModel.ToDate" DateFormat="dd.MM.yyyy" />
+                <MudDatePicker Variant="Variant.Outlined" Label="To Date" Date="inquiryModel.ToDate" DateFormat="dd.MM.yyyy" />
             }
         </MudItem>
         <MudItem Class="d-flex justify-end flex-wrap gap-4">
@@ -75,7 +76,10 @@
     {
         if (firstRender)
         {
+            inquiryModel.FromDate = DateTime.Today.AddDays(7);
+            inquiryModel.ToDate = DateTime.Today.AddDays(7);
             GetEventCategoryList();
+            StateHasChanged();
         }
 
         return base.OnAfterRenderAsync(firstRender);

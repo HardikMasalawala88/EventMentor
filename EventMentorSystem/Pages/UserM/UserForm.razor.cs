@@ -95,8 +95,8 @@ namespace EventMentorSystem.Pages.UserM
                 var user = new User
                 {
 
-                    UserName = UserModel.Email,
                     FullName = UserModel.FullName,
+                    UserName = UserModel.Email,
                     Email = UserModel.Email,
                     ContactNo = UserModel.ContactNo,
                     Userrole = UserModel.Userrole,

@@ -6,6 +6,7 @@
 @inject IUserRepository _UserRepository;
 @inject IStaffRepository _StaffRepository;
 @inject IEventCategoryRepository _EventCategoryRepository;
+@inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject IDialogService DialogService
 @*<h3>AddStaffDialog</h3>*@
@@ -44,6 +45,8 @@
 
 @code {
 
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Staff StaffModel { get; set; } = new Staff();
     private CategoryService ServiceModel = new();
     private List<CategoryService> ServiceList = new();
     private string searchString = "";
@@ -63,8 +66,6 @@
         ServiceList = _CategoryServiceRepository.GetList();
         return ServiceList;
     }
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public Staff StaffModel { get; set; } = new Staff();
 
     private bool isReadOnly = false;
     private Staff staffModel = new();
@@ -73,7 +74,7 @@
 
     protected override void OnInitialized()
     {
-        if (StaffModel is not null && StaffModel.Id >0)
+        if (StaffModel is not null && StaffModel.Id > 0)
         {
             isReadOnly = true;
         }

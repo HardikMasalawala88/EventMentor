@@ -1,4 +1,4 @@
-﻿@page "/Inqurylist"
+﻿@page "/Inquirylist"
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
 @using System.Globalization
@@ -13,7 +13,7 @@
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Inquiry list</MudText>
                 <MudSpacer />
-                <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search for Inquiry" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Action</MudTh>
@@ -24,8 +24,9 @@
                 <MudTh>AddressLine</MudTh>
                 <MudTh>NoOfAttendee</MudTh>
                 <MudTh>SlotType</MudTh>
-                <MudTh>FromDate</MudTh>
-                <MudTh>ToDate</MudTh>
+                @*<MudTh>FromDate</MudTh>
+        <MudTh>ToDate</MudTh>*@
+                <MudTh>date</MudTh>
                 <MudTh>Additionalnotes</MudTh>
             </HeaderContent>
             <RowTemplate>
@@ -42,8 +43,16 @@
                 <MudTd DataLabel="">@context.AddressLine1 , @context.AddressLine2,@context.Landmark,@context.Pincode,@context.City,@context.State</MudTd>
                 <MudTd DataLabel="">@context.NoOfAttendee</MudTd>
                 <MudTd DataLabel="">@context.SlotType</MudTd>
-                <MudTd DataLabel="">@context.FromDate</MudTd>
-                <MudTd DataLabel="">@context.ToDate</MudTd>
+                @*<MudTd DataLabel="">@context.FromDate</MudTd>
+                <MudTd DataLabel="">@context.ToDate</MudTd>*@
+                <MudTd DataLabel="">
+                    @context.FromDate?.ToLongDateString()
+                    @if (@context.ToDate.HasValue)
+                    {
+                        @(" To ")
+                        @context.ToDate?.ToLongDateString()
+                    }
+                </MudTd>
                 <MudTd DataLabel="">@context.Additionalnotes</MudTd>
             </RowTemplate>
         </MudTable>

@@ -19,20 +19,20 @@
         </MudCardHeader>
         <MudCardContent>
             <MudItem>
-                <MudTextField @bind-Value="UserModel.FullName" Label="User Full Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="UserModel.ContactNo" Label="User contactno" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="UserModel.Email" Label="User email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudSelect @bind-Value="UserModel.Userrole" Label="User role" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudTextField @bind-Value="UserModel.FullName" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="UserModel.ContactNo" Label="contactno" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="UserModel.Email" Label="email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudSelect @bind-Value="UserModel.Userrole" Label="role" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                     <MudSelectItem Value="@(Userrole.Admin.ToString())">@Userrole.Admin.ToString()</MudSelectItem>
                     <MudSelectItem Value="@(Userrole.Staff.ToString())">@Userrole.Staff.ToString()</MudSelectItem>
                     <MudSelectItem Value="@(Userrole.Supervisor.ToString())">@Userrole.Supervisor.ToString()</MudSelectItem>
                     <MudSelectItem Value="@(Userrole.Operator.ToString())">@Userrole.Operator.ToString()</MudSelectItem>
                 </MudSelect>
-                <MudTextField @bind-Value="UserModel.Password" InputType="InputType.Password" Label="User password" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="UserModel.Password" InputType="InputType.Password" Label="password" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             </MudItem>
             <MudItem Class="d-flex justify-end">
                 <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="Cancel">
-                    <FontLabel Fontweight="500" FontColor="white">Reset</FontLabel>
+                    <FontLabel Fontweight="500" FontColor="white">Cancel</FontLabel>
                 </MudButton>
                 <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
                     <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>

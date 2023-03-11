@@ -1,5 +1,7 @@
 ﻿using EMS.DB.Models;
 using EMS.DB.Repository.Interface;
+using EventMentorSystem.Data;
+using EventMentorSystem.Pages.PaymentM;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System;
@@ -13,6 +15,9 @@ namespace EventMentorSystem.Pages.EventM
     {
         [Parameter]
         public string EventId { get; set; }
+
+        [CascadingParameter(Name = "cascadeParameters")]
+        public GlobalParameter _parameters { get; set; }
         [Inject] IEventRepository _EventRepository { get; set; }
         [Inject] IEventCategoryRepository _EventCategoryRepository { get; set; }
         [Inject] ICategoryServiceRepository _CategoryServiceRepository { get; set; }
@@ -92,6 +97,7 @@ namespace EventMentorSystem.Pages.EventM
         {
             var parameters = new DialogParameters();
             parameters.Add("EventModel", events);
+            parameters.Add("_parameters", _parameters);
             var options = new DialogOptions()
             {
                 CloseOnEscapeKey = false,
@@ -107,6 +113,7 @@ namespace EventMentorSystem.Pages.EventM
         {
             var parameters = new DialogParameters();
             parameters.Add("EventModel", events);
+            parameters.Add("_parameters", _parameters);
             var options = new DialogOptions()
             {
                 CloseOnEscapeKey = false,
@@ -131,6 +138,7 @@ namespace EventMentorSystem.Pages.EventM
 
             var parameters = new DialogParameters();
             parameters.Add("PaymentModel", payments);
+            parameters.Add("_parameters", _parameters);
             var options = new DialogOptions()
             {
                 CloseOnEscapeKey = false,
@@ -142,6 +150,23 @@ namespace EventMentorSystem.Pages.EventM
             };
 
             DialogService.Show<EditPaymentDialog>("Edit Payment", parameters, options);
+
+        }
+        private void Addpayment()
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("EventId", EventId);
+            var options = new DialogOptions()
+            {
+                CloseOnEscapeKey = false,
+                CloseButton = true,
+                MaxWidth = MaxWidth.Large,
+                Position = DialogPosition.TopCenter,
+                DisableBackdropClick = true
+
+            };
+
+            DialogService.Show<AddPaymentDialog>("Add Payment", parameters, options);
 
         }
 

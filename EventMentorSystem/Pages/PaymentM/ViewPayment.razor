@@ -62,13 +62,13 @@
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Payment list</MudText>
                 <MudSpacer />
-                <MudTextField Value="searchString" T=" string" ValueChanged="@(s => OnSearch(s))" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField Value="searchString" T=" string" ValueChanged="@(s => OnSearch(s))" Immediate="true" Placeholder="Search for Payment" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Action</MudTh>
-                <MudTh>PaymentId</MudTh>
+                <MudTh>Id</MudTh>
                 <MudTh>Event Name</MudTh>
-                <MudTh>OrganizorName</MudTh>
+                <MudTh>Organizor Name</MudTh>
                 <MudTh>OrganizorNo</MudTh>
                 <MudTh>Operator Name</MudTh>
                 <MudTh>From date</MudTh>
@@ -89,11 +89,11 @@
                 <MudTd DataLabel="Id">@context.Event.OrganizerName</MudTd>
                 <MudTd DataLabel="Id">@context.Event.OrganizerContact</MudTd>
                 <MudTd DataLabel="Id">@context.Event.OperatorName</MudTd>
-                <MudTd DataLabel="Id">@context.Event.FromDate</MudTd>
+                <MudTd DataLabel="Id">@context.Event.FromDate?.ToLongDateString()</MudTd>
                 <MudTd DataLabel="Id">@context.PaymentMode</MudTd>
-                <MudTd DataLabel="Id">@context.TotalAmount</MudTd>
-                <MudTd DataLabel="Id">@context.ReceivedAmount</MudTd>
-                <MudTd DataLabel="Id">@context.RemainingAmount</MudTd>
+                <MudTd DataLabel="Id">@ValidCurrency(context.TotalAmount)</MudTd>
+                <MudTd DataLabel="Id">@ValidCurrency(context.ReceivedAmount)</MudTd>
+                <MudTd DataLabel="Id">@ValidCurrency(context.RemainingAmount)</MudTd>
                 <MudTd DataLabel="Id">@context.Transactionid</MudTd>
                 <MudTd DataLabel="Id">@context.Description</MudTd>
             </RowTemplate>
@@ -110,7 +110,6 @@
 @code{
     [CascadingParameter(Name = "cascadeParameters")]
     public GlobalParameter _parameters { get; set; }
-
     private List<Payment> PaymentList = new();
     private List<Event> EventList = new();
     private List<User> UserList = new();
@@ -210,7 +209,8 @@
             NotificationMessagesModel.Message = $"payment update by Event Id:{PaymentModel.EventId}.";
             NotificationMessagesModel.Title = "payment";
             NotificationMessagesModel.UserId = PaymentModel.UserId;
-            _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
+            NotificationMessagesModel.EventId = PaymentModel.EventId;
+            await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
             await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
             PaymentModel = new Payment();
             tableRef.ReloadServerData();
@@ -245,6 +245,7 @@
 
         var parameters = new DialogParameters();
         parameters.Add("paymentsModel", payments);
+        parameters.Add("_parameters", _parameters);
         var options = new DialogOptions()
         {
             CloseOnEscapeKey = false,
@@ -264,4 +265,5 @@
         searchString = text;
         tableRef.ReloadServerData();
     }
+    string ValidCurrency(string value) => string.Format("₹ {0:#.00}", Convert.ToDecimal(value));
 }

@@ -3,6 +3,7 @@
 @inject IEventRepository _eventService;
 @inject IEventCategoryRepository _EventCategoryRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
+@inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
 
 <MudDialog>
@@ -37,6 +38,8 @@
 @code {
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter]
+    public GlobalParameter _parameters { get; set; }
     [Parameter] public Event EventModel { get; set; } = new Event();
     private Event eventModel = new();
     private bool isReadOnly = false;
@@ -46,6 +49,8 @@
     private List<EventCategory> EventCategoryList = new();
     List<String> selectedServiceList = new List<String>();
     List<long> selectedServiceIdList = new List<long>();
+
+    public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
 
 
     protected override Task OnAfterRenderAsync(bool firstRender)
@@ -80,11 +85,17 @@
         return ServiceList;
     }
     void Cancel() => MudDialog.Close(DialogResult.Ok(false));
-    private void AddService()
+    private async Task AddService()
     {
         try
         {
             _eventService.Update(eventModel);
+            NotificationMessagesModel.Message = $"Edit Event service {eventModel.EventName}: By {eventModel.OperatorName}.";
+            NotificationMessagesModel.Title = "add service";
+            NotificationMessagesModel.UserId = _parameters.UserId;
+            NotificationMessagesModel.EventId = eventModel.Id;
+            await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
+            await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
             eventModel = new Event();
             MudDialog.Close();
             Snackbar.Add("add service successfully.", Severity.Success);
