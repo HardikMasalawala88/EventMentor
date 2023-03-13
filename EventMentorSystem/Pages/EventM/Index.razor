@@ -234,7 +234,7 @@
             _EventRepository.Insert(eventModel);
             Snackbar.Add(" record saved", Severity.Success);
             tableRef.ReloadServerData();
-            //Sendmail(eventModel.Email);
+            Sendmail(eventModel.Email);
             NotificationMessagesModel.Message = $"Add Event  {eventModel.EventName}: By {eventModel.OperatorName}.";
             NotificationMessagesModel.Title = "add Event";
             NotificationMessagesModel.UserId = _parameters.UserId;
@@ -310,7 +310,7 @@
         {
             using (MailMessage mail = new MailMessage())
             {
-                mail.From = new MailAddress("baruwalaom@gmail.com");
+                mail.From = new MailAddress("eventmentor3@gmail.com");
                 mail.To.Add(@email);
                 mail.Subject = "this is test1.";
                 mail.Body = "<h1>this is demo link</h1>" +

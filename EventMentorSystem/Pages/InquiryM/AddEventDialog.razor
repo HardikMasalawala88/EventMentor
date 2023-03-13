@@ -1,6 +1,8 @@
 ﻿@using EMS.DB.Models
 @using EMS.DB.Constant
 @using  EMS.DB.Repository.Interface
+@using System.Net
+@using System.Net.Mail
 @inject IEventRepository _EventRepository;
 @inject ISnackbar Snackbar;
 @inject IEventCategoryRepository _EventCategoryRepository;
@@ -39,12 +41,13 @@
                 </MudSelect>
             </MudItem>
             <MudItem lg="2" md="3" xs="12">
-                <MudDatePicker Label="From Date" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy"  Variant="Variant.Outlined" ReadOnly="isReadOnly"/>
+                <MudDatePicker Label="From Date" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" ReadOnly="isReadOnly" />
             </MudItem>
-            @if (eventModel.SlotType== EventSlotType.MultipleDay.ToString()) {
-            <MudItem lg="2" md="3" xs="12">
-                <MudDatePicker Label="To Date" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" ReadOnly="isReadOnly"/>
-            </MudItem>
+            @if (eventModel.SlotType == EventSlotType.MultipleDay.ToString())
+            {
+                <MudItem lg="2" md="3" xs="12">
+                    <MudDatePicker Label="To Date" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" ReadOnly="isReadOnly" />
+                </MudItem>
             }
             <MudItem lg="4" md="4" xs="12">
                 <MudSelect @bind-Value="eventModel.CategoryId" T="long" SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
@@ -114,6 +117,7 @@
             eventModel.SlotType = inquiryModel.SlotType;
             eventModel.Email = inquiryModel.Email;
             eventModel.OrganizerContact = inquiryModel.MobileNo;
+            eventModel.CategoryId = inquiryModel.EventCategoryId;
             eventModel.FromDate = inquiryModel.FromDate;
             eventModel.Todate = inquiryModel.ToDate;
             eventModel.Description = inquiryModel.Additionalnotes;
@@ -156,6 +160,7 @@
 
             _EventRepository.Insert(eventModel);
             Snackbar.Add(" record saved", Severity.Success);
+            Sendmail(eventModel.Email);
             NotificationMessagesModel.Message = $"Add Event  {eventModel.EventName}: By {eventModel.OperatorName}.";
             NotificationMessagesModel.Title = "add Event";
             NotificationMessagesModel.UserId = _parameters.UserId;
@@ -177,6 +182,32 @@
     {
         MudDialog.Close(DialogResult.Ok(true));
         inquiryModel = new Inquiry();
+    }
+    private void Sendmail(string email)
+    {
+        try
+        {
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress("baruwalaom@gmail.com");
+                mail.To.Add(@email);
+                mail.Subject = "this is test1.";
+                mail.Body = "<h1>this is demo link</h1>" +
+                        "<a href='https://localhost:44304/eventlist'>Visit your event detail.</a>";
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtp.Credentials = new NetworkCredential("baruwalaom@gmail.com", "nyjagskbmgrqvkkb");
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                }
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
     #endregion
 

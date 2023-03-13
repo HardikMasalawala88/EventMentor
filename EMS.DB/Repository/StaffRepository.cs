@@ -40,7 +40,11 @@ namespace EMS.DB.Repository
             using AppDbContext _myContext = base.GetContext();
             return _myContext.Staffs.Where(x => x.StaffService == service).ToList();
         }
-
+        public List<Staff> GetStaffByUserId(string id)
+        {
+            using AppDbContext _myContext = base.GetContext();
+            return _myContext.Staffs.Where(x => x.UserId == id).ToList();
+        }
         public List<Staff> GetById(long id)
         {
             using AppDbContext _myContext = base.GetContext();

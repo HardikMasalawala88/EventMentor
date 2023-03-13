@@ -4,6 +4,7 @@
 @inject IEventRepository _EventRepository;
 @inject ISnackbar Snackbar;
 @inject IInquiryRepository _InquiryRepository;
+@inject IEventCategoryRepository _EventCategoryRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject IDialogService DialogService
 <MudDialog>
@@ -47,7 +48,7 @@
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
                 <MudText>SlotType</MudText>
-                <MudRadioGroup  @bind-SelectedOption="@inquiryModel.SlotType" >
+                <MudRadioGroup @bind-SelectedOption="@inquiryModel.SlotType">
                     <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
                     <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
                     <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
@@ -55,13 +56,23 @@
                 </MudRadioGroup>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudDatePicker Label="From Date" Class="m-0" @bind-Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" ReadOnly="isReadOnly"/>
+                <MudDatePicker Label="From Date" Class="m-0" @bind-Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" ReadOnly="isReadOnly" />
             </MudItem>
-            @if (inquiryModel.SlotType== "MultipleDay") {
-            <MudItem lg="4" md="4" xs="12">
-                <MudDatePicker Label="To Date" Class="m-0" @bind-Date="inquiryModel.ToDate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" ReadOnly="isReadOnly" />
-            </MudItem>
+            @if (inquiryModel.SlotType == "MultipleDay")
+            {
+                <MudItem lg="4" md="4" xs="12">
+                    <MudDatePicker Label="To Date" Class="m-0" @bind-Date="inquiryModel.ToDate" DateFormat="dd.MM.yyyy" Variant="Variant.Outlined" ReadOnly="isReadOnly" />
+                </MudItem>
             }
+        <MudItem lg="4" md="4" xs="12">
+            
+            <MudSelect @bind-Value="inquiryModel.EventCategoryId" T="long"  Label="selected categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                @foreach (var eventCategory in EventCategoryList)
+                {
+                    <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
             <MudItem lg="12" md="12" xs="12">
                 <MudTextField T="string" Class="m-0" Label="Additional notes" Variant="Variant.Outlined" @bind-Text="inquiryModel.Additionalnotes" Lines="5" />
             </MudItem>
@@ -82,10 +93,11 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Inquiry InquiryModel { get; set; } = new Inquiry();
-    [CascadingParameter(Name = "cascadeParameters")]
+    [Parameter]
     public GlobalParameter _parameters { get; set; }
     private bool isReadOnly = false;
     private Inquiry inquiryModel = new();
+    private List<EventCategory> EventCategoryList = new();
     private Event eventModel = new();
 
     private List<Inquiry> inquiryList = new();
@@ -108,7 +120,10 @@
         inquiryModel = InquiryModel;
         base.OnInitialized();
     }
-
+    private void GetEventCategoryList()
+    {
+        EventCategoryList = _EventCategoryRepository.GetList();
+    }
 
     private void Save()
     {
@@ -132,12 +147,7 @@
         {
             _InquiryRepository.Delete(id);
             GetLists();
-            //NotificationMessagesModel.Message = $"Add Event  {eventModel.EventName}: By {eventModel.OperatorName}.";
-            //NotificationMessagesModel.Title = "add category";
-            //NotificationMessagesModel.UserId = _parameters.UserId;
-            //NotificationMessagesModel.EventId = eventModel.Id;
-            //await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
-            //await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
+            
             MudDialog.Close(DialogResult.Ok(true));
             inquiryModel = new Inquiry();
             Snackbar.Add("Inquiry Rejected Successfull.", Severity.Success);

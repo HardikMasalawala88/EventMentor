@@ -26,9 +26,6 @@
     -webkit-border-radius: 2px;
     z-index: 1
 }
-
-
-
 .ikrNotifications {
     display: none;
     width: 300px;
@@ -40,22 +37,6 @@
     -webkit-box-shadow: 0 3px 8px rgba(0,0,0,.2);
     z-index: 1000
 }
-
-
-
-    .ikrNotifications:before {
-        content: '';
-        display: block;
-        width: 0;
-        height: 0;
-        color: transparent;
-        border: 10px solid #ccc;
-        border-color: transparent transparent #fff;
-        margin-top: -20px;
-        margin-left: 10px
-    }
-
-
 
     .ikrNotifications h3 {
         display: block;
@@ -93,15 +74,12 @@
                 text-decoration: underline
             }
 
-
-
 .ikrNotificationItems {
-    height: 300px;
-    overflow-y: scroll;
-    background-color: #f0f8ff
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #dbdaff;
 }
-
-
 
 .ikrSingleNotiDiv {
     border-top: 1px solid #ccc;
@@ -110,58 +88,40 @@
     color: #000
 }
 
-
-
 .ikrSingleNotiDivUnReadColor {
     color: #c00
 }
-
-
 
 .ikrNotificationTitle {
     font-weight: 700;
     margin-left: 10px
 }
 
-
-
 .ikrNotificationBody {
     margin: 0 10px 0 10px
 }
-
-
 
 .ikrNotiCreatedDate {
     text-align: right;
     margin-right: 10px;
 }
 
-
-
 .ikrNotiFromPropName {
     margin-left: 4px;
 }
-
-
 
 ::-webkit-scrollbar {
     width: 2px
 }
 
-
-
 ::-webkit-scrollbar-track {
     background: #f1f1f1
 }
-
-
 
 ::-webkit-scrollbar-thumb {
     background: #888
 }
 
-
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #555
-    }
+::-webkit-scrollbar-thumb:hover {
+    background: #555
+}

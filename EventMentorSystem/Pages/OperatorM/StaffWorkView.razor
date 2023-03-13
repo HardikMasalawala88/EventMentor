@@ -1,16 +1,16 @@
-﻿@page "/ViewStaffwork"
+﻿@page "/viewstaffworklist"
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
 @inject IEventStaffWorkRepository _EventStaffWorkRepository;
+@inject IStaffRepository _StaffRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
 @inject IDialogService DialogService;
 @using EMS.DB.Constant
-<AuthorizeView Roles="Admin" Context="data">
-    <Authorized>
+
         <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<EventStaffWork>>>(ServerReload))" T="EventStaffWork" Filter="new Func<EventStaffWork, bool>(Search)" Class="w-100" @bind-customer="EventStaffWorkList">
             <ToolBarContent>
-                <MudText Typo="Typo.h6"> list</MudText>
+                <MudText Typo="Typo.h6">Worklist</MudText>
                 <MudSpacer />
                 <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search for Work" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
@@ -35,25 +35,34 @@
                 <MudTd DataLabel="Id">@context.Id</MudTd>
                 <MudTd DataLabel="Id">@context.Event.EventName</MudTd>
                 <MudTd DataLabel="Id">@context.Event.EventVenue</MudTd>
-                <MudTd DataLabel="Id">@context.Event.FromDate</MudTd>
+                <MudTd DataLabel="Id">@context.Event.FromDate?.ToLongDateString()</MudTd>
                 <MudTd DataLabel="Id">@context.Event.SlotType</MudTd>
                 <MudTd DataLabel="Id">@context.Service</MudTd>
                 <MudTd DataLabel="Id">@context.Description</MudTd>
-                <MudTd DataLabel="Id">@context.Status</MudTd>
+                <MudTd DataLabel="Id">
+                    @if (context.Status == Status.pending.ToString())
+                    {
+<MudAlert Severity="Severity.Success">@context.Status</MudAlert> }
+                        else if (context.Status == Status.OnProcess.ToString())
+                        {
+<MudAlert Severity="Severity.Warning">@context.Status</MudAlert> }
+                        else
+                        {
+<MudAlert Severity="Severity.Error">@context.Status</MudAlert>}
+                </MudTd>
             </RowTemplate>
             <PagerContent>
                 <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
             </PagerContent>
         </MudTable>
-    </Authorized>
-    <NotAuthorized>
-        <MudAlert Severity="Severity.Error">please <MudLink Href="/login">login</MudLink></MudAlert>
-    </NotAuthorized>
-</AuthorizeView>
 
+@code{ 
+    [CascadingParameter(Name = "cascadeParameters")]
+    public GlobalParameter _parameters { get; set; }
 
-@code{ private string searchString = "";
+    private string searchString = "";
     private List<EventStaffWork> EventStaffWorkList = new();
+    private List<Staff> staffList = new();
     private EventStaffWork EventStaffWorkModel = new();
     private MudTable<EventStaffWork> tableRef;
     private IEnumerable<EventStaffWork> pagedData;
@@ -62,24 +71,9 @@
     private bool IsStatus;
     private int totalItems;
     private int totalItemsOperator;
-    [CascadingParameter(Name = "cascadeParameters")]
-    public GlobalParameter _parameters { get; set; }
+
     public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
 
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            GetAllEventStaffWork();
-        }
-
-        return base.OnAfterRenderAsync(firstRender);
-    }
-    private List<EventStaffWork> GetAllEventStaffWork()
-    {
-        EventStaffWorkList = _EventStaffWorkRepository.GetEventStaffWorkList();
-        return EventStaffWorkList;
-    }
     private bool Search(EventStaffWork EventStaffWorks)
     {
         if (string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(searchString)
@@ -109,9 +103,8 @@
     private async Task<TableData<EventStaffWork>> ServerReload(TableState state)
     {
         IEnumerable<EventStaffWork> data;
-
         //get all data of current month
-        data = _EventStaffWorkRepository.GetEventStaffWorkList();
+        data = _EventStaffWorkRepository.GetListByStaff(_parameters.UserId);
 
         data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
         data = data.OrderByDirection(state.SortDirection, o => o.Event.FromDate.Value);

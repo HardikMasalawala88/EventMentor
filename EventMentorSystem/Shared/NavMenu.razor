@@ -1,22 +1,25 @@
 ﻿@inject IUserRepository _UserRepository;
 <MudPaper Width="250px" Class="d-inline-flex py-3" Elevation="0">
-    <MudNavMenu Class="mud-width-full" >
-        @foreach (var data in Getuser()) {
-        <PersonCard UserName="@data.FullName" UserRole="@data.Userrole" Style="background-color: var(--mud-palette-drawer-background);color: var(--mud-palette-drawer-text);" />
+    <MudNavMenu Class="mud-width-full">
+        @foreach (var data in Getuser())
+        {
+            <PersonCard UserName="@data.FullName" UserRole="@data.Userrole" Style="background-color: var(--mud-palette-drawer-background);color: var(--mud-palette-drawer-text);" />
         }
         <MudDivider Class="my-2" />
-        <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
-        <MudNavLink Href="/userlist" Icon="@Icons.Material.TwoTone.AccountBox">Users</MudNavLink>
-        <MudNavLink Href="/eventlist" Icon="@Icons.Material.TwoTone.Event">Events</MudNavLink>
-        <MudNavLink Href="/Inquirylist" Icon="@Icons.Material.TwoTone.AppRegistration">Inquiries</MudNavLink>
-        <MudNavLink Href="/ViewPayment" Icon="@Icons.Material.TwoTone.Payment">Payments</MudNavLink>
-        <MudNavLink Href="/EventCategorys" Icon="@Icons.Material.TwoTone.ViewList">Categories</MudNavLink>
-        <MudNavLink Href="/ServiceList" Icon="@Icons.Material.TwoTone.Category">Category Services</MudNavLink>
-        <MudNavLink Href="/Updatelist" Icon="@Icons.Material.TwoTone.Category">Staffs</MudNavLink>
-        <MudNavLink Href="/staffworkgiven" Icon="@Icons.Material.TwoTone.Category">Staff work given</MudNavLink>
-        <MudNavLink Href="/ViewStaffwork" Icon="@Icons.Material.TwoTone.Category">View Work</MudNavLink>
+        
+                <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
+                <MudNavLink Href="/userlist" Icon="@Icons.Material.TwoTone.AccountBox">Users</MudNavLink>
+                <MudNavLink Href="/eventlist" Icon="@Icons.Material.TwoTone.Event">Events</MudNavLink>
+                <MudNavLink Href="/Inquirylist" Icon="@Icons.Material.TwoTone.AppRegistration">Inquiries</MudNavLink>
+                <MudNavLink Href="/viewpaymentlist" Icon="@Icons.Material.TwoTone.Payment">Payments</MudNavLink>
+                <MudNavLink Href="/eventcategorylist" Icon="@Icons.Material.TwoTone.ViewList">Categories</MudNavLink>
+                <MudNavLink Href="/servicelist" Icon="@Icons.Material.TwoTone.Category">Category Services</MudNavLink>
+                <MudNavLink Href="/staffupdatelist" Icon="@Icons.Material.Filled.Person">Staffs</MudNavLink>
+                <MudNavLink Href="/staffworkgivenlist" Icon="@Icons.Material.TwoTone.Category">Staff work given</MudNavLink>
+                <MudNavLink Href="/viewstaffworklist" Icon="@Icons.Material.TwoTone.Category">View Work</MudNavLink>
     </MudNavMenu>
 </MudPaper>
+
 @code{
     [CascadingParameter(Name = "cascadeParameters")]
     public GlobalParameter _parameters { get; set; }

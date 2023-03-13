@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMS.DB.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230310111210_initial12")]
-    partial class initial12
+    [Migration("20230313063318_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

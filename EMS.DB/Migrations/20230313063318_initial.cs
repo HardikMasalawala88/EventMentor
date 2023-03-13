@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace EMS.DB.Migrations
 {
-    public partial class initial1 : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -386,6 +386,7 @@ namespace EMS.DB.Migrations
                     EventVenue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OrganizerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OrganizerContact = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SlotType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FromDate = table.Column<DateTime>(type: "datetime2", nullable: true),

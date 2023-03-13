@@ -1,4 +1,4 @@
-﻿@page "/staffworkgiven"
+﻿@page "/staffworkgivenlist"
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
 @inject IEventStaffWorkRepository _EventStaffWorkRepository;
@@ -150,7 +150,7 @@
         }
         <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<EventStaffWork>>>(ServerReload))" T="EventStaffWork" Filter="new Func<EventStaffWork, bool>(Search)" Class="w-100" @bind-customer="EventStaffWorkList">
             <ToolBarContent>
-                <MudText Typo="Typo.h6"> list</MudText>
+                <MudText Typo="Typo.h6"> Staff Worklist</MudText>
                 <MudSpacer />
                 <MudTextField Value="searchString" T=" string" ValueChanged="@(s => OnSearch(s))" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
@@ -170,7 +170,7 @@
                 </MudTd>
                 <MudTd DataLabel="Id">@context.Event.EventName</MudTd>
                 <MudTd DataLabel="Id">@context.Event.EventVenue</MudTd>
-                <MudTd DataLabel="Id">@context.Event.FromDate</MudTd>
+                <MudTd DataLabel="Id">@context.Event.FromDate?.ToLongDateString()</MudTd>
                 <MudTd DataLabel="Id">@context.Event.SlotType</MudTd>
                 <MudTd DataLabel="Id">@context.Service</MudTd>
                 <MudTd DataLabel="Id">@context.Description</MudTd>

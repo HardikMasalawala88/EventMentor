@@ -16,25 +16,26 @@
             <MudBadge Content="@allNotificationMgs.Count()" Color="Color.Dark" Overlap="true" Class="mx-6 my-4 cursor-pointer">
                 <MudIconButton @onclick="NotificationHideShow" Icon="@Icons.Material.Filled.Notifications" Color="Color.Secondary" />
             </MudBadge>
-            
-            <div class='ikrNotifications' style="display:@BoxCss !important" @onclick="NotificationHideShow">
-                <h3>Notifications (<span class='notiCounterOnHead'>@currentUserMsgList.Count()</span>)</h3>
+            <div class='ikrNotifications' style="display:@BoxCss !important">
+                <h3>Notifications (<span class='notiCounterOnHead'>@count</span>)</h3>
                 <div class='ikrNotificationItems' style="color:black">
-                    @foreach (var nmobj in allNotificationMgs.OrderByDescending(x => x.CreatedOn))
+                    @foreach (var nmobj in allNotificationMgs)
                     {
                         <div class='ikrsingleNotiDiv' notiId="@nmobj.Id">
                             <h4 class='ikrNotiFromPropName'>Title : @nmobj.Title</h4>
-                            <h5 class='ikrNotificationTitle'>Mesddage :@nmobj.Message</h5>
+                            <h5 class='ikrNotificationTitle'>Message :@nmobj.Message</h5>
                             <div class='ikrNotiCreatedDate'>@nmobj.CreatedOn</div>
                         </div>
+
                     }
                 </div>
                 <div class="ikrSeeAll"><a href="#">see all</a></div>
             </div>
 
-        
-            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" Edge="Edge.End" @onclick="Logout" />
-            <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+            @*<MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" Edge="Edge.End" @onclick="Logout" />*@
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
+                <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="Logout">Logout</MudMenuItem>
+            </MudMenu>
         </MudAppBar>
         <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
             <NavMenu />
@@ -46,19 +47,21 @@
         </MudMainContent>
     </CascadingValue>
 </MudLayout>
+
 @code {
     [Inject]
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
     [Inject] UserManager<User> UserManager { get; set; }
+    [Inject] SignInManager<User> signInManager { get; set; }
     private readonly GlobalParameter _parameters = new();
     private bool isUserLoggedIn = false;
     private List<NotificationMessages> allNotificationMgs = new List<NotificationMessages>();
-    private List<NotificationMessages> currentUserMsgList = new List<NotificationMessages>();
     private NotificationMessages notificationMessage = new NotificationMessages();
     //private HubConnection hubConnection;
     private string BoxCss = "none";
     public bool IsConnected => _parameters.hubConnection?.State == HubConnectionState.Connected;
     private string authMessage;
+    private int count;
     private string surname;
     private string Userid;
     private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
@@ -133,6 +136,7 @@
     {
         try
         {
+            
             _parameters.UserId = userId;
             _parameters.LoggedInUser = await UserManager.FindByIdAsync(userId);
         }
@@ -157,7 +161,7 @@
         if (BoxCss == "none") BoxCss = "block";
         else BoxCss = "none";
     }
-  
+
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -175,5 +179,9 @@
 
         if (_parameters is not null && !string.IsNullOrEmpty(_parameters.UserId))
             allNotificationMgs = await _NotificationMessagesRepository.GetMessages(_parameters.UserId);
+
+        allNotificationMgs.Reverse();
+        count = allNotificationMgs.Count();
     }
+
 }
