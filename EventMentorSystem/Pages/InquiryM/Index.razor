@@ -1,4 +1,5 @@
 ﻿@page "/Inquirylist"
+@attribute [Authorize(Roles = "Admin")]
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
 @using System.Globalization
@@ -25,7 +26,7 @@
                 <MudTh>NoOfAttendee</MudTh>
                 <MudTh>SlotType</MudTh>
                 @*<MudTh>FromDate</MudTh>
-        <MudTh>ToDate</MudTh>*@
+                    <MudTh>ToDate</MudTh>*@
                 <MudTh>date</MudTh>
                 <MudTh>Additionalnotes</MudTh>
             </HeaderContent>
@@ -44,7 +45,7 @@
                 <MudTd DataLabel="">@context.NoOfAttendee</MudTd>
                 <MudTd DataLabel="">@context.SlotType</MudTd>
                 @*<MudTd DataLabel="">@context.FromDate</MudTd>
-                <MudTd DataLabel="">@context.ToDate</MudTd>*@
+                    <MudTd DataLabel="">@context.ToDate</MudTd>*@
                 <MudTd DataLabel="">
                     @context.FromDate?.ToLongDateString()
                     @if (@context.ToDate.HasValue)

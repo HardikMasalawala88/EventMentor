@@ -1,161 +1,163 @@
 ﻿@page "/eventlist"
+@attribute [Authorize(Roles = "Admin, Operator")]
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
 @using EMS.DB.Constant
 @using System.Net
 @using System.Net.Mail
 @inject IEventRepository _EventRepository;
+@inject IOperatorRepository _OperatorRepository;
 @inject ISnackbar Snackbar;
 @inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 @inject IEventCategoryRepository _EventCategoryRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject NavigationManager UriHelper
-<AuthorizeView Roles="Admin">
-    <Authorized>
-        @if (IsEdit || IsAdd)
-        {
-            <MudCard Elevation="25">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6">Add / Edit Events</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudItem>
-                        <MudTextField @bind-Value="eventModel.EventName" Label="Event Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudTextField @bind-Value="eventModel.OperatorName" Label="Operator Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudTextField @bind-Value="eventModel.EventVenue" Label="EventVenue" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudTextField @bind-Value="eventModel.OrganizerName" Label="Organizer Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudTextField @bind-Value="eventModel.Email" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudTextField @bind-Value="eventModel.OrganizerContact" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudRadioGroup @bind-SelectedOption="@eventModel.SlotType">
-                            <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
-                            <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
-                            <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
-                            <MudRadio Option="@(EventSlotType.MultipleDay.ToString())" Color="Color.Primary">@EventSlotType.MultipleDay.ToString()</MudRadio>
-                        </MudRadioGroup>
-                        <MudDatePicker Variant="Variant.Outlined" Label="From Date" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy"  />
-                        @if (eventModel.SlotType== EventSlotType.MultipleDay.ToString()) { 
-                        <MudDatePicker Variant="Variant.Outlined" Label="To Date" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" />
+@if (IsEdit || IsAdd)
+{
+    <MudCard Elevation="25">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Add / Edit Events</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudItem>
+                <MudTextField @bind-Value="eventModel.EventName" Label="Event Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudSelect @bind-Value="eventModel.OperatorId" Label="Operator Name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var data in OperatorList)
+                        {
+                        <MudSelectItem Value="@data.Id">@data.User.FullName</MudSelectItem>
                         }
-                        <MudTextField @bind-Value="eventModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudSelect @bind-Value="eventModel.CategoryId" Label="Select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                            @foreach (var eventCategory in GetEventCategoryList())
-                                {
-                                <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
+                </MudSelect>
+                <MudTextField @bind-Value="eventModel.EventVenue" Label="EventVenue" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="eventModel.OrganizerName" Label="Organizer Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="eventModel.Email" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="eventModel.OrganizerContact" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudRadioGroup @bind-SelectedOption="@eventModel.SlotType">
+                    <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
+                    <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
+                    <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
+                    <MudRadio Option="@(EventSlotType.MultipleDay.ToString())" Color="Color.Primary">@EventSlotType.MultipleDay.ToString()</MudRadio>
+                </MudRadioGroup>
+                <MudDatePicker Variant="Variant.Outlined" Label="From Date" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy" />
+                @if (eventModel.SlotType == EventSlotType.MultipleDay.ToString())
+                {
+                    <MudDatePicker Variant="Variant.Outlined" Label="To Date" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" />
+                }
+                <MudTextField @bind-Value="eventModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudSelect @bind-Value="eventModel.CategoryId" Label="Select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var eventCategory in GetEventCategoryList())
+                        {
+                        <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
 
-                                }
-                        </MudSelect>
-                        <MudSwitch @bind-Checked="eventModel.IsApproved" Color="Color.Primary" Label="Approved?" />
-                    </MudItem>
-                    <MudItem Class="d-flex justify-end">
-                        <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
-                            <FontLabel Fontweight="500" FontColor="white">Cancel</FontLabel>
-                        </MudButton>
-                        <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
-                            <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
-                        </MudButton>
-                    </MudItem>
-                </MudCardContent>
-            </MudCard>
-        }
-        else
-        {
+                        }
+                </MudSelect>
+                <MudSwitch @bind-Checked="eventModel.IsApproved" Color="Color.Primary" Label="Approved?" />
+            </MudItem>
+            <MudItem Class="d-flex justify-end">
+                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
+                    <FontLabel Fontweight="500" FontColor="white">Cancel</FontLabel>
+                </MudButton>
+                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                    <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
+                </MudButton>
+            </MudItem>
+        </MudCardContent>
+    </MudCard>
+}
+else
+{
     <MudItem Class="d-flex justify-end">
         <MudButton Variant="Variant.Filled" Color="Color.Primary " OnClick="ShowAddForm">
             <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
         </MudButton>
     </MudItem>
-        }
-        <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<Event>>>(ServerReload))" T="Event" Filter="new Func<Event, bool>(Search)" Class="w-100" @bind-customer="eventList" OnRowClick="@RowClicked">
-            <ToolBarContent>
-                <MudText Typo="Typo.h6">Event list</MudText>
-                <MudSpacer />
-                <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent>
-            <HeaderContent>
-                <MudTh>Action</MudTh>
-                <MudTh>Event(#Id)</MudTh>
-                <MudTh>Operator</MudTh>
-                <MudTh>Venue</MudTh>
-                <MudTh>Organizor(#Contact)</MudTh>
-                @*<MudTh>Description</MudTh>*@
-                <MudTh>SlotType</MudTh>
-                <MudTh>Event date</MudTh>
-                <MudTh>Approved</MudTh>
-                <MudTh>Payment</MudTh>
-                <MudTh>Reference</MudTh>
-                <MudTh>Category</MudTh>
-            </HeaderContent>
-            <RowTemplate Context="data">
-                <MudTd DataLabel="">
-                    <MudFab @onclick="@(() => Edit(@data))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab @onclick="@(() => Delete(@data.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-                </MudTd>
-                <MudTd DataLabel="Event Name">@(string.Concat("(#", @data.Id,") "))@data.EventName</MudTd>
-                <MudTd DataLabel="">@data.OperatorName</MudTd>
-                <MudTd DataLabel="">@data.EventVenue</MudTd>
-                <MudTd DataLabel="">@data.OrganizerName@(string.Concat("(#", @data.OrganizerContact, ") "))</MudTd>
-                <MudTd DataLabel="">@data.SlotType</MudTd>
-                <MudTd DataLabel="">
-                    @data.FromDate?.ToLongDateString()
-                    @if (@data.Todate.HasValue)
-                    {
-                        @(" To ")
-                        @data.Todate?.ToLongDateString()
-                    }
-                </MudTd>
-                <MudTd DataLabel="">
-                    @if (data.IsApproved)
-                    {
-                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
-                    }
-                    else
-                    {
-                        <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" />
-                    }
-                </MudTd>
-                <MudTd DataLabel="">
-                    @if (data.Ispaymentdone)
-                    {
-                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
-                    }
-                    else
-                    {
-                        <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" />
-                    }
-                </MudTd>
-                <MudTd DataLabel="">
-                    @if (data.InquiryId > 0)
-                    {
-                        @("By Inquiry Form")
-                    }
-                    else
-                    {
-                        @("By Call")
-                    }
-                </MudTd>
-                <MudTd DataLabel="">
-                    @if (@data.Category is not null)
-                    {
-                        @data.Category.CategoryName
-                    }
-                    else
-                    {
-                        @("----")
-                    }
-                </MudTd>
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
-            </PagerContent>
-        </MudTable>
-    </Authorized>
-    <NotAuthorized>
-        <MudAlert Severity="Severity.Error">please login Authorize user <MudLink Href="Identity/Account/Login">login</MudLink></MudAlert>
-    </NotAuthorized>
-</AuthorizeView>
+}
+<MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<Event>>>(ServerReload))" T="Event" Filter="new Func<Event, bool>(Search)" Class="w-100" @bind-customer="eventList" OnRowClick="@RowClicked">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Event list</MudText>
+        <MudSpacer />
+        <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Action</MudTh>
+        <MudTh>Event(#Id)</MudTh>
+        <MudTh>Operator</MudTh>
+        <MudTh>Venue</MudTh>
+        <MudTh>Organizor(#Contact)</MudTh>
+        @*<MudTh>Description</MudTh>*@
+        <MudTh>SlotType</MudTh>
+        <MudTh>Event date</MudTh>
+        <MudTh>Approved</MudTh>
+        <MudTh>Payment</MudTh>
+        <MudTh>Reference</MudTh>
+        <MudTh>Category</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="data">
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(() => Edit(@data))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(() => Delete(@data.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+        <MudTd DataLabel="Event Name">@(string.Concat("(#", @data.Id,") "))@data.EventName</MudTd>
+        <MudTd DataLabel="">@data.OperatorId</MudTd>
+        <MudTd DataLabel="">@data.EventVenue</MudTd>
+        <MudTd DataLabel="">@data.OrganizerName@(string.Concat("(#", @data.OrganizerContact, ") "))</MudTd>
+        <MudTd DataLabel="">@data.SlotType</MudTd>
+        <MudTd DataLabel="">
+            @data.FromDate?.ToLongDateString()
+            @if (@data.Todate.HasValue)
+            {
+                @(" To ")
+                @data.Todate?.ToLongDateString()
+            }
+        </MudTd>
+        <MudTd DataLabel="">
+            @if (data.IsApproved)
+            {
+                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
+            }
+            else
+            {
+                <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" />
+            }
+        </MudTd>
+        <MudTd DataLabel="">
+            @if (data.Ispaymentdone)
+            {
+                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
+            }
+            else
+            {
+                <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" />
+            }
+        </MudTd>
+        <MudTd DataLabel="">
+            @if (data.InquiryId > 0)
+            {
+                @("By Inquiry Form")
+            }
+            else
+            {
+                @("By Call")
+            }
+        </MudTd>
+        <MudTd DataLabel="">
+            @if (@data.Category is not null)
+            {
+                @data.Category.CategoryName
+            }
+            else
+            {
+                @("----")
+            }
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+    </PagerContent>
+</MudTable>
+
 @code{
     [CascadingParameter(Name = "cascadeParameters")]
     public GlobalParameter _parameters { get; set; }
@@ -170,6 +172,7 @@
     private int totalItemsOperator;
     private List<Event> eventList = new();
     private List<EventCategory> eventcategoryList = new();
+    private List<Operator> OperatorList = new();
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -177,6 +180,8 @@
             eventModel.FromDate = DateTime.Today.AddDays(7);
             eventModel.Todate = DateTime.Today.AddDays(7);
             GetAllevents();
+            GetOperatorlist();
+            StateHasChanged();
         }
         return base.OnAfterRenderAsync(firstRender);
     }
@@ -188,14 +193,14 @@
     private bool Search(Event events)
     {
         if (string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(searchString) && StringValid(events.EventName)
-            && StringValid(events.OperatorName)
+            && StringValid(events.OperatorId.ToString())
             && StringValid(events.EventVenue)
             && StringValid(events.OrganizerName)
             && StringValid(events.OrganizerContact)
             && StringValid(events.Description)
             &&
             events.EventName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-            || events.OperatorName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || events.OperatorId.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase)
             || events.EventVenue.Contains(searchString, StringComparison.OrdinalIgnoreCase)
             || events.OrganizerName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
             || events.OrganizerContact.Contains(searchString, StringComparison.OrdinalIgnoreCase))
@@ -234,8 +239,9 @@
             _EventRepository.Insert(eventModel);
             Snackbar.Add(" record saved", Severity.Success);
             tableRef.ReloadServerData();
-            Sendmail(eventModel.Email);
-            NotificationMessagesModel.Message = $"Add Event  {eventModel.EventName}: By {eventModel.OperatorName}.";
+            //Sendmail(eventModel.Email);
+            Operatorname(eventModel.OperatorId);
+            NotificationMessagesModel.Message = $"Add Event  {eventModel.EventName}: By {name}.";
             NotificationMessagesModel.Title = "add Event";
             NotificationMessagesModel.UserId = _parameters.UserId;
             NotificationMessagesModel.EventId = eventModel.Id;
@@ -261,9 +267,25 @@
         UriHelper.NavigateTo($"/EditEvent/{events.Id.ToString()}");
         tableRef.ReloadServerData();
     }
+    public List<Operator> operatorlist = new();
+    public string name { get; set; }
+    private void Operatorname(long id)
+    {
+        operatorlist = _OperatorRepository.GetById(id);
+        foreach (var data in operatorlist)
+        {
+            name = data.User.FullName;
+        }
+    }
     private List<EventCategory> GetEventCategoryList()
     {
         return _EventCategoryRepository.GetList();
+    }
+    private List<Operator> GetOperatorlist()
+    {
+        OperatorList= _OperatorRepository.GetLists();
+        StateHasChanged();
+        return OperatorList;
     }
     private void CancelForm()
     {
@@ -284,7 +306,8 @@
         {
 
             _EventRepository.Delete(id);
-            NotificationMessagesModel.Message = $"delete Event  {eventModel.EventName}: By {eventModel.OperatorName}.";
+
+            NotificationMessagesModel.Message = $"delete Event  {eventModel.EventName}: By {name}.";
             NotificationMessagesModel.Title = "delete Event";
             NotificationMessagesModel.UserId = _parameters.UserId;
             NotificationMessagesModel.EventId = eventModel.Id;
@@ -319,7 +342,7 @@
 
                 using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
                 {
-                    smtp.Credentials = new NetworkCredential("baruwalaom@gmail.com", "nyjagskbmgrqvkkb");
+                    smtp.Credentials = new NetworkCredential("eventmentor3@gmail.com", "nyjagskbmgrqvkkb");
                     smtp.EnableSsl = true;
                     smtp.Send(mail);
                 }

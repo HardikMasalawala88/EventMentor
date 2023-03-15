@@ -133,8 +133,8 @@ namespace EMS.DB.Migrations
                     b.Property<bool>("Ispaymentdone")
                         .HasColumnType("bit");
 
-                    b.Property<string>("OperatorName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long>("OperatorId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("OrganizerContact")
                         .HasColumnType("nvarchar(max)");
@@ -164,6 +164,8 @@ namespace EMS.DB.Migrations
                     b.HasIndex("InquiryId")
                         .IsUnique()
                         .HasFilter("[InquiryId] IS NOT NULL");
+
+                    b.HasIndex("OperatorId");
 
                     b.ToTable("Events");
                 });
@@ -536,43 +538,6 @@ namespace EMS.DB.Migrations
                     b.ToTable("Staffs");
                 });
 
-            modelBuilder.Entity("EMS.DB.Models.Supervisor", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDelete")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
-
-                    b.ToTable("Supervisors");
-                });
-
             modelBuilder.Entity("EMS.DB.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -811,9 +776,17 @@ namespace EMS.DB.Migrations
                         .WithOne("Event")
                         .HasForeignKey("EMS.DB.Models.Event", "InquiryId");
 
+                    b.HasOne("EMS.DB.Models.Operator", "Operator")
+                        .WithMany()
+                        .HasForeignKey("OperatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Category");
 
                     b.Navigation("Inquiry");
+
+                    b.Navigation("Operator");
                 });
 
             modelBuilder.Entity("EMS.DB.Models.EventStaffWork", b =>
@@ -896,15 +869,6 @@ namespace EMS.DB.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("EMS.DB.Models.Supervisor", b =>
-                {
-                    b.HasOne("EMS.DB.Models.User", "User")
-                        .WithOne("Supervisors")
-                        .HasForeignKey("EMS.DB.Models.Supervisor", "UserId");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -983,8 +947,6 @@ namespace EMS.DB.Migrations
                     b.Navigation("Operators");
 
                     b.Navigation("Staffs");
-
-                    b.Navigation("Supervisors");
                 });
 #pragma warning restore 612, 618
         }

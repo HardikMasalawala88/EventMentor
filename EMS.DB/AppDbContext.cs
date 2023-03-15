@@ -24,7 +24,6 @@ namespace EMS.DB
         public DbSet<Staff> Staffs { get; set; }
         public DbSet<NotificationMessages> NotificationMessages { get; set; }
         public DbSet<Operator> Operators { get; set; }
-        public DbSet<Supervisor> Supervisors { get; set; }
         public DbSet<Admin> Admins { get; set; }
 
 

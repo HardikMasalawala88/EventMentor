@@ -22,6 +22,5 @@ namespace EMS.DB.Models
 
         public virtual Staff Staffs { get; set; }
         public virtual Operator Operators { get; set; }
-        public virtual Supervisor Supervisors { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 @using EMS.DB.Constant
 @using  EMS.DB.Repository.Interface
 @inject IEventRepository _EventRepository;
+@inject IOperatorRepository _OperatorRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
 <MudDialog>
@@ -11,7 +12,12 @@
                 <MudTextField @bind-Value="eventModel.EventName" Class="m-0" Label="Event Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="eventModel.OperatorName" Class="m-0" Label="Operator Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudSelect @bind-Value="eventModel.OperatorId" Label="Operator Name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var data in OperatorList)
+                    {
+                        <MudSelectItem Value="@data.Id">@data.User.FullName</MudSelectItem>
+                    }
+                </MudSelect>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
                 <MudTextField @bind-Value="eventModel.EventVenue" Class="m-0" Label="EventVenue" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
@@ -62,6 +68,9 @@
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
     private List<Event> eventList = new();
+    private List<Operator> OperatorList = new();
+    private List<Operator> operatorlist = new();
+    private string name { get; set; }
 
 
     protected override void OnInitialized()
@@ -79,16 +88,30 @@
         if (firstRender)
         {
             GetAllevents();
+            GetOperatorlist();
             StateHasChanged();
         }
 
         return base.OnAfterRenderAsync(firstRender);
     }
-
+    private List<Operator> GetOperatorlist()
+    {
+        OperatorList = _OperatorRepository.GetLists();
+        StateHasChanged();
+        return OperatorList;
+    }
     private List<Event> GetAllevents()
     {
         eventList = _EventRepository.GetList();
         return eventList;
+    }
+    private void Operatorname()
+    {
+        operatorlist= _OperatorRepository.GetById(eventModel.OperatorId);
+        foreach(var data in operatorlist)
+        {
+            name = data.User.FullName;
+        }
     }
 
     private async Task Save()
@@ -97,7 +120,7 @@
         {
             _EventRepository.Update(eventModel);
             MudDialog.Close(DialogResult.Ok(true));
-            NotificationMessagesModel.Message = $"Edit Event  {eventModel.EventName}: By {eventModel.OperatorName}.";
+            NotificationMessagesModel.Message = $"Edit Event  {eventModel.EventName}: By {name}.";
             NotificationMessagesModel.Title = "Edit Event";
             NotificationMessagesModel.UserId = _parameters.UserId;
             NotificationMessagesModel.EventId = eventModel.Id;

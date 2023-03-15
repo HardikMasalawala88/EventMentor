@@ -1,4 +1,5 @@
 ﻿@page "/staffupdatelist"
+@attribute [Authorize(Roles = "Admin,Operator")]
 @using EMS.DB.Models
 @using EMS.DB.Repository.Interface
 @using System.Globalization
@@ -8,8 +9,7 @@
 @inject IStaffRepository _StaffRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject IDialogService DialogService
-<AuthorizeView Roles="Admin" Context="data">
-    <Authorized>
+
         @*Filter="new Func<User, bool>(Search)"*@
         <MudTable Elevation="25" Items="GetAllstaff()" @bind-customer="StaffList" HorizontalScrollbar="true" Breakpoint="Breakpoint.Sm">
             <ToolBarContent>
@@ -37,7 +37,7 @@
                 <MudTd DataLabel="">@context.User.UserName</MudTd>
                 <MudTd DataLabel="">@context.User.Email</MudTd>
                 <MudTd DataLabel="">@context.User.ContactNo</MudTd>
-                @if (context.StaffService >0)
+                @if (context.StaffService > 0)
                 {
                     foreach (var data in GetAll())
                     {
@@ -53,11 +53,7 @@
                 }
             </RowTemplate>
         </MudTable>
-    </Authorized>
-    <NotAuthorized>
-        <MudAlert Severity="Severity.Error">please <MudLink Href="/login">login</MudLink></MudAlert>
-    </NotAuthorized>
-</AuthorizeView>
+
 
 
 @code{

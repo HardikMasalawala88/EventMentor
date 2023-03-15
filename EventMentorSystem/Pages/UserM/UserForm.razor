@@ -1,13 +1,13 @@
 ﻿@page "/AddUser"
+@attribute [Authorize(Roles = "Admin")]
 @using  EMS.DB.Repository.Interface
 @inject IUserRepository _UserRepository;
 @inject IStaffRepository _StaffRepository;
-@inject ISupervisorRepository _SupervisorRepository;
 @inject IOperatorRepository _OperatorRepository;
 @inject IAdminRepository _AdminRepository;
 @inject ISnackbar Snackbar;
 @using EMS.DB.Constant
-@attribute [Authorize(Roles = "Admin, Supervisor")]
+@attribute [Authorize(Roles = "Admin")]
 
 @if (_parameters.IsUserLoggedIn())
 {
@@ -25,7 +25,6 @@
                 <MudSelect @bind-Value="UserModel.Userrole" Label="role" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                     <MudSelectItem Value="@(Userrole.Admin.ToString())">@Userrole.Admin.ToString()</MudSelectItem>
                     <MudSelectItem Value="@(Userrole.Staff.ToString())">@Userrole.Staff.ToString()</MudSelectItem>
-                    <MudSelectItem Value="@(Userrole.Supervisor.ToString())">@Userrole.Supervisor.ToString()</MudSelectItem>
                     <MudSelectItem Value="@(Userrole.Operator.ToString())">@Userrole.Operator.ToString()</MudSelectItem>
                 </MudSelect>
                 <MudTextField @bind-Value="UserModel.Password" InputType="InputType.Password" Label="password" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>

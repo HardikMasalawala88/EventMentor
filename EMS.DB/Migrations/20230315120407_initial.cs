@@ -303,31 +303,6 @@ namespace EMS.DB.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Supervisors",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    IsDelete = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Supervisors", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Supervisors_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Inquiries",
                 columns: table => new
                 {
@@ -382,7 +357,6 @@ namespace EMS.DB.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EventName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OperatorName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EventVenue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OrganizerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OrganizerContact = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -396,6 +370,7 @@ namespace EMS.DB.Migrations
                     SelectedService = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InquiryId = table.Column<long>(type: "bigint", nullable: true),
                     CategoryId = table.Column<long>(type: "bigint", nullable: false),
+                    OperatorId = table.Column<long>(type: "bigint", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -418,6 +393,12 @@ namespace EMS.DB.Migrations
                         principalTable: "Inquiries",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Events_Operators_OperatorId",
+                        column: x => x.OperatorId,
+                        principalTable: "Operators",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -550,6 +531,11 @@ namespace EMS.DB.Migrations
                 filter: "[InquiryId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Events_OperatorId",
+                table: "Events",
+                column: "OperatorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EventStaffWorks_EventId",
                 table: "EventStaffWorks",
                 column: "EventId");
@@ -598,13 +584,6 @@ namespace EMS.DB.Migrations
                 column: "UserId",
                 unique: true,
                 filter: "[UserId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Supervisors_UserId",
-                table: "Supervisors",
-                column: "UserId",
-                unique: true,
-                filter: "[UserId] IS NOT NULL");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -634,13 +613,7 @@ namespace EMS.DB.Migrations
                 name: "NotificationMessages");
 
             migrationBuilder.DropTable(
-                name: "Operators");
-
-            migrationBuilder.DropTable(
                 name: "Payments");
-
-            migrationBuilder.DropTable(
-                name: "Supervisors");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -652,16 +625,19 @@ namespace EMS.DB.Migrations
                 name: "Events");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Inquiries");
 
             migrationBuilder.DropTable(
-                name: "Inquiries");
+                name: "Operators");
 
             migrationBuilder.DropTable(
                 name: "CategoryServices");
 
             migrationBuilder.DropTable(
                 name: "EventCategories");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿@page "/viewpaymentlist"
+@attribute [Authorize(Roles = "Admin")]
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
 @inject IEventRepository _EventRepository;
@@ -32,11 +33,11 @@
                                 <MudSelectItem Value="@events.Id">@events.EventName</MudSelectItem>
                             }
                         </MudSelect>
-                        <MudSelect @bind-Value="PaymentModel.UserId"  Label="User name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelect @bind-Value="PaymentModel.UserId" Label="User name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                             @foreach (var events in GetAllUser())
-                            {
+                                {
                                 <MudSelectItem Value="@events.Id">@events.UserName</MudSelectItem>
-                            }
+                                }
                         </MudSelect>
 
                     </MudItem>
@@ -88,7 +89,7 @@
                 <MudTd DataLabel="Id">@context.Event.EventName</MudTd>
                 <MudTd DataLabel="Id">@context.Event.OrganizerName</MudTd>
                 <MudTd DataLabel="Id">@context.Event.OrganizerContact</MudTd>
-                <MudTd DataLabel="Id">@context.Event.OperatorName</MudTd>
+                <MudTd DataLabel="Id">@context.Event.OperatorId</MudTd>
                 <MudTd DataLabel="Id">@context.Event.FromDate?.ToLongDateString()</MudTd>
                 <MudTd DataLabel="Id">@context.PaymentMode</MudTd>
                 <MudTd DataLabel="Id">@ValidCurrency(context.TotalAmount)</MudTd>

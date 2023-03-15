@@ -9,6 +9,8 @@ namespace EMS.DB.Repository.Interface
 {
    public interface IOperatorRepository
     {
+        public List<Operator> GetLists();
+        public List<Operator> GetById(long Id);
         public void Insert(Operator OperatorModel);
         public void Delete(long id);
     }

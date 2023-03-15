@@ -1,4 +1,8 @@
-﻿using EMS.DB.Models;
+﻿using EMS.DB.Constant;
+using EMS.DB.Models;
+using EventMentorSystem.Data;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 using System;
 using System.Collections.Generic;
@@ -9,12 +13,14 @@ namespace EventMentorSystem.Pages.dashboard
 {
     public partial class Index
     {
+        [Inject] NavigationManager UriHelper { get; set; }
         private MudDateRangePicker _picker;
         private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
         private bool _autoClose;
         private string searchString = "";
         private string searchString1 = "";
         private int Totalevent;
+        private int TotalWork;
         private int Totaluser;
         private int Totalservice;
         private DateTime? startDate;
@@ -22,16 +28,45 @@ namespace EventMentorSystem.Pages.dashboard
         private List<Event> eventList = new();
         private List<User> userlist = new();
         private List<CategoryService> categoryservicelist = new();
+        private List<Staff> stafflist = new();
         private IEnumerable<Event> pagedData;
         private IEnumerable<EventStaffWork> EventStaffWorkpagedData;
         private MudTable<Event> tableRef;
         private MudTable<EventStaffWork> tableRefEventStaffWork;
         private int totalItems;
+        private string userId;
         private int totalItemsOperator;
         private List<EventStaffWork> EventStaffWorkList = new();
+        private List<EventStaffWork> StaffWorkList = new();
 
+        [Inject]
+        public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
+        protected override async Task OnInitializedAsync()
+        {
+            AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
+            if (authState.User.Identity is { IsAuthenticated: true })
+            {
+                string nameIdentifier = authState.User.Identity.Name;
+                if (!string.IsNullOrEmpty(nameIdentifier))
+                {
+                    var userIdClaim = authState.User.Claims.Where(c => c.Type == "UserId").FirstOrDefault();
+                    if (userIdClaim != null)
+                    {
+                        userId = userIdClaim.Value;
+                    }
+                    else
+                    {
+                        var claim = authState.User.Claims.Where(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").FirstOrDefault();
+                        if (claim != null)
+                        {
+                            userId = claim.Value;
+                        }
+                    }
+                }
+            }
+        }
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -39,6 +74,9 @@ namespace EventMentorSystem.Pages.dashboard
                 GetAllevents();
                 GetUserList();
                 GetList();
+                Getstaff();
+                GetAllTodate();
+                GetstaffWork();
             }
 
             return base.OnAfterRenderAsync(firstRender);
@@ -51,14 +89,12 @@ namespace EventMentorSystem.Pages.dashboard
             StateHasChanged();
             return eventList;
         }
-
-        //private List<User> GetUsers1()
-        //{
-        //    Totaluser = userlist.Count();
-        //    StateHasChanged();
-        //    return userlist;
-        //}
-
+        private List<Staff> Getstaff()
+        {
+            stafflist = _StaffRepository.GetStaffByUserId(userId);
+            StateHasChanged();
+            return stafflist;
+        }
         private List<User> GetUserList()
         {
             userlist = _UserRepository.GetAllUser();
@@ -75,18 +111,23 @@ namespace EventMentorSystem.Pages.dashboard
 
         }
 
-        private List<EventStaffWork> GetAllOperatorWork()
+        private List<EventStaffWork> GetAllTodate()
         {
-            EventStaffWorkList = _EventStaffWorkRepository.GetEventStaffWorkList();
+            EventStaffWorkList = _EventStaffWorkRepository.GetListToday();
             return EventStaffWorkList;
         }
-
-
+        private List<EventStaffWork> GetstaffWork()
+        {
+            StaffWorkList = _EventStaffWorkRepository.GetListByStaff(userId);
+            TotalWork = StaffWorkList.Count();
+            StateHasChanged();
+            return StaffWorkList;
+        }
 
         private bool Search(Event events)
         {
             if (StringValid(events.EventName)
-                && StringValid(events.OperatorName)
+                && StringValid(events.OperatorId.ToString())
                 && StringValid(events.EventVenue)
                 && StringValid(events.OrganizerName)
                 && StringValid(events.OrganizerContact)
@@ -94,7 +135,7 @@ namespace EventMentorSystem.Pages.dashboard
 
                 &&
                 events.EventName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-                || events.OperatorName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+                || events.OperatorId.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase)
                 || events.EventVenue.Contains(searchString, StringComparison.OrdinalIgnoreCase)
                 || events.OrganizerName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
                 || events.OrganizerContact.Contains(searchString, StringComparison.OrdinalIgnoreCase)
@@ -104,6 +145,18 @@ namespace EventMentorSystem.Pages.dashboard
             }
 
             return false;
+        }
+        private void eventlink()
+        {
+            UriHelper.NavigateTo($"/eventlist");
+        }
+        private void userlink()
+        {
+            UriHelper.NavigateTo($"/userlist");
+        }
+        private void servicelink()
+        {
+            UriHelper.NavigateTo($"/servicelist");
         }
 
         private bool SearchforOperatorwork(EventStaffWork EventStaffWorks)
@@ -140,22 +193,6 @@ namespace EventMentorSystem.Pages.dashboard
             return false;
         }
 
-
-
-        private List<Event> GetEventListFromDashBoard(DateTime? startDate, DateTime? endDate)
-        {
-            UpdateDashboardData();
-            if (startDate.HasValue && endDate.HasValue)
-            {
-                return _EventRepository.GetListFromDashboard(startDate, endDate);
-            }
-            else
-            {
-                //get all data of current month
-                return _EventRepository.GetList();
-            }
-        }
-
         /// <summary>
         /// Here we simulate getting the paged, filtered and ordered data from the server
         /// </summary>
@@ -188,9 +225,34 @@ namespace EventMentorSystem.Pages.dashboard
             }
             else
             {
-                //get all data of current month
                 data = _EventStaffWorkRepository.GetEventStaffWorkList();
             }
+
+            data = data.Where(selectedModel => { return SearchforOperatorwork(selectedModel); }).ToArray();
+            data = data.OrderByDirection(state.SortDirection, o => o.Event.FromDate.Value);
+            totalItemsOperator = data.Count();
+
+            EventStaffWorkpagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+            return new TableData<EventStaffWork>() { TotalItems = totalItemsOperator, Items = EventStaffWorkpagedData };
+        }
+        private async Task<TableData<EventStaffWork>> ServerReloadForStaff(TableState state)
+        {
+            IEnumerable<EventStaffWork> data;
+            
+                data = _EventStaffWorkRepository.GetListBystatus(userId);
+
+            data = data.Where(selectedModel => { return SearchforOperatorwork(selectedModel); }).ToArray();
+            data = data.OrderByDirection(state.SortDirection, o => o.Event.FromDate.Value);
+            totalItemsOperator = data.Count();
+
+            EventStaffWorkpagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+            return new TableData<EventStaffWork>() { TotalItems = totalItemsOperator, Items = EventStaffWorkpagedData };
+        }
+        private async Task<TableData<EventStaffWork>> ServerReloadForstaff(TableState state)
+        {
+            IEnumerable<EventStaffWork> data;
+
+            data = _EventStaffWorkRepository.GetListBystatusFinish(userId);
 
             data = data.Where(selectedModel => { return SearchforOperatorwork(selectedModel); }).ToArray();
             data = data.OrderByDirection(state.SortDirection, o => o.Event.FromDate.Value);

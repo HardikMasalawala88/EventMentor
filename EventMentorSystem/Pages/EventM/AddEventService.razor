@@ -2,6 +2,7 @@
 @using  EMS.DB.Repository.Interface
 @inject IEventRepository _eventService;
 @inject IEventCategoryRepository _EventCategoryRepository;
+@inject IOperatorRepository _OperatorRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
@@ -10,12 +11,12 @@
     <DialogContent>
         <MudGrid>
             @*<MudItem>
-                <MudSelect @bind-Value="eventModel.CategoryId" T="long" 
-                    SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))" 
-                    Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
-                    <MudSelectItem Value="@eventModel.CategoryId">@eventModel.Category.CategoryName</MudSelectItem>
-                </MudSelect>
-            </MudItem>*@
+                    <MudSelect @bind-Value="eventModel.CategoryId" T="long"
+                        SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))"
+                        Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+                        <MudSelectItem Value="@eventModel.CategoryId">@eventModel.Category.CategoryName</MudSelectItem>
+                    </MudSelect>
+                </MudItem>*@
             <MudItem>
                 <CustomMudSelect PlaceHolder="Select Service" MultiSelection="true" Variant="Variant.Outlined" Class="mb-2" Value="@eventModel.SelectedService"
                                  ValueChangedCallBack="@(e => OnSelectedPriorityChange(e))" SelectedValues="selectedServiceList">
@@ -47,6 +48,8 @@
     private CategoryService CategoryServiceModel = new();
     private List<CategoryService> ServiceList = new();
     private List<EventCategory> EventCategoryList = new();
+    private List<Operator> operatorlist = new();
+    public string name { get; set; }
     List<String> selectedServiceList = new List<String>();
     List<long> selectedServiceIdList = new List<long>();
 
@@ -84,13 +87,21 @@
         ServiceList = _CategoryServiceRepository.GetList();
         return ServiceList;
     }
+    private void Operatorname()
+    {
+        operatorlist = _OperatorRepository.GetById(eventModel.OperatorId);
+        foreach (var data in operatorlist)
+        {
+            name = data.User.FullName;
+        }
+    }
     void Cancel() => MudDialog.Close(DialogResult.Ok(false));
     private async Task AddService()
     {
         try
         {
             _eventService.Update(eventModel);
-            NotificationMessagesModel.Message = $"Edit Event service {eventModel.EventName}: By {eventModel.OperatorName}.";
+            NotificationMessagesModel.Message = $"Edit Event service {eventModel.EventName}: By {name}.";
             NotificationMessagesModel.Title = "add service";
             NotificationMessagesModel.UserId = _parameters.UserId;
             NotificationMessagesModel.EventId = eventModel.Id;

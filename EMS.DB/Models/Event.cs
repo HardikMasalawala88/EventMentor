@@ -11,7 +11,7 @@ namespace EMS.DB.Models
     public class Event : BaseEntity
     {
         public string EventName { get; set; }
-        public string OperatorName { get; set; }
+        
         public string EventVenue { get; set; }
         public string OrganizerName { get; set; }
         public string OrganizerContact { get; set; }
@@ -42,6 +42,9 @@ namespace EMS.DB.Models
         public virtual List<EventStaffWork> EventStaffWork { get; set; }
 
         public virtual Payment Payment { get; set; }
+
+        public long OperatorId { get; set; }
+        public Operator Operator { get; set; }
 
     }
 }

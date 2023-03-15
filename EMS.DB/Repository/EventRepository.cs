@@ -30,7 +30,7 @@ namespace EMS.DB.Repository
         public List<Event> GetList()
         {
             using AppDbContext _myContext = base.GetContext();
-            return _myContext.Events.Include(x => x.Inquiry).Include(x => x.Category).ToList();
+            return _myContext.Events.Include(x => x.Inquiry).Include(x => x.Operator).Include(x => x.Category).ToList();
             //_appDbContext.Events.Include(x => x.Category).ToList();
             //return _appDbContext.Events.Include(x => x.Inquiry).ToList();
         }

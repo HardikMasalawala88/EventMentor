@@ -3,8 +3,8 @@
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
-                    <p>Sorry, you're not authorized to reach this page.</p>
-                    <p>You may need to log in as a different user.</p>
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="mx-1">Sorry, you're not authorized to reach this page.</MudText>
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="mx-1">You may need to log in as a different user.</MudText>
                 </NotAuthorized>
             </AuthorizeRouteView>
         </Found>

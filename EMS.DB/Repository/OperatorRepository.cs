@@ -1,6 +1,7 @@
 ﻿using EMS.DB.Models;
 using EMS.DB.Repository.Interface;
 using EMS.DB.unitofwork;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,12 @@ namespace EMS.DB.Repository
             _myContext.SaveChanges();
         }
 
+        public List<Operator> GetById(long Id)
+        {
+            using AppDbContext _myContext = base.GetContext();
+            return _myContext.Operators.Include(x => x.User).Where(e=>e.Id==Id).ToList();
+        }
+
         //public List<Operator> GetOperatorList()
         //{
         //    return _appDbContext.Operators.ToList();
@@ -44,7 +51,7 @@ namespace EMS.DB.Repository
         public List<Operator> GetLists()
         {
             using AppDbContext _myContext = base.GetContext();
-            return _myContext.Operators.ToList();
+            return _myContext.Operators.Include(x => x.User).ToList();
             //_appDbContext.Events.Include(x => x.Category).ToList();
             //return _appDbContext.Events.Include(x => x.Inquiry).ToList();
         }

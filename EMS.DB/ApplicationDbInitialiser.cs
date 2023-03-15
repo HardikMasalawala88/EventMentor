@@ -11,7 +11,6 @@
         public static void SeedRoles(RoleManager<IdentityRole> roleManager)
         {
             AddRoleIfNotExists(roleManager, "Admin");
-            AddRoleIfNotExists(roleManager, "Supervisor");
             AddRoleIfNotExists(roleManager, "Staff");
             AddRoleIfNotExists(roleManager, "Operator");
         }

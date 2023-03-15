@@ -6,6 +6,7 @@
 @inject IEventRepository _EventRepository;
 @inject ISnackbar Snackbar;
 @inject IEventCategoryRepository _EventCategoryRepository;
+@inject IOperatorRepository _OperatorRepository;
 @inject IInquiryRepository _InquiryRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject IDialogService DialogService
@@ -18,7 +19,7 @@
                 <MudTextField @bind-Value="eventModel.EventName" Label="Event Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="eventModel.OperatorName" Label="OperatorName" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                <MudTextField @bind-Value="eventModel.OperatorId" Label="OperatorName" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
                 <MudTextField @bind-Value="eventModel.EventVenue" Label="Event Venue" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
@@ -152,7 +153,16 @@
         eventList = _EventRepository.GetList();
         return eventList;
     }
-
+    public List<Operator> operatorlist = new();
+    public string name { get; set; }
+    private void Operatorname()
+    {
+        operatorlist = _OperatorRepository.GetById(eventModel.OperatorId);
+        foreach (var data in operatorlist)
+        {
+            name = data.User.FullName;
+        }
+    }
     private async Task Save()
     {
         try
@@ -161,7 +171,7 @@
             _EventRepository.Insert(eventModel);
             Snackbar.Add(" record saved", Severity.Success);
             Sendmail(eventModel.Email);
-            NotificationMessagesModel.Message = $"Add Event  {eventModel.EventName}: By {eventModel.OperatorName}.";
+            NotificationMessagesModel.Message = $"Add Event  {eventModel.EventName}: By {name}.";
             NotificationMessagesModel.Title = "add Event";
             NotificationMessagesModel.UserId = _parameters.UserId;
             NotificationMessagesModel.EventId = eventModel.Id;

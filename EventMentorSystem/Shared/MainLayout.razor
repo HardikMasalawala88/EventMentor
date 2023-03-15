@@ -17,7 +17,7 @@
                 <MudIconButton @onclick="NotificationHideShow" Icon="@Icons.Material.Filled.Notifications" Color="Color.Secondary" />
             </MudBadge>
             <div class='ikrNotifications' style="display:@BoxCss !important">
-                <h3>Notifications (<span class='notiCounterOnHead'>@count</span>)</h3>
+                <h3>Notifications (<span class='notiCounterOnHead'>@allNotificationMgs.Count()</span>)</h3>
                 <div class='ikrNotificationItems' style="color:black">
                     @foreach (var nmobj in allNotificationMgs)
                     {
@@ -53,7 +53,7 @@
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
     [Inject] UserManager<User> UserManager { get; set; }
     [Inject] SignInManager<User> signInManager { get; set; }
-    private readonly GlobalParameter _parameters = new();
+    private  GlobalParameter _parameters = new();
     private bool isUserLoggedIn = false;
     private List<NotificationMessages> allNotificationMgs = new List<NotificationMessages>();
     private NotificationMessages notificationMessage = new NotificationMessages();
@@ -136,7 +136,7 @@
     {
         try
         {
-            
+
             _parameters.UserId = userId;
             _parameters.LoggedInUser = await UserManager.FindByIdAsync(userId);
         }
@@ -181,7 +181,6 @@
             allNotificationMgs = await _NotificationMessagesRepository.GetMessages(_parameters.UserId);
 
         allNotificationMgs.Reverse();
-        count = allNotificationMgs.Count();
     }
 
 }

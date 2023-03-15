@@ -1,20 +1,19 @@
 ﻿@page "/dashboard"
+@attribute [Authorize(Roles = "Admin, Staff,Operator")]
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
-@using EventMentorSystem.Pages.SupervisorM;
-@using System.Reflection
-@using System.ComponentModel.DataAnnotations
 @inject IEventCategoryRepository _EventCategoryRepository;
 @inject IEventRepository _EventRepository;
 @inject IUserRepository _UserRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject IEventStaffWorkRepository _EventStaffWorkRepository;
 @inject IStaffRepository _StaffRepository;
+
 <AuthorizeView Roles="Admin">
     <Authorized>
         <MudGrid>
             <MudItem xs="12" sm="6" md="4">
-                <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
+                <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="eventlink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Events</MudText>
@@ -23,7 +22,7 @@
                 </MudPaper>
             </MudItem>
             <MudItem xs="12" sm="6" md="4">
-                <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
+                <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="userlink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Users</MudText>
@@ -32,7 +31,7 @@
                 </MudPaper>
             </MudItem>
             <MudItem xs="12" sm="6" md="4">
-                <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
+                <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="servicelink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.MiscellaneousServices" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Service</MudText>
@@ -76,12 +75,12 @@
                             <MudTh>Organizer Name</MudTh>
                             <MudTh>Organizer contact </MudTh>
                             <MudTh>Event Date</MudTh>
-                            
+
                         </HeaderContent>
                         <RowTemplate Context="data">
 
                             <MudTd DataLabel="Event Name">@data.EventName</MudTd>
-                            <MudTd DataLabel="">@data.OperatorName</MudTd>
+                            <MudTd DataLabel="">@data.OperatorId</MudTd>
                             <MudTd DataLabel="">@data.EventVenue</MudTd>
                             <MudTd DataLabel="">@data.OrganizerName</MudTd>
                             <MudTd DataLabel="">@data.OrganizerContact</MudTd>
@@ -139,8 +138,252 @@
             </MudItem>
         </MudGrid>
     </Authorized>
-    <NotAuthorized>
-        <MudAlert Severity="Severity.Error">please <MudLink Href="/login">login</MudLink></MudAlert>
-    </NotAuthorized>
 </AuthorizeView>
 
+<AuthorizeView Roles="Operator">
+    <Authorized>
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="eventlink" Style="height:100px;">
+                    <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Events</MudText>
+                        <MudText Typo="Typo.h5">@Totalevent</MudText>
+                    </div>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="userlink" Style="height:100px;">
+                    <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Users</MudText>
+                        <MudText Typo="Typo.h5">@Totaluser</MudText>
+                    </div>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="servicelink" Style="height:100px;">
+                    <MudIcon Icon="@Icons.Material.Filled.MiscellaneousServices" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Service</MudText>
+                        <MudText Typo="Typo.h5">@Totalservice</MudText>
+                    </div>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" sm="6" md="6">
+                <MudPaper Elevation="25" Class="object-position: center" Style="height:100px;">
+                    <MudText Typo="Typo.h6">Select Range</MudText>
+                    <MudDateRangePicker @ref="_picker" PickerClosed="(() => UpdateDashboardData())" @bind-DateRange="_dateRange" AutoClose="@_autoClose">
+                        <PickerActions Context="data">
+                            <MudButton Class="mr-auto align-self-start" OnClick="@(() => { _picker.Clear();tableRef.ReloadServerData();} )">Clear</MudButton>
+                            <MudButton OnClick="@(() => _picker.Close(false))">Cancel</MudButton>
+                            <MudButton Color="Color.Primary" OnClick="@(() => _picker.Close())">Ok</MudButton>
+                        </PickerActions>
+                    </MudDateRangePicker>
+                </MudPaper>
+            </MudItem>
+
+
+
+            <MudItem xs="12" sm="12">
+                <MudPaper Elevation="25" Class="pa-8">
+
+                    <MudText Typo="Typo.h6">Event Details</MudText>
+                    <MudTable Elevation="25" @ref="tableRef" T="Event"
+                              Class="w-100"
+                              ServerData="@(new Func<TableState, Task<TableData<Event>>>(ServerReload))"
+                              Filter="new Func<Event, bool>(Search)"
+                              @bind-customer="eventList">
+                        <ToolBarContent>
+                            <MudSpacer />
+                            <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        </ToolBarContent>
+                        <HeaderContent>
+                            <MudTh>Event Name</MudTh>
+                            <MudTh>Operator name</MudTh>
+                            <MudTh>Event Venue</MudTh>
+                            <MudTh>Organizer Name</MudTh>
+                            <MudTh>Organizer contact </MudTh>
+                            <MudTh>Event Date</MudTh>
+
+                        </HeaderContent>
+                        <RowTemplate Context="data">
+
+                            <MudTd DataLabel="Event Name">@data.EventName</MudTd>
+                            <MudTd DataLabel="">@data.OperatorId</MudTd>
+                            <MudTd DataLabel="">@data.EventVenue</MudTd>
+                            <MudTd DataLabel="">@data.OrganizerName</MudTd>
+                            <MudTd DataLabel="">@data.OrganizerContact</MudTd>
+                            <MudTd DataLabel="">
+                                @data.FromDate?.ToLongDateString()
+                                @if (@data.Todate.HasValue)
+                                {
+                                    @(" To ")
+                                    @data.Todate?.ToLongDateString()
+                                }
+                            </MudTd>
+                        </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+                        </PagerContent>
+                    </MudTable>
+                </MudPaper>
+            </MudItem>
+
+
+            <MudItem xs="12" sm="12">
+                <MudPaper Elevation="25" Class="pa-8">
+                    <MudText Typo="Typo.h6">StaffWork Details</MudText>
+                    <MudTable Elevation="25" @ref="tableRefEventStaffWork" T="EventStaffWork"
+                              ServerData="@(new Func<TableState, Task<TableData<EventStaffWork>>>(ServerReload1))"
+                              Filter="new Func<EventStaffWork, bool>(SearchforOperatorwork)"
+                              Class="w-100" @bind-customer="EventStaffWorkList">
+                        <ToolBarContent>
+
+                            <MudSpacer />
+                            <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search for Staff Work..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        </ToolBarContent>
+                        <HeaderContent>
+                            <MudTh>Event Name</MudTh>
+                            <MudTh>Event Venue</MudTh>
+                            @*<MudTh>Staff Name</MudTh>*@
+                            <MudTh>From Date</MudTh>
+                            <MudTh>Service</MudTh>
+                            <MudTh>Status</MudTh>
+                            <MudTh></MudTh>
+                        </HeaderContent>
+                        <RowTemplate Context="data">
+
+                            <MudTd DataLabel="Id">@data.Event.EventName</MudTd>
+                            <MudTd DataLabel="Id">@data.Event.EventVenue</MudTd>
+                            <MudTd DataLabel="Id">@data.Event.FromDate?.ToLongDateString()</MudTd>
+                            <MudTd DataLabel="Id">@data.Service</MudTd>
+                            <MudTd DataLabel="Id">@data.Status</MudTd>
+                        </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+                        </PagerContent>
+                    </MudTable>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="Staff">
+    <Authorized>
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4 " @onclick="eventlink" Style="height:100px;">
+                    <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Work</MudText>
+                        <MudText Typo="Typo.h5">@TotalWork</MudText>
+                    </div>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="userlink" Style="height:100px;">
+                    <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Todate WorkPlace</MudText>
+                        @foreach (var data in EventStaffWorkList)
+                        {
+                            <MudText Typo="Typo.h5">@data.Event.EventVenue</MudText>
+                        }
+                    </div>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
+                    <MudIcon Icon="@Icons.Material.Filled.MiscellaneousServices" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Service</MudText>
+                        @foreach (var staff in stafflist)
+                        {
+                            foreach (var service in categoryservicelist)
+                            {
+                                if (staff.StaffService == service.Id)
+                                {
+                                    <MudText Typo="Typo.h5">@service.ServiceName</MudText>
+                                }
+                            }
+                        }
+                    </div>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" sm="12">
+                <MudPaper Elevation="25" Class="pa-8">
+                    <MudText Typo="Typo.h6">Work Pending</MudText>
+                    <MudTable Elevation="25" @ref="tableRefEventStaffWork" T="EventStaffWork"
+                              ServerData="@(new Func<TableState, Task<TableData<EventStaffWork>>>(ServerReloadForStaff))"
+                              Filter="new Func<EventStaffWork, bool>(SearchforOperatorwork)"
+                              Class="w-100" @bind-customer="EventStaffWorkList">
+                        <ToolBarContent>
+
+                            <MudSpacer />
+                            <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search for Staff Work..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        </ToolBarContent>
+                        <HeaderContent>
+                            <MudTh>Event Name</MudTh>
+                            <MudTh>Event Venue</MudTh>
+                            @*<MudTh>Staff Name</MudTh>*@
+                            <MudTh>From Date</MudTh>
+                            <MudTh>Service</MudTh>
+                            <MudTh>Status</MudTh>
+                            <MudTh></MudTh>
+                        </HeaderContent>
+                        <RowTemplate Context="data">
+
+                            <MudTd DataLabel="Id">@data.Event.EventName</MudTd>
+                            <MudTd DataLabel="Id">@data.Event.EventVenue</MudTd>
+                            <MudTd DataLabel="Id">@data.Event.FromDate?.ToLongDateString()</MudTd>
+                            <MudTd DataLabel="Id">@data.Service</MudTd>
+                            <MudTd DataLabel="Id">@data.Status</MudTd>
+                        </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+                        </PagerContent>
+                    </MudTable>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="12">
+                <MudPaper Elevation="25" Class="pa-8">
+                    <MudText Typo="Typo.h6">Work Finish</MudText>
+                    <MudTable Elevation="25" @ref="tableRefEventStaffWork" T="EventStaffWork"
+                              ServerData="@(new Func<TableState, Task<TableData<EventStaffWork>>>(ServerReloadForstaff))"
+                              Filter="new Func<EventStaffWork, bool>(SearchforOperatorwork)"
+                              Class="w-100" @bind-customer="EventStaffWorkList">
+                        <ToolBarContent>
+
+                            <MudSpacer />
+                            <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search for Staff Work..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        </ToolBarContent>
+                        <HeaderContent>
+                            <MudTh>Event Name</MudTh>
+                            <MudTh>Event Venue</MudTh>
+                            @*<MudTh>Staff Name</MudTh>*@
+                            <MudTh>From Date</MudTh>
+                            <MudTh>Service</MudTh>
+                            <MudTh>Status</MudTh>
+                            <MudTh></MudTh>
+                        </HeaderContent>
+                        <RowTemplate Context="data">
+
+                            <MudTd DataLabel="Id">@data.Event.EventName</MudTd>
+                            <MudTd DataLabel="Id">@data.Event.EventVenue</MudTd>
+                            <MudTd DataLabel="Id">@data.Event.FromDate?.ToLongDateString()</MudTd>
+                            <MudTd DataLabel="Id">@data.Service</MudTd>
+                            <MudTd DataLabel="Id">@data.Status</MudTd>
+                        </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+                        </PagerContent>
+                    </MudTable>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </Authorized>
+</AuthorizeView>

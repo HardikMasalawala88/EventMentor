@@ -52,7 +52,6 @@ namespace EMS.DB.Repository
             foreach (var userRec in userList.Where(x => x.Userrole.Equals(Userrole.Staff.ToString(), StringComparison.OrdinalIgnoreCase) 
             || x.Userrole.Equals(Userrole.Operator.ToString(), StringComparison.OrdinalIgnoreCase)
             || x.Userrole.Equals(Userrole.Admin.ToString(), StringComparison.OrdinalIgnoreCase)
-            || x.Userrole.Equals(Userrole.Supervisor.ToString(), StringComparison.OrdinalIgnoreCase)
             ))
             {
                 if (userRec.Userrole.Equals(Userrole.Staff.ToString(), StringComparison.OrdinalIgnoreCase)

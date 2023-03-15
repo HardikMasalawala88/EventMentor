@@ -19,39 +19,41 @@
             <MudItem lg="4" md="4" xs="12">
                 <MudButton Color="Color.Primary" OnClick="update" Variant="Variant.Filled">Change</MudButton>
             </MudItem>
-            <MudTimeline>
-                <MudTimelineItem Color="Color.Error" Elevation="25">
-                    <ItemContent>
-                        <MudPaper Elevation="0" Class="mt-n1">
-                            @if (eventStaffWorkModel.Status == "Workpending")
-                            {
-                                <MudAlert Severity="Severity.Error">@eventStaffWorkModel.Status</MudAlert>
-                            }
-                        </MudPaper>
-                    </ItemContent>
-                </MudTimelineItem>
-                <MudTimelineItem Color="Color.Warning" Elevation="25" TimelineAlign="TimelineAlign.End">
-                    
-                    <ItemContent>
-                        <MudPaper Elevation="0" Class="mt-n1">
-                            @if (eventStaffWorkModel.Status == "WorkOnProcess")
-                            {
-                                <MudAlert Severity="Severity.Warning">@eventStaffWorkModel.Status</MudAlert>
-                            }
-                        </MudPaper>
-                    </ItemContent>
-                </MudTimelineItem>
-                <MudTimelineItem Color="Color.Success" Elevation="25">
-                    <ItemContent>
-                        <MudPaper Elevation="0" Class="mt-n1">
-                            @if (eventStaffWorkModel.Status == "WorkFinish")
-                            {
-                                <MudAlert Severity="Severity.Success">@eventStaffWorkModel.Status</MudAlert>
-                            }
-                        </MudPaper>
-                    </ItemContent>
-                </MudTimelineItem>
-            </MudTimeline>
+            <MudItem lg="12" md="12" xs="12">
+                <MudTimeline TimelineOrientation="TimelineOrientation.Horizontal" TimelinePosition="TimelinePosition.Top">
+                    <MudTimelineItem Color="Color.Error" Elevation="25">
+                        <ItemContent>
+                            <MudPaper Elevation="0" Class="mt-n1">
+                                @if (eventStaffWorkModel.Status == Status.pending.ToString())
+                                {
+                                    <MudAlert Severity="Severity.Error">@eventStaffWorkModel.Status</MudAlert>
+                                }
+                            </MudPaper>
+                        </ItemContent>
+                    </MudTimelineItem>
+                    <MudTimelineItem Color="Color.Warning" Elevation="25" TimelineAlign="TimelineAlign.End">
+
+                        <ItemContent>
+                            <MudPaper Elevation="0" Class="mt-n1">
+                                @if (eventStaffWorkModel.Status == Status.OnProcess.ToString())
+                                {
+                                    <MudAlert Severity="Severity.Warning">@eventStaffWorkModel.Status</MudAlert>
+                                }
+                            </MudPaper>
+                        </ItemContent>
+                    </MudTimelineItem>
+                    <MudTimelineItem Color="Color.Success" Elevation="25">
+                        <ItemContent>
+                            <MudPaper Elevation="0" Class="mt-n1">
+                                @if (eventStaffWorkModel.Status == Status.Finish.ToString())
+                                {
+                                    <MudAlert Severity="Severity.Success">@eventStaffWorkModel.Status</MudAlert>
+                                }
+                            </MudPaper>
+                        </ItemContent>
+                    </MudTimelineItem>
+                </MudTimeline>
+            </MudItem>
         </MudGrid>
     </DialogContent>
 </MudDialog>
@@ -60,8 +62,8 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public EventStaffWork EventStaffWorkModel { get; set; } = new EventStaffWork();
     private EventStaffWork eventStaffWorkModel = new();
-    [Parameter]
-    public GlobalParameter _parameters { get; set; }
+    [Parameter]public string userId { get; set; }
+    [Parameter]public GlobalParameter _parameters { get; set; }
     public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
 
     protected override void OnInitialized()
@@ -78,11 +80,12 @@
             Snackbar.Add("Event work Status Change", Severity.Success);
             NotificationMessagesModel.Message = $"staff:{EventStaffWorkModel.StaffId}has change Event Status.";
             NotificationMessagesModel.Title = "Edit Event Status";
-            NotificationMessagesModel.UserId = _parameters.UserId;
+            NotificationMessagesModel.UserId = userId;
             NotificationMessagesModel.EventId = EventStaffWorkModel.EventId;
             await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
             await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
             eventStaffWorkModel = new EventStaffWork();
+            MudDialog.Close(DialogResult.Ok(true));
         }
         catch (Exception ex)
         {
@@ -91,7 +94,7 @@
     }
     private void CancelForm()
     {
-        MudDialog.Close(DialogResult.Ok(true));
         eventStaffWorkModel = new EventStaffWork();
+        MudDialog.Close(DialogResult.Ok(true));
     }
 }

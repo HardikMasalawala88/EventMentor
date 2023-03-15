@@ -84,7 +84,6 @@ namespace EventMentorSystem
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IStaffRepository, StaffRepository>();
             services.AddScoped<INotificationMessagesRepository, NotificationMessagesRepository>();
-            services.AddScoped<ISupervisorRepository, SupervisorRepository>();
             services.AddScoped<IOperatorRepository, OperatorRepository>();
             services.AddScoped<IAdminRepository, AdminRepository>();
             #endregion

@@ -76,7 +76,6 @@ namespace EventMentorSystem.Pages.UserM
         //private readonly IEmailSender _emailSender;
         private User UserModel = new();
         private Operator OperatorModel = new();
-        private Supervisor SupervisorModel = new();
         private Admin AdminModel = new();
         private Staff StaffModel = new();
 
@@ -122,13 +121,6 @@ namespace EventMentorSystem.Pages.UserM
                     {
                         OperatorModel.UserId = user.Id;
                         _OperatorRepository.Insert(OperatorModel);
-                        //UserModel = new User();
-                    }
-                    else if (UserModel.Userrole == Userrole.Supervisor.ToString())
-                    {
-
-                        SupervisorModel.UserId = user.Id;
-                        _SupervisorRepository.Insert(SupervisorModel);
                         //UserModel = new User();
                     }
                     else if (UserModel.Userrole == Userrole.Admin.ToString())
