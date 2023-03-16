@@ -13,13 +13,17 @@
 @inject IEventCategoryRepository _EventCategoryRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject NavigationManager UriHelper
+
 @if (IsEdit || IsAdd)
 {
-    <MudCard Elevation="25">
+    <MudCard Elevation="25" Class="my-2">
         <MudCardHeader>
             <CardHeaderContent>
                 <MudText Typo="Typo.h6">Add / Edit Events</MudText>
             </CardHeaderContent>
+            <CardHeaderActions>
+                <MudIconButton Icon="@Icons.Material.TwoTone.Close" Color="Color.Error" Edge="Edge.End" OnClick="CancelForm"></MudIconButton>
+            </CardHeaderActions>
         </MudCardHeader>
         <MudCardContent>
             <MudItem>
@@ -68,95 +72,183 @@
 }
 else
 {
-    <MudItem Class="d-flex justify-end">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary " OnClick="ShowAddForm">
+    <MudItem Class="d-flex justify-end my-2">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary " OnClick="ShowAddForm" StartIcon="@Icons.Material.TwoTone.Add" Size="Size.Large">
             <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
         </MudButton>
     </MudItem>
 }
-<MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<Event>>>(ServerReload))" T="Event" Filter="new Func<Event, bool>(Search)" Class="w-100" @bind-customer="eventList" OnRowClick="@RowClicked">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Event list</MudText>
-        <MudSpacer />
-        <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Action</MudTh>
-        <MudTh>Event(#Id)</MudTh>
-        <MudTh>Operator</MudTh>
-        <MudTh>Venue</MudTh>
-        <MudTh>Organizor(#Contact)</MudTh>
-        @*<MudTh>Description</MudTh>*@
-        <MudTh>SlotType</MudTh>
-        <MudTh>Event date</MudTh>
-        <MudTh>Approved</MudTh>
-        <MudTh>Payment</MudTh>
-        <MudTh>Reference</MudTh>
-        <MudTh>Category</MudTh>
-    </HeaderContent>
-    <RowTemplate Context="data">
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(() => Edit(@data))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-            <MudFab @onclick="@(() => Delete(@data.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-        </MudTd>
-        <MudTd DataLabel="Event Name">@(string.Concat("(#", @data.Id,") "))@data.EventName</MudTd>
-        <MudTd DataLabel="">@data.OperatorId</MudTd>
-        <MudTd DataLabel="">@data.EventVenue</MudTd>
-        <MudTd DataLabel="">@data.OrganizerName@(string.Concat("(#", @data.OrganizerContact, ") "))</MudTd>
-        <MudTd DataLabel="">@data.SlotType</MudTd>
-        <MudTd DataLabel="">
-            @data.FromDate?.ToLongDateString()
-            @if (@data.Todate.HasValue)
-            {
-                @(" To ")
-                @data.Todate?.ToLongDateString()
-            }
-        </MudTd>
-        <MudTd DataLabel="">
-            @if (data.IsApproved)
-            {
-                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
-            }
-            else
-            {
-                <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" />
-            }
-        </MudTd>
-        <MudTd DataLabel="">
-            @if (data.Ispaymentdone)
-            {
-                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
-            }
-            else
-            {
-                <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" />
-            }
-        </MudTd>
-        <MudTd DataLabel="">
-            @if (data.InquiryId > 0)
-            {
-                @("By Inquiry Form")
-            }
-            else
-            {
-                @("By Call")
-            }
-        </MudTd>
-        <MudTd DataLabel="">
-            @if (@data.Category is not null)
-            {
-                @data.Category.CategoryName
-            }
-            else
-            {
-                @("----")
-            }
-        </MudTd>
-    </RowTemplate>
-    <PagerContent>
-        <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
-    </PagerContent>
-</MudTable>
+<AuthorizeView Roles="Admin">
+    <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<Event>>>(ServerReload))" T="Event" Filter="new Func<Event, bool>(Search)" Class="w-100" @bind-customer="eventList" OnRowClick="@RowClicked">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Event list</MudText>
+            <MudSpacer />
+            <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Action</MudTh>
+            <MudTh>Event(#Id)</MudTh>
+            <MudTh>Operator</MudTh>
+            <MudTh>Venue</MudTh>
+            <MudTh>Organizor(#Contact)</MudTh>
+            @*<MudTh>Description</MudTh>*@
+            <MudTh>SlotType</MudTh>
+            <MudTh>Event date</MudTh>
+            <MudTh>Approved</MudTh>
+            <MudTh>Payment</MudTh>
+            <MudTh>Reference</MudTh>
+            <MudTh>Category</MudTh>
+        </HeaderContent>
+        <RowTemplate Context="data">
+            <MudTd DataLabel="">
+                <MudFab @onclick="@(() => Edit(@data))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                <MudFab @onclick="@(() => Delete(@data.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+            </MudTd>
+            <MudTd DataLabel="Event Name">@(string.Concat("(#", @data.Id,") "))@data.EventName</MudTd>
+            <MudTd DataLabel="">@data.OperatorId</MudTd>
+            <MudTd DataLabel="">@data.EventVenue</MudTd>
+            <MudTd DataLabel="">@data.OrganizerName@(string.Concat("(#", @data.OrganizerContact, ") "))</MudTd>
+            <MudTd DataLabel="">@data.SlotType</MudTd>
+            <MudTd DataLabel="">
+                @data.FromDate?.ToLongDateString()
+                @if (@data.Todate.HasValue)
+                {
+                    @(" To ")
+                    @data.Todate?.ToLongDateString()
+                }
+            </MudTd>
+            <MudTd DataLabel="">
+                @if (data.IsApproved)
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" />
+                }
+            </MudTd>
+            <MudTd DataLabel="">
+                @if (data.Ispaymentdone)
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" />
+                }
+            </MudTd>
+            <MudTd DataLabel="">
+                @if (data.InquiryId > 0)
+                {
+                    @("By Inquiry Form")
+                }
+                else
+                {
+                    @("By Call")
+                }
+            </MudTd>
+            <MudTd DataLabel="">
+                @if (@data.Category is not null)
+                {
+                    @data.Category.CategoryName
+                }
+                else
+                {
+                    @("----")
+                }
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+        </PagerContent>
+    </MudTable>
+</AuthorizeView>
+
+<AuthorizeView Roles="Operator">
+
+    <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<Event>>>(ServerReloadForOprator))" T="Event" Filter="new Func<Event, bool>(Search)" Class="w-100" @bind-customer="eventList" OnRowClick="@RowClicked">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Event list</MudText>
+            <MudSpacer />
+            <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search for Event..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Action</MudTh>
+            <MudTh>Event(#Id)</MudTh>
+            <MudTh>Operator</MudTh>
+            <MudTh>Venue</MudTh>
+            <MudTh>Organizor(#Contact)</MudTh>
+            @*<MudTh>Description</MudTh>*@
+            <MudTh>SlotType</MudTh>
+            <MudTh>Event date</MudTh>
+            <MudTh>Approved</MudTh>
+            <MudTh>Payment</MudTh>
+            <MudTh>Reference</MudTh>
+            <MudTh>Category</MudTh>
+        </HeaderContent>
+        <RowTemplate Context="data">
+            <MudTd DataLabel="">
+                <MudFab @onclick="@(() => Edit(@data))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            </MudTd>
+            <MudTd DataLabel="Event Name">@(string.Concat("(#", @data.Id,") "))@data.EventName</MudTd>
+            <MudTd DataLabel="">@data.OperatorId</MudTd>
+            <MudTd DataLabel="">@data.EventVenue</MudTd>
+            <MudTd DataLabel="">@data.OrganizerName@(string.Concat("(#", @data.OrganizerContact, ") "))</MudTd>
+            <MudTd DataLabel="">@data.SlotType</MudTd>
+            <MudTd DataLabel="">
+                @data.FromDate?.ToLongDateString()
+                @if (@data.Todate.HasValue)
+                {
+                    @(" To ")
+                    @data.Todate?.ToLongDateString()
+                }
+            </MudTd>
+            <MudTd DataLabel="">
+                @if (data.IsApproved)
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" />
+                }
+            </MudTd>
+            <MudTd DataLabel="">
+                @if (data.Ispaymentdone)
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" />
+                }
+            </MudTd>
+            <MudTd DataLabel="">
+                @if (data.InquiryId > 0)
+                {
+                    @("By Inquiry Form")
+                }
+                else
+                {
+                    @("By Call")
+                }
+            </MudTd>
+            <MudTd DataLabel="">
+                @if (@data.Category is not null)
+                {
+                    @data.Category.CategoryName
+                }
+                else
+                {
+                    @("----")
+                }
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+        </PagerContent>
+    </MudTable>
+</AuthorizeView>
 
 @code{
     [CascadingParameter(Name = "cascadeParameters")]
@@ -173,6 +265,7 @@ else
     private List<Event> eventList = new();
     private List<EventCategory> eventcategoryList = new();
     private List<Operator> OperatorList = new();
+    private string userId;
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -185,6 +278,36 @@ else
         }
         return base.OnAfterRenderAsync(firstRender);
     }
+
+    [Inject]
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        if (authState.User.Identity is { IsAuthenticated: true })
+        {
+            string nameIdentifier = authState.User.Identity.Name;
+            if (!string.IsNullOrEmpty(nameIdentifier))
+            {
+                var userIdClaim = authState.User.Claims.Where(c => c.Type == "UserId").FirstOrDefault();
+                if (userIdClaim != null)
+                {
+                    userId = userIdClaim.Value;
+                }
+                else
+                {
+                    var claim = authState.User.Claims.Where(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").FirstOrDefault();
+                    if (claim != null)
+                    {
+                        userId = claim.Value;
+                    }
+                }
+            }
+        }
+    }
+
     private List<Event> GetAllevents()
     {
         eventList = _EventRepository.GetList();
@@ -226,6 +349,16 @@ else
     {
         IEnumerable<Event> data;
         data = _EventRepository.GetList();
+        data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
+        data = data.OrderByDirection(state.SortDirection, o => o.FromDate.Value);
+        totalItemsOperator = data.Count();
+        pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<Event>() { TotalItems = totalItemsOperator, Items = pagedData };
+    }
+    private async Task<TableData<Event>> ServerReloadForOprator(TableState state)
+    {
+        IEnumerable<Event> data;
+        data = _EventRepository.GetByOpertorId(userId);
         data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
         data = data.OrderByDirection(state.SortDirection, o => o.FromDate.Value);
         totalItemsOperator = data.Count();
@@ -283,7 +416,7 @@ else
     }
     private List<Operator> GetOperatorlist()
     {
-        OperatorList= _OperatorRepository.GetLists();
+        OperatorList = _OperatorRepository.GetLists();
         StateHasChanged();
         return OperatorList;
     }

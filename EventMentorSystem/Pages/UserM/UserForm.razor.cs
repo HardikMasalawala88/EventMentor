@@ -127,7 +127,6 @@ namespace EventMentorSystem.Pages.UserM
                     {
                         AdminModel.UserId = user.Id;
                         _AdminRepository.Insert(AdminModel);
-                       
                     }
                     else if (UserModel.Userrole == Userrole.Staff.ToString())
                     {

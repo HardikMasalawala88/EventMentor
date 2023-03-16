@@ -3,11 +3,11 @@
     <MudNavMenu Class="mud-width-full">
         @foreach (var data in Getuser())
         {
-            <PersonCard UserName="@data.FullName" UserRole="@data.Userrole" Style="background-color: var(--mud-palette-drawer-background);color: var(--mud-palette-drawer-text);" />
+            <PersonCard  Style="background-color: var(--mud-palette-drawer-background);color: var(--mud-palette-drawer-text);" />
         }
         <MudDivider Class="my-2" />
         <AuthorizeView Roles="Admin">
-            <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
             <MudNavLink Href="/Inquirylist" Icon="@Icons.Material.TwoTone.AppRegistration">Inquiries</MudNavLink>
             <MudNavLink Href="/eventlist" Icon="@Icons.Material.TwoTone.Event">Events</MudNavLink>
             <MudNavLink Href="/staffworkgivenlist" Icon="@Icons.Material.TwoTone.Category">Event Work</MudNavLink>
@@ -18,7 +18,7 @@
             <MudNavLink Href="/staffupdatelist" Icon="@Icons.Material.Filled.Person">Staffs</MudNavLink>
         </AuthorizeView>
         <AuthorizeView Roles="Operator">
-            <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
             <MudNavLink Href="/eventlist" Icon="@Icons.Material.TwoTone.Event">Events</MudNavLink>
             <MudNavLink Href="/staffworkgivenlist" Icon="@Icons.Material.TwoTone.Category">Event Work</MudNavLink>
             <MudNavLink Href="/eventcategorylist" Icon="@Icons.Material.TwoTone.ViewList">Categories</MudNavLink>
@@ -26,7 +26,7 @@
             <MudNavLink Href="/staffupdatelist" Icon="@Icons.Material.Filled.Person">Staffs</MudNavLink>
         </AuthorizeView>
         <AuthorizeView Roles="Staff">
-            <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
             <MudNavLink Href="/viewstaffworklist" Icon="@Icons.Material.TwoTone.Category">View Work</MudNavLink>
         </AuthorizeView>
     </MudNavMenu>

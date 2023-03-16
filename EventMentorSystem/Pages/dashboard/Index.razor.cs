@@ -34,6 +34,9 @@ namespace EventMentorSystem.Pages.dashboard
         private MudTable<Event> tableRef;
         private MudTable<EventStaffWork> tableRefEventStaffWork;
         private int totalItems;
+        private int totaleventforOprator;
+        private string nowork = "No Work";
+        private List<Event> OpratorWorkPlace;
         private string userId;
         private int totalItemsOperator;
         private List<EventStaffWork> EventStaffWorkList = new();
@@ -77,6 +80,8 @@ namespace EventMentorSystem.Pages.dashboard
                 Getstaff();
                 GetAllTodate();
                 GetstaffWork();
+                GeteventTotal();
+                GeteventforOperator();
             }
 
             return base.OnAfterRenderAsync(firstRender);
@@ -88,6 +93,17 @@ namespace EventMentorSystem.Pages.dashboard
             Totalevent = eventList.Count();
             StateHasChanged();
             return eventList;
+        }
+        
+        private void GeteventTotal()
+        {
+            totaleventforOprator = _EventRepository.GetByOpertorId(userId).Count();
+        }
+        private List<Event> GeteventforOperator()
+        {
+            OpratorWorkPlace = _EventRepository.GetListToday(userId);
+            StateHasChanged();
+            return OpratorWorkPlace;
         }
         private List<Staff> Getstaff()
         {
@@ -110,7 +126,6 @@ namespace EventMentorSystem.Pages.dashboard
             return categoryservicelist;
 
         }
-
         private List<EventStaffWork> GetAllTodate()
         {
             EventStaffWorkList = _EventStaffWorkRepository.GetListToday();
@@ -208,6 +223,20 @@ namespace EventMentorSystem.Pages.dashboard
                 //get all data of current month
                 data = _EventRepository.GetList();
             }
+
+            data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
+            data = data.OrderByDirection(state.SortDirection, o => o.FromDate.Value);
+            totalItems = data.Count();
+
+            pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+            return new TableData<Event>() { TotalItems = totalItems, Items = pagedData };
+        }
+        private async Task<TableData<Event>> ServerReloadForOperator(TableState state)
+        {
+            IEnumerable<Event> data;
+           
+                data = _EventRepository.GetByOpertorId(userId);
+
 
             data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
             data = data.OrderByDirection(state.SortDirection, o => o.FromDate.Value);

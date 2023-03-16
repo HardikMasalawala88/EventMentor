@@ -172,7 +172,7 @@ namespace EventMentorSystem.Pages.EventM
 
         private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Dashboard", href: "/dashboard", icon: Icons.Material.Filled.Home),
+        new BreadcrumbItem("Dashboard", href: "/", icon: Icons.Material.Filled.Home),
         new BreadcrumbItem("Event List", href:"/eventlist",  icon: Icons.Material.TwoTone.Event),
         new BreadcrumbItem("View Event", href: null, disabled: true, icon: Icons.Material.Filled.Create)
     };

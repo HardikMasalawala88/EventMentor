@@ -1,3 +1,7 @@
 .mud-input-control.mud-select {
     min-width: 300px !important;
 }
+
+body {
+    background-color: #594ae24f!important;
+}

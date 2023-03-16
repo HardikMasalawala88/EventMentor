@@ -41,7 +41,16 @@ namespace EMS.DB.Repository
             return _myContext.Events.FirstOrDefault(x => x.Id == id);
             //return _repository.GetById(id);
         }
-
+        public List<Event> GetByOpertorId(string id)
+        {
+            using AppDbContext _myContext = base.GetContext();
+            return _myContext.Events.Include(x => x.Operator).Where(e=>e.Operator.UserId==id).ToList();
+        }
+        public List<Event> GetListToday(string id)
+        {
+            using AppDbContext _myContext = base.GetContext();
+            return _myContext.Events.Where(c => c.Operator.UserId == id&& c.FromDate == DateTime.Today).ToList();
+        }
         public void Insert(Event eventModel)
         {
             using AppDbContext _myContext = base.GetContext();

@@ -15,22 +15,18 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 <AuthorizeView>
     <Authorized>
-        <MudCard Elevation="25">
+        <MudCard Elevation="25" Class="my-2">
             <MudCardHeader>
                 <CardHeaderContent>
                     <MudText Typo="Typo.h6">Add / Edit Category</MudText>
-                    @if (showLeaveAlert)
-                    {
-                        <MudAlert Severity="Severity.Error" ContentAlignment="HorizontalAlignment.Center" Class="my-2">@error</MudAlert>
-                    }
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent>
                 <MudItem>
-                    <MudTextField @bind-Value="EventCategoryModel.CategoryName" Label="Category Name" Variant="Variant.Text" HelperText="@error" Error="@showLeaveAlert" Margin="Margin.Normal"></MudTextField>
+                    <MudTextField @bind-Value="EventCategoryModel.CategoryName" Label="Category Name" Variant="Variant.Outlined" HelperText="@error" Error="@showLeaveAlert" Margin="Margin.Normal"></MudTextField>
                 </MudItem>
                 <MudItem Class="d-flex justify-end">
-                    <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                    <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save" StartIcon="@Icons.Material.TwoTone.Add" Size="Size.Large">
                         <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
                     </MudButton>
                 </MudItem>
