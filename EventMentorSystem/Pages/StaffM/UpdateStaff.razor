@@ -55,6 +55,8 @@
 
 
 @code{
+    [CascadingParameter(Name = "cascadeParameters")]
+    public GlobalParameter _parameters { get; set; }
     private string searchString = "";
     private User userModel = new();
     private Staff StaffModel = new();
@@ -128,7 +130,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
 
@@ -146,7 +148,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
 
@@ -165,7 +167,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
     private void OpenDialog(Staff staff)
@@ -173,6 +175,7 @@
 
         var parameters = new DialogParameters();
         parameters.Add("staffModel", staff);
+        parameters.Add("_parameters", _parameters);
         var options = new DialogOptions()
         {
             CloseOnEscapeKey = false,

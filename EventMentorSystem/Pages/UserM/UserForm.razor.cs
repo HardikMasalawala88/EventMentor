@@ -16,53 +16,6 @@ namespace EventMentorSystem.Pages.UserM
 {
     public partial class UserForm
     {
-
-        //private List<User> UserList = new();
-        //private User userModel = new();
-        //MudForm form;
-        //public IList<AuthenticationScheme> ExternalLogins { get; set; }
-        //protected override Task OnAfterRenderAsync(bool firstRender)
-        //{
-        //    if (firstRender)
-        //    {
-        //        //GetAllUser();
-        //    }
-
-        //    return base.OnAfterRenderAsync(firstRender);
-        //}
-        ////private List<User> GetAllUser()
-        ////{
-        ////    UserList = _UserRepository.GetUserList();
-        ////    return UserList;
-        ////}
-
-        //private void Save()
-        //{
-        //    try
-        //    {
-        //        _UserRepository.Insert(userModel);
-        //        Snackbar.Add(" record saved", Severity.Success);
-        //        //GetAllUser();
-
-        //        userModel = new User();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Snackbar.Add(ex.Message, Severity.Error);
-        //    }
-        //}
-        //private void CancelForm()
-        //{
-        //    try
-        //    {
-        //        userModel = new User();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Snackbar.Add(ex.Message, Severity.Error);
-        //    }
-        //}
-
         [CascadingParameter(Name = "cascadeParameters")]
         public GlobalParameter _parameters { get; set; }
         [Inject] SignInManager<User> SignInManager { get; set; }
@@ -72,15 +25,14 @@ namespace EventMentorSystem.Pages.UserM
 
         [Parameter]
         public EventCallback  OnCancelEvent { get; set; }
-        //[Inject] ILogger<UserForm> Logger { get; set; }
-        //private readonly IEmailSender _emailSender;
+       
         private User UserModel = new();
         private Operator OperatorModel = new();
         private Admin AdminModel = new();
         private Staff StaffModel = new();
 
 
-        //public IList<AuthenticationScheme> ExternalLogins { get; set; }
+        
  
         private void Cancel() {
             OnCancelEvent.InvokeAsync();
@@ -89,7 +41,6 @@ namespace EventMentorSystem.Pages.UserM
         {
                 try
             {
-                //ExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
                 var user = new User
                 {
@@ -153,8 +104,7 @@ namespace EventMentorSystem.Pages.UserM
             }
             catch (Exception ex)
             {
-
-                throw;
+                _parameters.ShowErrorMessages(ex);
             }
 
         }

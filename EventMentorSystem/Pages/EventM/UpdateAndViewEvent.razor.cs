@@ -9,9 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+
 using System.IO;
-using GemBox.Pdf;
-using GemBox.Pdf.Content;
 
 namespace EventMentorSystem.Pages.EventM
 {
@@ -23,7 +23,8 @@ namespace EventMentorSystem.Pages.EventM
         [CascadingParameter(Name = "cascadeParameters")]
         public GlobalParameter _parameters { get; set; }
         [Inject] IEventRepository _EventRepository { get; set; }
-        [Inject] IJSRuntime JS { get; set; }
+        [Inject] IJSRuntime js { get; set; }
+
         [Inject] IEventCategoryRepository _EventCategoryRepository { get; set; }
         [Inject] ICategoryServiceRepository _CategoryServiceRepository { get; set; }
         [Inject] IStaffRepository _StaffRepository { get; set; }
@@ -85,13 +86,11 @@ namespace EventMentorSystem.Pages.EventM
         private List<Event> GetAllevents()
         {
             eventList = _EventRepository.GetList();
-
             return eventList;
         }
 
         public List<Payment> GetByEventId()
         {
-
             return PaymentList.Where(x => x.EventId == Convert.ToInt64(EventId)).ToList();
         }
 
@@ -157,49 +156,7 @@ namespace EventMentorSystem.Pages.EventM
             DialogService.Show<EditPaymentDialog>("Edit Payment", parameters, options);
 
         }
-        //private async Task CreatePdf()
-        //{
-        //    ComponentInfo.SetLicense("FREE-LIMITED-KEY");
 
-        //    // Create new document.
-        //    using var document = new PdfDocument();
-
-        //    // Add page.
-        //    var page = document.Pages.Add();
-
-        //    using var formattedText = new PdfFormattedText();
-
-        //    // Write header.
-        //    formattedText.TextAlignment = PdfTextAlignment.Center;
-        //    formattedText.FontSize = 18;
-        //    formattedText.MaxTextWidth = 400;
-        //    formattedText.Append(PaymentModel.PaymentMode);
-        //    page.Content.DrawText(formattedText, new PdfPoint(90, 750));
-
-        //    // Write body.
-        //    formattedText.Clear();
-        //    formattedText.TextAlignment = PdfTextAlignment.Justify;
-        //    formattedText.FontSize = 14;
-        //    formattedText.Append(PaymentModel.PaymentMode);
-        //    page.Content.DrawText(formattedText, new PdfPoint(90, 400));
-
-        //    // Write footer.
-        //    formattedText.Clear();
-        //    formattedText.TextAlignment = PdfTextAlignment.Right;
-        //    formattedText.FontSize = 10;
-        //    formattedText.MaxTextWidth = 100;
-        //    formattedText.Append(PaymentModel.PaymentMode);
-        //    page.Content.DrawText(formattedText, new PdfPoint(450, 40));
-
-        //    // Save PDF file.
-        //    var stream = new MemoryStream();
-        //    document.Save(stream);
-        //    stream.Position = 0;
-
-        //    // Download file.
-        //    using var streamRef = new DotNetStreamReference(stream);
-        //    await JS.InvokeVoidAsync("downloadFileFromStream", "BlazorServerOutput.pdf", streamRef);
-        //}
         private void Addpayment()
         {
             var parameters = new DialogParameters();
@@ -225,4 +182,6 @@ namespace EventMentorSystem.Pages.EventM
         new BreadcrumbItem("View Event", href: null, disabled: true, icon: Icons.Material.Filled.Create)
     };
     }
+   
+
 }

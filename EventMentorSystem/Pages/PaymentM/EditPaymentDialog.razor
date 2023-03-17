@@ -79,7 +79,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
     void Cancel() => MudDialog.Cancel();

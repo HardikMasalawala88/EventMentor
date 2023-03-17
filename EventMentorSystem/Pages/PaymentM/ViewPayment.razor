@@ -152,7 +152,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
     private List<Payment> GetAllPayment()
@@ -236,7 +236,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
     private void ShowAddForm()
@@ -255,7 +255,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
     private void OpenDialog(Payment payments)

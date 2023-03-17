@@ -63,6 +63,8 @@
 </AuthorizeView>
 
 @code {
+    [CascadingParameter(Name = "cascadeParameters")]
+    public GlobalParameter _parameters { get; set; }
     private bool showLeaveAlert = false;
     private EventCategory EventCategoryModel = new();
     private NotificationMessages NotificationModel = new();
@@ -145,7 +147,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
 
@@ -163,7 +165,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
 
@@ -183,7 +185,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
 

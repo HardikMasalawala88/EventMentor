@@ -64,6 +64,8 @@
 
 
 @code{
+    [CascadingParameter(Name = "cascadeParameters")]
+    public GlobalParameter _parameters { get; set; }
     private CategoryService ServiceModel = new();
     private List<EventCategory> EventCategoryList = new();
     private Inquiry inquiryModel = new();
@@ -101,8 +103,7 @@
         }
         catch (Exception ex)
         {
-
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
 

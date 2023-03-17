@@ -399,7 +399,7 @@ else
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
     private void ShowAddForm()
@@ -442,7 +442,7 @@ else
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
     private async Task Delete(long id)
@@ -463,7 +463,7 @@ else
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
     }
     private void OnSearch(string text)
@@ -494,10 +494,9 @@ else
             }
             Message = "email was sent successfully!";
         }
-        catch (Exception ep)
+        catch (Exception ex)
         {
-            Message = "failed to send email with the following error:";
-            Message = ep.Message;
+            _parameters.ShowErrorMessages(ex);
         }
     }
 

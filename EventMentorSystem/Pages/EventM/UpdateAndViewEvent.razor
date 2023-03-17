@@ -1,5 +1,6 @@
 ﻿@page "/EditEvent/{EventId}"
 @attribute [Authorize(Roles = "Admin, Operator")]
+@inject IJSRuntime JS
 
 <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
     <MudBreadcrumbs Items="_items"></MudBreadcrumbs>
@@ -74,6 +75,7 @@
                                     @if (PaymentList.Any())
                                     {
                                         <MudIconButton @onclick="@(() => OpenDialog(PaymentModel))" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" aria-label="github"></MudIconButton>
+                                        @*<MudIconButton @onclick="@(() => CreatePdf())" Icon="@Icons.Material.Filled.Download" Color="Color.Primary" aria-label="github"></MudIconButton>*@
                                     }
                                     else
                                     {

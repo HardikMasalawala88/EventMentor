@@ -44,10 +44,58 @@
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 
     @*<script src="~/landingpage/vendor/jquery/jquery.min.js"></script>
-    <script src="~/landingpage/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="~/landingpage/assets/js/owl-carousel.js"></script>
-    <script src="~/landingpage/assets/js/animation.js"></script>
-    <script src="~/landingpage/assets/js/imagesloaded.js"></script>
-    <script src="~/landingpage/assets/js/templatemo-custom.js"></script>*@
+        <script src="~/landingpage/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="~/landingpage/assets/js/owl-carousel.js"></script>
+        <script src="~/landingpage/assets/js/animation.js"></script>
+        <script src="~/landingpage/assets/js/imagesloaded.js"></script>
+        <script src="~/landingpage/assets/js/templatemo-custom.js"></script>*@
+    <script type="text/javascript">
+        function DownloadPdf(filename, bytesBase64) {
+            var link = document.createElement('a');
+            link.download = filename;
+            link.href = "data:application/octet-stream;base64," + bytesBase64;
+            document.body.appendChild(link); // Needed for Firefox
+            link.click();
+            document.body.removeChild(link);
+        }
+        function base64Blob(b64Data) {
+            sliceSize = 512;
+            var data = window.atob(b64Data);
+            var byteArrays = [];
+            for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                var slice = byteCharacters.slice(offset, offset + sliceSize);
+                var byteNumbers = new Array(slice.length);
+                for (var i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = data.charCodeAt(i);
+                }
+                var byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
+            }
+            
+            var blob = new Blob(byteArrays, { type: 'application/pdf' });
+            return blob; 
+        }
+        function saveAsFile(filename, bytesBase64) {
+            if (navigator.msSaveBlob) {
+                //Download document in Edge browser
+                var data = window.atob(bytesBase64);
+                var bytes = new Uint8Array(data.length);
+                for (var i = 0; i < data.length; i++) {
+                    bytes[i] = data.charCodeAt(i);
+                }
+                var blob = new Blob([bytes.buffer], { type: "application/octet-stream" });
+                navigator.msSaveBlob(blob, filename);
+                window.navigator.msSaveOrOpenBlob(blob);
+            }
+            else {
+                var link = document.createElement('a');
+                link.download = filename;
+                link.href = "data:application/octet-stream;base64," + bytesBase64;
+                document.body.appendChild(link); // Needed for Firefox
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+    </script>
 </body>
 </html>

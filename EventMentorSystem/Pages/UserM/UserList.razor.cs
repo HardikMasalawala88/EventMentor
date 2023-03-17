@@ -1,5 +1,6 @@
 ﻿using EMS.DB.Models;
 using EMS.DB.Repository.Interface;
+using EventMentorSystem.Data;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System;
@@ -13,7 +14,8 @@ namespace EventMentorSystem.Pages.UserM
 {
     public partial class UserList
     {
-
+        [CascadingParameter(Name = "cascadeParameters")]
+        public GlobalParameter _parameters { get; set; }
         [Inject] private IUserRepository _UserRepository { get; set; }
         [Inject] ISnackbar Snackbar { get; set; }
         private List<User> userList = new();
@@ -49,7 +51,7 @@ namespace EventMentorSystem.Pages.UserM
             }
             catch (Exception ex)
             {
-                Snackbar.Add(ex.Message, Severity.Error);
+                _parameters.ShowErrorMessages(ex);
             }
         }
         private void Save()
@@ -61,7 +63,7 @@ namespace EventMentorSystem.Pages.UserM
             }
             catch (Exception ex)
             {
-                Snackbar.Add(ex.Message, Severity.Error);
+                _parameters.ShowErrorMessages(ex);
             }
         }
         private void Cancel()

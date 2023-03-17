@@ -136,7 +136,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
 
     }
@@ -147,7 +147,7 @@
         {
             _InquiryRepository.Delete(id);
             GetLists();
-            
+
             MudDialog.Close(DialogResult.Ok(true));
             inquiryModel = new Inquiry();
             Snackbar.Add("Inquiry Rejected Successfull.", Severity.Success);
@@ -155,7 +155,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
 
     }

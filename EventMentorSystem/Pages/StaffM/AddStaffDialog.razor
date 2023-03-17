@@ -47,6 +47,7 @@
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Staff StaffModel { get; set; } = new Staff();
+    [Parameter] public GlobalParameter _parameters { get; set; }
     private CategoryService ServiceModel = new();
     private List<CategoryService> ServiceList = new();
     private string searchString = "";
@@ -92,7 +93,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            _parameters.ShowErrorMessages(ex);
         }
 
     }
