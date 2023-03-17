@@ -28,6 +28,7 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Payment PaymentModel { get; set; } = new Payment();
     private Payment paymentModel = new();
+
     [Parameter]
     public GlobalParameter _parameters { get; set; }
     public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();

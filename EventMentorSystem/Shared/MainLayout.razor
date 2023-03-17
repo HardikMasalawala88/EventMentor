@@ -49,11 +49,11 @@
 </MudLayout>
 
 @code {
-    [Inject]
-    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
     [Inject] UserManager<User> UserManager { get; set; }
     [Inject] SignInManager<User> signInManager { get; set; }
-    private  GlobalParameter _parameters = new();
+    private GlobalParameter _parameters = new();
     private bool isUserLoggedIn = false;
     private List<NotificationMessages> allNotificationMgs = new List<NotificationMessages>();
     private NotificationMessages notificationMessage = new NotificationMessages();
@@ -66,6 +66,7 @@
     private string Userid;
     private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
     bool _drawerOpen = true;
+
     protected override async Task OnInitializedAsync()
     {
         _parameters.hubConnection = new HubConnectionBuilder()
@@ -80,6 +81,7 @@
 
         await _parameters.hubConnection.StartAsync();
     }
+
     protected override async Task OnParametersSetAsync()
     {
 
@@ -131,12 +133,21 @@
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _parameters.ErrorTriggerEvent += ErrorTriggerMessage;
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
 
     private async Task FetchUserData(string userId)
     {
         try
         {
-
+            
             _parameters.UserId = userId;
             _parameters.LoggedInUser = await UserManager.FindByIdAsync(userId);
         }
@@ -183,4 +194,11 @@
         allNotificationMgs.Reverse();
     }
 
+    private async Task ErrorTriggerMessage(Exception exception)
+    {
+        if (exception is not null)
+        {
+            Snackbar.Add(string.Concat(exception.Message, Environment.NewLine, exception.StackTrace), Severity.Error);
+        }
+    }
 }

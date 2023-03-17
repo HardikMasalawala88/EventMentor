@@ -49,7 +49,7 @@
 
     protected override void OnInitialized()
     {
-        PaymentModel.EventId = Convert.ToInt64(EventId);
+        PaymentModel.EventId =Convert.ToInt64(EventId);
         base.OnInitialized();
     }
     private List<Event> GetAllEvent()
@@ -67,14 +67,14 @@
     {
         try
         {
-            _PaymentRepository.Insert(PaymentModel);
+            _PaymentRepository.Update(PaymentModel);
             NotificationMessagesModel.Message = $"Add Event  {PaymentModel.EventId}: By {PaymentModel.UserId}.";
             NotificationMessagesModel.Title = "add category";
             NotificationMessagesModel.UserId = _parameters.UserId;
             NotificationMessagesModel.EventId = PaymentModel.EventId;
             await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
             await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
-            Snackbar.Add("payment update",Severity.Success);
+            Snackbar.Add("payment update", Severity.Success);
             PaymentModel = new Payment();
         }
         catch (Exception ex)

@@ -16,11 +16,22 @@ namespace EventMentorSystem.Data
         public string UserEmail { get; set; }
         public User LoggedInUser { get; set; }
 
+        /// <summary>
+        /// Event that is invoked asynchronously when ticket created from tab.
+        /// </summary>
+#pragma warning disable S3264 // Events should be invoked
+        public event Func<Exception, Task> ErrorTriggerEvent;
+#pragma warning restore S3264 // Events should be invoked
         public bool IsUserLoggedIn() {
             if (LoggedInUser is not null && !string.IsNullOrEmpty(LoggedInUser.Email))
                 return true;
 
             return false;
+        }
+
+        public async Task ShowErrorMessages(Exception exception)
+        {
+            await ErrorTriggerEvent.Invoke(exception);
         }
     }
 }
