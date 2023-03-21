@@ -8,6 +8,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <base href="/" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EventMentorSystem</title>
@@ -16,8 +17,8 @@
     <link href="css/site.css" rel="stylesheet" />
     <link href="css/customSite.css" rel="stylesheet" />
     <link href="EventMentorSystem.styles.css" rel="stylesheet" />
-    <link href="~/Notification/ikr.notification.css" rel="stylesheet" />
-    <script src="~/Notification/script.js"></script>
+    <link href="/Notification/ikr.notification.css" rel="stylesheet" />
+    <script src="/Notification/script.js"></script>
     <script>
         $(document).ready(function () {
             $(".notification_icon .fa-bell").click(function () {
@@ -49,33 +50,8 @@
         <script src="~/landingpage/assets/js/animation.js"></script>
         <script src="~/landingpage/assets/js/imagesloaded.js"></script>
         <script src="~/landingpage/assets/js/templatemo-custom.js"></script>*@
-    <script type="text/javascript">
+    <script>
         function DownloadPdf(filename, bytesBase64) {
-            var link = document.createElement('a');
-            link.download = filename;
-            link.href = "data:application/octet-stream;base64," + bytesBase64;
-            document.body.appendChild(link); // Needed for Firefox
-            link.click();
-            document.body.removeChild(link);
-        }
-        function base64Blob(b64Data) {
-            sliceSize = 512;
-            var data = window.atob(b64Data);
-            var byteArrays = [];
-            for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-                var slice = byteCharacters.slice(offset, offset + sliceSize);
-                var byteNumbers = new Array(slice.length);
-                for (var i = 0; i < slice.length; i++) {
-                    byteNumbers[i] = data.charCodeAt(i);
-                }
-                var byteArray = new Uint8Array(byteNumbers);
-                byteArrays.push(byteArray);
-            }
-            
-            var blob = new Blob(byteArrays, { type: 'application/pdf' });
-            return blob; 
-        }
-        function saveAsFile(filename, bytesBase64) {
             if (navigator.msSaveBlob) {
                 //Download document in Edge browser
                 var data = window.atob(bytesBase64);
@@ -85,7 +61,6 @@
                 }
                 var blob = new Blob([bytes.buffer], { type: "application/octet-stream" });
                 navigator.msSaveBlob(blob, filename);
-                window.navigator.msSaveOrOpenBlob(blob);
             }
             else {
                 var link = document.createElement('a');

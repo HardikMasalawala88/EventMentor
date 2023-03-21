@@ -76,7 +76,7 @@ namespace EMS.DB.Repository
         public List<EventStaffWork> GetListFromWork(DateTime? startDate, DateTime? endDate)
         {
             using AppDbContext _myContext = base.GetContext();
-            return _myContext.EventStaffWorks.Include(e =>e.Event).Where(c => c.Event.FromDate >= startDate.Value && c.Event.Todate <= endDate.Value).ToList();
+            return _myContext.EventStaffWorks.Include(e =>e.Event).Where(c => c.Event.FromDate >= startDate.Value && c.Event.FromDate <= endDate.Value).ToList();
         }
         public List<EventStaffWork> GetListByStaff(string id)
         {

@@ -33,10 +33,10 @@ namespace EventMentorSystem.Pages.EventM
         [Inject] IDialogService DialogService { get; set; }
 
         private CategoryService CategoryServiceModel = new();
-        private List<CategoryService> ServiceList = new();
-        private List<CategoryService> eventservicelist = new();
-        private List<EventStaffWork> EventStaffWorklist = new();
+        //private List<CategoryService> eventservicelist = new();
         private List<EventCategory> EventCategoryList = new();
+        private List<CategoryService> ServiceList = new();
+        private List<EventStaffWork> EventStaffWorklist = new();
         private List<Staff> StaffList = new();
         private List<Payment> PaymentList = new();
         private List<Event> eventList = new();

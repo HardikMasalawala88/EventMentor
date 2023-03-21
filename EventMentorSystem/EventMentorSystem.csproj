@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <ApplicationIcon>wwwroot\EM.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,8 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IronPdf" Version="2023.3.2" />
-    <PackageReference Include="iTextSharp.LGPLv2.Core" Version="1.7.1" />
+    <PackageReference Include="iTextSharp.LGPLv2.Core" Version="1.7.5" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Connections.Client" Version="5.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.17" />
@@ -56,6 +56,7 @@
 
   <ItemGroup>
     <Folder Include="obj\" />
+    <Folder Include="wwwroot\Image\" />
   </ItemGroup>
 
 </Project>

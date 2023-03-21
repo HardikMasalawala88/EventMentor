@@ -99,7 +99,7 @@ namespace EMS.DB.Repository
         {
             //return _appDbContext.Payments.FirstOrDefault(x => x.EventId == eventId);
             using AppDbContext _myContext = base.GetContext();
-            return _myContext.Payments.FirstOrDefault(x => x.EventId == eventId);
+            return _myContext.Payments.Include(x => x.Event).FirstOrDefault(x => x.EventId == eventId);
         }
     }
 }

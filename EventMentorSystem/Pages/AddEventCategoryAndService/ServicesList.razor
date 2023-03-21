@@ -11,6 +11,10 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using Microsoft.AspNetCore.SignalR.Client
+
+<EditForm Model="@ServiceModel" OnSubmit="Save">
+    <DataAnnotationsValidator />
+  
         <MudCard Elevation="25" Class="my-2">
             <MudCardHeader>
                 <CardHeaderContent>
@@ -19,15 +23,16 @@
             </MudCardHeader>
             <MudCardContent>
                 <MudItem>
-                    <MudTextField @bind-Value="ServiceModel.ServiceName" Label="Service Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                    <MudTextField @bind-Value="ServiceModel.ServiceName" Label="Service Name" Variant="Variant.Outlined" For="@(() => ServiceModel.ServiceName)" Margin="Margin.Normal"></MudTextField>
                 </MudItem>
                 <MudItem Class="d-flex justify-end">
-                    <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save" StartIcon="@Icons.Material.TwoTone.Add" Size="Size.Large">
+                    <MudButton Class="mx-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary" StartIcon="@Icons.Material.TwoTone.Add" Size="Size.Large">
                         <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
                     </MudButton>
                 </MudItem>
             </MudCardContent>
         </MudCard>
+</EditForm>
         <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<CategoryService>>>(ServerReload))" Filter="new Func<CategoryService, bool>(Search)">
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Service list</MudText>
@@ -172,7 +177,9 @@
     }
     private bool Search(CategoryService services)
     {
-        if (string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(searchString) && StringValid(services.ServiceName) && services.ServiceName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(searchString) 
+            && StringValid(services.ServiceName) 
+            && services.ServiceName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }

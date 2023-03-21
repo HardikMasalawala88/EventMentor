@@ -16,6 +16,8 @@
             <MudNavLink Href="/servicelist" Icon="@Icons.Material.TwoTone.MiscellaneousServices" IconColor="Color.Primary">Services</MudNavLink>
             <MudNavLink Href="/userlist" Icon="@Icons.Material.TwoTone.AccountBox" IconColor="Color.Primary">Users</MudNavLink>
             <MudNavLink Href="/staffupdatelist" Icon="@Icons.Material.Filled.Person" IconColor="Color.Primary">Staffs</MudNavLink>
+            <MudNavLink Href="/identity/account/logout" Icon="@Icons.Material.Filled.Logout" IconColor="Color.Primary">Logout</MudNavLink>
+
         </AuthorizeView>
         <AuthorizeView Roles="Operator">
             <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard" IconColor="Color.Primary">Dashboard</MudNavLink>
@@ -24,10 +26,12 @@
             <MudNavLink Href="/eventcategorylist" Icon="@Icons.Material.TwoTone.ViewList" IconColor="Color.Primary">Categories</MudNavLink>
             <MudNavLink Href="/servicelist" Icon="@Icons.Material.TwoTone.MiscellaneousServices" IconColor="Color.Primary">Services</MudNavLink>
             <MudNavLink Href="/staffupdatelist" Icon="@Icons.Material.Filled.Person" IconColor="Color.Primary">Staffs</MudNavLink>
+            <MudNavLink Href="/identity/account/logout" Icon="@Icons.Material.Filled.Logout" IconColor="Color.Primary">Logout</MudNavLink>
         </AuthorizeView>
         <AuthorizeView Roles="Staff">
             <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard" IconColor="Color.Primary">Dashboard</MudNavLink>
             <MudNavLink Href="/viewstaffworklist" Icon="@Icons.Material.TwoTone.Category" IconColor="Color.Primary">View Work</MudNavLink>
+            <MudNavLink Href="/identity/account/logout" Icon="@Icons.Material.Filled.Logout" IconColor="Color.Primary">Logout</MudNavLink>
         </AuthorizeView>
     </MudNavMenu>
 </MudPaper>

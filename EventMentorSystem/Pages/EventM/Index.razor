@@ -3,6 +3,7 @@
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
 @using EMS.DB.Constant
+@using System.IO;
 @using System.Net
 @using System.Net.Mail
 @using EventMentorSystem.Shared
@@ -55,7 +56,6 @@
                     @foreach (var eventCategory in GetEventCategoryList())
                         {
                         <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
-
                         }
                 </MudSelect>
                 <MudSwitch @bind-Checked="eventModel.IsApproved" Color="Color.Primary" Label="Approved?" />
@@ -106,7 +106,8 @@ else
                 <MudFab @onclick="@(() => Delete(@data.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
             </MudTd>
             <MudTd DataLabel="Event Name">@(string.Concat("(#", @data.Id,") "))@data.EventName</MudTd>
-        
+
+            <MudTd DataLabel="">@data.OperatorId</MudTd>
             <MudTd DataLabel="">@data.EventVenue</MudTd>
             <MudTd DataLabel="">@data.OrganizerName@(string.Concat("(#", @data.OrganizerContact, ") "))</MudTd>
             <MudTd DataLabel="">@data.SlotType</MudTd>
@@ -192,15 +193,7 @@ else
                 <MudFab @onclick="@(() => Edit(@data))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
             </MudTd>
             <MudTd DataLabel="Event Name">@(string.Concat("(#", @data.Id,") "))@data.EventName</MudTd>
-            @try
-            {
-            
-            <MudTd DataLabel="">@data.Operator.User.FullName</MudTd>
-            }
-            catch (Exception ex)
-            {
-            Error.ProcessError(ex);
-            }
+            <MudTd DataLabel="">@data.OperatorId</MudTd>
             <MudTd DataLabel="">@data.EventVenue</MudTd>
             <MudTd DataLabel="">@data.OrganizerName@(string.Concat("(#", @data.OrganizerContact, ")"))</MudTd>
             <MudTd DataLabel="">@data.SlotType</MudTd>
@@ -265,6 +258,9 @@ else
 
     [CascadingParameter(Name = "cascadeParameters")]
     public GlobalParameter _parameters { get; set; }
+    //    AppDomain.CurrentDomain.BaseDirectory
+    string EventDetailsEmailTemplate = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "MailTemplate", "EventDetails.html");
+
     private string searchString = "";
     private Event eventModel = new();
     private NotificationMessages NotificationMessagesModel = new();
@@ -384,7 +380,7 @@ else
             _EventRepository.Insert(eventModel);
             Snackbar.Add(" record saved", Severity.Success);
             tableRef.ReloadServerData();
-            //Sendmail(eventModel.Email);
+            Sendmail(eventModel.Email,eventModel.Id);
             Operatorname(eventModel.OperatorId);
             NotificationMessagesModel.Message = $"Add Event  {eventModel.EventName}: By {name}.";
             NotificationMessagesModel.Title = "add Event";
@@ -424,7 +420,7 @@ else
     }
     private List<EventCategory> GetEventCategoryList()
     {
-        return _EventCategoryRepository.GetList();
+        return  _EventCategoryRepository.GetList();
     }
     private List<Operator> GetOperatorlist()
     {
@@ -451,7 +447,6 @@ else
         {
 
             _EventRepository.Delete(id);
-
             NotificationMessagesModel.Message = $"delete Event  {eventModel.EventName}: By {name}.";
             NotificationMessagesModel.Title = "delete Event";
             NotificationMessagesModel.UserId = _parameters.UserId;
@@ -472,22 +467,27 @@ else
         tableRef.ReloadServerData();
     }
     private string Message { get; set; } = "";
-    private void Sendmail(string email)
+    private void Sendmail(string email,long id)
     {
         try
         {
             using (MailMessage mail = new MailMessage())
             {
-                mail.From = new MailAddress("eventmentor3@gmail.com");
+                mail.From = new MailAddress("baruwalaom@gmail.com");
                 mail.To.Add(@email);
                 mail.Subject = "this is test1.";
-                mail.Body = "<h1>this is demo link</h1>" +
-                        "<a href='https://localhost:44304/eventlist'>Visit your event detail.</a>";
+
+                var str = File.ReadAllText(EventDetailsEmailTemplate);
+
+                string eventlink = "https://localhost:44304/eventdetail/"+ StringCipher.Encrypt(Convert.ToString(id), StringCipher.Password);
+
+                mail.Body = str.Replace("{{EVENTDETAILSLINK}}", eventlink);
                 mail.IsBodyHtml = true;
+
 
                 using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
                 {
-                    smtp.Credentials = new NetworkCredential("eventmentor3@gmail.com", "nyjagskbmgrqvkkb");
+                    smtp.Credentials = new NetworkCredential("baruwalaom@gmail.com", "nyjagskbmgrqvkkb");
                     smtp.EnableSsl = true;
                     smtp.Send(mail);
                 }

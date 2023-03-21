@@ -98,7 +98,7 @@ namespace EMS.DB.Repository
         public List<Event> GetListFromDashboard(DateTime? startDate, DateTime? endDate)
         {
             using AppDbContext _myContext = base.GetContext();
-            return _myContext.Events.Where(c => c.FromDate >= startDate.Value && c.Todate <= endDate.Value).ToList();
+            return _myContext.Events.Where(c => c.FromDate >= startDate.Value && c.FromDate <= endDate.Value).ToList();
         }
     }
 }

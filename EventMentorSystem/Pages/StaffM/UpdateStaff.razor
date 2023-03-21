@@ -9,11 +9,11 @@
 @inject IStaffRepository _StaffRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject IDialogService DialogService
-        <MudTable Elevation="25" Items="GetAllstaff()" @bind-customer="StaffList" HorizontalScrollbar="true" Breakpoint="Breakpoint.Sm" Class="my-2">
+        <MudTable Elevation="25"  @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<Staff>>>(ServerReload))" T="Staff"  Filter="new Func<Staff, bool>(Search)" @bind-customer="StaffList" HorizontalScrollbar="true" Breakpoint="Breakpoint.Sm" Class="my-2">
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Update Staff List</MudText>
                 <MudSpacer />
-                <MudTextField @bind-Value="searchString" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField Value="searchString" T="string"  ValueChanged="@(s => OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Action</MudTh>
@@ -22,7 +22,6 @@
                 <MudTh>StaffEmail</MudTh>
                 <MudTh>StaffMobileNo</MudTh>
                 <MudTh>Staff Service</MudTh>
-
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="">
@@ -52,8 +51,6 @@
             </RowTemplate>
         </MudTable>
 
-
-
 @code{
     [CascadingParameter(Name = "cascadeParameters")]
     public GlobalParameter _parameters { get; set; }
@@ -63,6 +60,9 @@
     private List<CategoryService> Servicelist = new();
     private List<User> userList = new();
     private List<Staff> StaffList = new();
+    private MudTable<Staff> tableRef;
+    private IEnumerable<Staff> pagedData;
+    private int totalItems;
 
     private List<CategoryService> GetAll()
     {
@@ -91,6 +91,32 @@
         return StaffList;
     }
 
+
+    private bool Search(Staff Staffs)
+    {
+        if (string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(searchString)
+            && StringValid(Staffs.User.UserName)
+            && StringValid(Staffs.User.Email)
+            && StringValid(Staffs.User.ContactNo)
+            &&
+            Staffs.User.Id.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || Staffs.User.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || Staffs.User.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            || Staffs.User.ContactNo.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        tableRef.ReloadServerData();
+    }
+
+
     //private bool Search(User user)
     //{
     //    if (StringValid(user.UserName)
@@ -110,6 +136,21 @@
     //    return false;
     //}
 
+    private async Task<TableData<Staff>> ServerReload(TableState state)
+    {
+        IEnumerable<Staff> data;
+
+        //get all data of current month
+        data = _StaffRepository.GetList();
+
+        data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
+        data = data.OrderByDirection(state.SortDirection, o => o.User.FullName);
+        totalItems = data.Count();
+
+        pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<Staff>() { TotalItems = totalItems, Items = pagedData };
+    }
+
     private bool StringValid(string strValue)
     {
         if (!string.IsNullOrEmpty(strValue))
@@ -125,7 +166,8 @@
         try
         {
             _StaffRepository.Insert(StaffModel);
-            GetAllstaff();
+            tableRef.ReloadServerData();
+            //GetAllstaff();
             StaffModel = new Staff();
         }
         catch (Exception ex)
@@ -145,6 +187,7 @@
         try
         {
             StaffModel = StaffList.FirstOrDefault(c => c.Id == id);
+            tableRef.ReloadServerData();
         }
         catch (Exception ex)
         {
@@ -163,7 +206,8 @@
         try
         {
             _StaffRepository.Delete(id);
-            GetAlluser();
+            tableRef.ReloadServerData();
+            //GetAlluser();
         }
         catch (Exception ex)
         {

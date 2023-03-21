@@ -10,8 +10,6 @@ namespace EMS.DB.Models
     public class EventCategory : BaseEntity
     {
         public String CategoryName { get; set; }
-
-
         public virtual List<Inquiry> InquiryList { get; set; }
     }
 }
