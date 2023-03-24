@@ -11,18 +11,25 @@ namespace EMS.DB.Models
     {
         
         [Required]
+        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
         public string PaymentMode { get; set; }
 
         [Required]
+        [RegularExpression(@"^[0-9]+$", ErrorMessage = "please enter amount.")]
         public string TotalAmount { get; set; }
 
         [Required]
+        [RegularExpression(@"^[0-9]+$", ErrorMessage = "please enter amount.")]
         public string ReceivedAmount { get; set; }
 
         [Required]
+        [RegularExpression(@"^[0-9]+$", ErrorMessage = "please enter amount.")]
         public string RemainingAmount { get; set; }
+
         [Required]
+        [RegularExpression(@"^[A-Za-z0-9]+$", ErrorMessage = "please enter amount.")]
         public string Transactionid { get; set; }
+
         public string Description { get; set; }
 
         [Required]

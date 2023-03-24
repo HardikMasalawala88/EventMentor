@@ -6,81 +6,84 @@
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
 
-<MudDialog>
-    <DialogContent>
-        <MudTextField @bind-Value="PaymentModel.PaymentMode" Label="PaymentMode" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.TotalAmount" Label="TotalAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.ReceivedAmount" Label="ReceivedAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.RemainingAmount" Label="RemainingAmount " Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.Transactionid" Label="Transactionid" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudSelect @bind-Value="PaymentModel.EventId" T="long" Label="select Event" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
-            @foreach (var events in GetAllEvent())
-            {
-                <MudSelectItem Value="@events.Id">@events.EventName</MudSelectItem>
-            }
-        </MudSelect>
-        <MudSelect @bind-Value="PaymentModel.UserId" Label="User name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-            @foreach (var events in GetAllUser())
-            {
-                <MudSelectItem Value="@events.Id">@events.UserName</MudSelectItem>
-            }
-        </MudSelect>
-    </DialogContent>
-    <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Edit">
-            <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
-        </MudButton>
-    </DialogActions>
-</MudDialog>
-
-@code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public string EventId { get; set; }
-    [Parameter]
-    public GlobalParameter _parameters { get; set; }
-    private Payment PaymentModel = new();
-    private bool isReadOnly = false;
-    private List<Event> EventList = new();
-    private List<User> userList = new();
-    public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
+    <MudDialog>
+        <DialogContent>
+            <MudTextField @bind-Value="PaymentModel.PaymentMode" For="@(() => PaymentModel.PaymentMode)" Label="PaymentMode" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="PaymentModel.TotalAmount" For="@(() => PaymentModel.TotalAmount)"Label="TotalAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="PaymentModel.ReceivedAmount" For="@(() => PaymentModel.ReceivedAmount)" Label="ReceivedAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="PaymentModel.RemainingAmount" For="@(() => PaymentModel.RemainingAmount)" Label="RemainingAmount " Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="PaymentModel.Transactionid" For="@(() => PaymentModel.Transactionid)" Label="Transactionid" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="PaymentModel.Description" For="@(() => PaymentModel.Description)" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudSelect @bind-Value="PaymentModel.EventId" T="long" Label="select Event" Variant="Variant.Outlined" For="@(() => PaymentModel.EventId)"  AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+                @foreach (var events in GetAllEvent())
+                {
+                    <MudSelectItem Value="@events.Id">@events.EventName</MudSelectItem>
+                }
+            </MudSelect>
+            <MudSelect @bind-Value="PaymentModel.UserId" For="@(() => PaymentModel.UserId)" Label="User name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                @foreach (var events in GetAllUser())
+                {
+                    <MudSelectItem Value="@events.Id">@events.UserName</MudSelectItem>
+                }
+            </MudSelect>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel">Cancel</MudButton>
+            <MudButton Class="mx-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary" OnClick="Edit">
+                <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
 
 
-    protected override void OnInitialized()
-    {
-        PaymentModel.EventId =Convert.ToInt64(EventId);
-        base.OnInitialized();
-    }
-    private List<Event> GetAllEvent()
-    {
-        EventList = _EventRepository.GetList();
-        return EventList;
-    }
-    private List<User> GetAllUser()
-    {
-        userList = _UserRepository.GetAllUser();
-        return userList;
-    }
+    @code {
+        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+        [Parameter] public Payment paymentsModel { get; set; }
+        [Parameter]
+        public GlobalParameter _parameters { get; set; }
+        private Payment PaymentModel = new();
+        private bool isReadOnly = false;
+        private List<Event> EventList = new();
+        private List<User> userList = new();
+        public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
 
-    private async Task Edit()
-    {
-        try
+
+        protected override void OnInitialized()
         {
-            _PaymentRepository.Update(PaymentModel);
-            NotificationMessagesModel.Message = $"Add Event  {PaymentModel.EventId}: By {PaymentModel.UserId}.";
-            NotificationMessagesModel.Title = "add category";
-            NotificationMessagesModel.UserId = _parameters.UserId;
-            NotificationMessagesModel.EventId = PaymentModel.EventId;
-            await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
-            await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
-            Snackbar.Add("payment update", Severity.Success);
-            PaymentModel = new Payment();
+            PaymentModel = paymentsModel;
+            StateHasChanged();
+            base.OnInitialized();
         }
-        catch (Exception ex)
+        private List<Event> GetAllEvent()
         {
-            _parameters.ShowErrorMessages(ex);
+            EventList = _EventRepository.GetList();
+            return EventList;
         }
+        private List<User> GetAllUser()
+        {
+            userList = _UserRepository.GetAllUser();
+            return userList;
+        }
+
+        private async Task Edit()
+        {
+            try
+            {
+                _PaymentRepository.Update(PaymentModel);
+                NotificationMessagesModel.Message = $"Add Event  {PaymentModel.EventId}: By {PaymentModel.UserId}.";
+                NotificationMessagesModel.Title = "add category";
+                NotificationMessagesModel.UserId = _parameters.UserId;
+                NotificationMessagesModel.EventId = PaymentModel.EventId;
+                await _NotificationMessagesRepository.InsertAsync(NotificationMessagesModel);
+                await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
+                Snackbar.Add("payment update", Severity.Success);
+                PaymentModel = new Payment();
+                MudDialog.Close();
+            }
+            catch (Exception ex)
+            {
+                _parameters.ShowErrorMessages(ex);
+            }
+        }
+        void Cancel() => MudDialog.Cancel();
     }
-    void Cancel() => MudDialog.Cancel();
-}

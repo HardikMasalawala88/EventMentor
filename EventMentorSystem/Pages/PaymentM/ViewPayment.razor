@@ -13,46 +13,49 @@
     <Authorized>
         @if (IsEdit || IsAdd)
         {
-            <MudCard Elevation="25" Class="my-2">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6">Add / Edit Events</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.TwoTone.Close" Color="Color.Error" Edge="Edge.End" OnClick="CancelForm"></MudIconButton>
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudItem>
-                        <MudTextField @bind-Value="PaymentModel.PaymentMode" Label="PaymentMode" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudTextField @bind-Value="PaymentModel.TotalAmount" Label="TotalAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudTextField @bind-Value="PaymentModel.ReceivedAmount" Label="ReceivedAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudTextField @bind-Value="PaymentModel.RemainingAmount" Label="RemainingAmount " Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudTextField @bind-Value="PaymentModel.Transactionid" Label="Transactionid" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudTextField @bind-Value="PaymentModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                        <MudSelect @bind-Value="PaymentModel.EventId" T="long" Label="select Event" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                            @foreach (var events in GetAllEvent())
-                            {
-                                <MudSelectItem Value="@events.Id">@events.EventName</MudSelectItem>
-                            }
-                        </MudSelect>
-                        <MudSelect @bind-Value="PaymentModel.UserId" Label="User name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                            @foreach (var events in GetAllUser())
+            <EditForm Model="@PaymentModel" OnValidSubmit="Addpayment">
+                <DataAnnotationsValidator />
+                <MudCard Elevation="25" Class="my-2">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">Add / Edit Events</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudIconButton Icon="@Icons.Material.TwoTone.Close" Color="Color.Error" Edge="Edge.End" OnClick="CancelForm"></MudIconButton>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudItem>
+                            <MudTextField @bind-Value="PaymentModel.PaymentMode" For="@(() => PaymentModel.PaymentMode)" Label="PaymentMode" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                            <MudTextField @bind-Value="PaymentModel.TotalAmount" For="@(() => PaymentModel.TotalAmount)" Label="TotalAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                            <MudTextField @bind-Value="PaymentModel.ReceivedAmount" For="@(() => PaymentModel.ReceivedAmount)" Label="ReceivedAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                            <MudTextField @bind-Value="PaymentModel.RemainingAmount" For="@(() => PaymentModel.RemainingAmount)" Label="RemainingAmount " Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                            <MudTextField @bind-Value="PaymentModel.Transactionid" For="@(() => PaymentModel.Transactionid)" Label="Transactionid" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                            <MudTextField @bind-Value="PaymentModel.Description" For="@(() => PaymentModel.Description)" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                            <MudSelect @bind-Value="PaymentModel.EventId" For="@(() => PaymentModel.EventId)" Label="select Event" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                @foreach (var events in GetAllEvent())
                                 {
-                                <MudSelectItem Value="@events.Id">@events.UserName</MudSelectItem>
+                                    <MudSelectItem Value="@events.Id">@events.EventName</MudSelectItem>
                                 }
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem Class="d-flex justify-end my-2">
-                        <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
-                            <FontLabel Fontweight="500" FontColor="white">Cancel</FontLabel>
-                        </MudButton>
-                        <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Addpayment">
-                            <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
-                        </MudButton>
-                    </MudItem>
-                </MudCardContent>
-            </MudCard>
+                            </MudSelect>
+                            <MudSelect @bind-Value="PaymentModel.UserId" For="@(() => PaymentModel.UserId)" Label="User name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                @foreach (var events in GetAllUser())
+                                    {
+                                    <MudSelectItem Value="@events.Id">@events.UserName</MudSelectItem>
+                                    }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem Class="d-flex justify-end my-2">
+                            <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
+                                <FontLabel Fontweight="500" FontColor="white">Cancel</FontLabel>
+                            </MudButton>
+                            <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">
+                                <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
+                            </MudButton>
+                        </MudItem>
+                    </MudCardContent>
+                </MudCard>
+            </EditForm>
         }
         else
         {
@@ -274,7 +277,7 @@
 
         };
 
-        DialogService.Show<AddPaymentDialog>("Edit Payment", parameters, options);
+        DialogService.Show<EditPaymentDialog>("Edit Payment", parameters, options);
 
     }
 

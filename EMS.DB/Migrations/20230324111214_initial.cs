@@ -26,11 +26,11 @@ namespace EMS.DB.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ContactNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Useraddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Userrole = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FullName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    ContactNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Useraddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Userrole = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserJoiningDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -59,7 +59,7 @@ namespace EMS.DB.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ServiceName = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -78,7 +78,7 @@ namespace EMS.DB.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CategoryName = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -312,10 +312,10 @@ namespace EMS.DB.Migrations
                     MobileNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AltPhoneNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AddressLine1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AddressLine1 = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     AddressLine2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Landmark = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Pincode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Landmark = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Pincode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NoOfAttendee = table.Column<int>(type: "int", nullable: false),
@@ -356,14 +356,14 @@ namespace EMS.DB.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EventName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EventVenue = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OrganizerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OrganizerContact = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EventName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EventVenue = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrganizerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrganizerContact = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SlotType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FromDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    SlotType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FromDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Todate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsApproved = table.Column<bool>(type: "bit", nullable: false),
                     Ispaymentdone = table.Column<bool>(type: "bit", nullable: false),
@@ -407,8 +407,8 @@ namespace EMS.DB.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Service = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Service = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StaffId = table.Column<long>(type: "bigint", nullable: false),
                     EventId = table.Column<long>(type: "bigint", nullable: false),

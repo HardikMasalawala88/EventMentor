@@ -10,38 +10,37 @@
 @inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject IDialogService DialogService
 @*<h3>AddStaffDialog</h3>*@
-<MudDialog>
-    <DialogContent>
-        <MudGrid>
-            <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="staffModel.User.UserName" Class="m-0" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-            </MudItem>
-            <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="staffModel.User.ContactNo" Class="m-0" Label="MobileNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-            </MudItem>
-            <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="staffModel.User.Email" Class="m-0" Label="AltPhoneNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-            </MudItem>
-            <MudItem>
-                <MudSelect @bind-Value="staffModel.StaffService" Label="select Service" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+<EditForm Model="@staffModel" OnValidSubmit="Save">
+    <DataAnnotationsValidator />
+    <MudDialog>
+        <DialogContent>
+            <MudGrid>
+                <MudItem lg="4" md="4" xs="12">
+                    <MudTextField @bind-Value="staffModel.User.UserName" For="@(() => staffModel.User.UserName)" Class="m-0" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                </MudItem>
+                <MudItem lg="4" md="4" xs="12">
+                    <MudTextField @bind-Value="staffModel.User.ContactNo" For="@(() => staffModel.User.ContactNo)" Class="m-0" Label="MobileNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                </MudItem>
+                <MudItem lg="4" md="4" xs="12">
+                    <MudTextField @bind-Value="staffModel.User.Email" For="@(() => staffModel.User.Email)" Class="m-0" Label="AltPhoneNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                </MudItem>
+                <MudItem>
+                    <MudSelect @bind-Value="staffModel.StaffService" For="@(() => staffModel.StaffService)" Label="select Service" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Required="true" RequiredError="Service is required.">
+                        @foreach (var data in ServiceList)
+                        {
+                            <MudSelectItem Value="@data.Id">@data.ServiceName</MudSelectItem>
 
-                    @foreach (var data in ServiceList)
-                    {
-                        <MudSelectItem Value="@data.Id">@data.ServiceName</MudSelectItem>
-
-                    }
-                </MudSelect>
-            </MudItem>
-        </MudGrid>
-
-
-    </DialogContent>
-    <DialogActions>
-        <MudButton OnClick="CancelForm" Variant="Variant.Filled" Color="Color.Error">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Save" Variant="Variant.Filled">Edit</MudButton>
-
-    </DialogActions>
-</MudDialog>
+                        }
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="CancelForm" Variant="Variant.Filled" Color="Color.Error">Cancel</MudButton>
+            <MudButton Color="Color.Primary" ButtonType="ButtonType.Submit" Variant="Variant.Filled">Edit</MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
 
 @code {
 

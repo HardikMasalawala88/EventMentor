@@ -16,19 +16,19 @@
         }
         public static void SeedUsers(UserManager<User> userManager)
         {
-            (string name, string password, string role)[] demoUsers = new[]
+            (string name, string password, string role,string fullName,string number,string address)[] demoUsers = new[]
             {
-                (name: "sadmin@yopmail.com", password: "Test@123", role: "Admin"),
+                (name: "sadmin@yopmail.com", password: "Test@123", role: "Admin",fullName:"sadmin",number:"9874563210",address:"this is demo."),
             };
 
-            foreach ((string name, string password, string role) user in demoUsers)
+            foreach ((string name, string password, string role,string fullName,string number,string address) user in demoUsers)
             {
                 AddUserIfNotExists(userManager, user);
             }
 
         }
 
-        private static void AddUserIfNotExists(UserManager<User> userManager, (string name, string password, string role) demoUser)
+        private static void AddUserIfNotExists(UserManager<User> userManager, (string name, string password, string role,string fullName,string number, string address ) demoUser)
         {
             User user = userManager.FindByNameAsync(demoUser.name).Result;
             if (user == default)
@@ -36,6 +36,10 @@
                 var newAppUser = new User
                 {
                     UserName = demoUser.name,
+                    Password = demoUser.password,
+                    FullName = demoUser.fullName,
+                    Useraddress = demoUser.address,
+                    ContactNo = demoUser.number,
                     Email = demoUser.name,
                     Userrole = demoUser.role,
                     EmailConfirmed = true,

@@ -74,7 +74,9 @@ namespace EMS.DB.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ServiceName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -107,15 +109,19 @@ namespace EMS.DB.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EventName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EventVenue")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("FromDate")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("InquiryId")
@@ -137,15 +143,18 @@ namespace EMS.DB.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("OrganizerContact")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OrganizerName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SelectedService")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SlotType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("Todate")
@@ -178,7 +187,9 @@ namespace EMS.DB.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CategoryName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -217,6 +228,7 @@ namespace EMS.DB.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("EventId")
@@ -229,6 +241,7 @@ namespace EMS.DB.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Service")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("StaffId")
@@ -264,7 +277,8 @@ namespace EMS.DB.Migrations
 
                     b.Property<string>("AddressLine1")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("AddressLine2")
                         .HasColumnType("nvarchar(max)");
@@ -308,7 +322,9 @@ namespace EMS.DB.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Landmark")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("MobileNo")
                         .IsRequired()
@@ -318,6 +334,7 @@ namespace EMS.DB.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Pincode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SlotType")
@@ -551,6 +568,7 @@ namespace EMS.DB.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContactNo")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -561,7 +579,9 @@ namespace EMS.DB.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -581,6 +601,7 @@ namespace EMS.DB.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
@@ -606,9 +627,11 @@ namespace EMS.DB.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Useraddress")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Userrole")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -777,7 +800,7 @@ namespace EMS.DB.Migrations
                         .HasForeignKey("EMS.DB.Models.Event", "InquiryId");
 
                     b.HasOne("EMS.DB.Models.Operator", "Operator")
-                        .WithMany()
+                        .WithMany("Events")
                         .HasForeignKey("OperatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -940,6 +963,11 @@ namespace EMS.DB.Migrations
             modelBuilder.Entity("EMS.DB.Models.Inquiry", b =>
                 {
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("EMS.DB.Models.Operator", b =>
+                {
+                    b.Navigation("Events");
                 });
 
             modelBuilder.Entity("EMS.DB.Models.User", b =>

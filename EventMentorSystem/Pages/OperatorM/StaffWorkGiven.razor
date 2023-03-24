@@ -11,139 +11,145 @@
 @inject IDialogService DialogService
 @if (IsAdd)
 {
-<MudCard Elevation="25" Class="my-2">
-    <MudCardHeader>
-        <CardHeaderContent>
-            <MudText Typo="Typo.h6">Operator Work</MudText>
-        </CardHeaderContent>
-        <CardHeaderActions>
-            <MudIconButton Icon="@Icons.Material.TwoTone.Close" Color="Color.Error" Edge="Edge.End" OnClick="CancelForm"></MudIconButton>
-        </CardHeaderActions>
-    </MudCardHeader>
-        <MudCardContent>
-            <MudItem>
-                @*@bind-Value="EventStaffWorkModel.EventId"*@
-                <MudSelect T="long" Value="EventStaffWorkModel.EventId" ValueChanged="@(e => EventSelectionChange(e))" Label="Event" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    @foreach (var data in EventList)
-                    {
-                        <MudSelectItem T="long" Value="data.Id">@data.EventName</MudSelectItem>
-                    }
-                </MudSelect>
-
-                <MudSelect @bind-Value="EventStaffWorkModel.Service" Label="Event Service" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    @if (EventStaffWorkModel.EventId > 0)
+    <EditForm Model="@EventStaffWorkModel" OnValidSubmit="Save">
+        <DataAnnotationsValidator />
+        <MudCard Elevation="25" Class="my-2">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Operator Work</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Material.TwoTone.Close" Color="Color.Error" Edge="Edge.End" OnClick="CancelForm"></MudIconButton>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudItem>
+                    @*@bind-Value="EventStaffWorkModel.EventId"*@
+                    <MudSelect T="long" Value="EventStaffWorkModel.EventId" ValueChanged="@(e => EventSelectionChange(e))" For="@(() => EventStaffWorkModel.EventId)" Label="Event" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var data in EventList)
                         {
-                            foreach (var data in EventList)
-                            {
-                                if (EventStaffWorkModel.EventId == data.Id && data.SelectedService is not null)
-                                {
-                                    ServiceList = data.SelectedService.Split(",").ToList();
+                            <MudSelectItem T="long" Value="data.Id">@data.EventName</MudSelectItem>
+                        }
+                    </MudSelect>
 
-                                    foreach (var service in ServiceList)
+                    <MudSelect @bind-Value="EventStaffWorkModel.Service" For="@(() => EventStaffWorkModel.Service)" Label="Event Service" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @if (EventStaffWorkModel.EventId > 0)
+                            {
+                                foreach (var data in EventList)
+                                {
+                                    if (EventStaffWorkModel.EventId == data.Id && data.SelectedService is not null)
                                     {
-                                    <MudSelectItem Value="service.Trim()">@service</MudSelectItem>
+                                        ServiceList = data.SelectedService.Split(",").ToList();
+
+                                        foreach (var service in ServiceList)
+                                        {
+                                        <MudSelectItem Value="service.Trim()">@service</MudSelectItem>
+                                        }
                                     }
                                 }
                             }
-                        }
-                </MudSelect>
-                <MudSelect T="long" @bind-Value="EventStaffWorkModel.StaffId" Label="Staff" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    </MudSelect>
+                    <MudSelect T="long" @bind-Value="EventStaffWorkModel.StaffId" For="@(() => EventStaffWorkModel.StaffId)" Label="Staff" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
 
-                    @foreach (var data in GetAllservice())
-                    {
-
-                        foreach (var data1 in GetAlluser())
+                        @foreach (var data in GetAllservice())
                         {
 
-                            if (data.Id == data1.StaffService)
+                            foreach (var data1 in GetAlluser())
                             {
-                                <MudSelectItem T="long" Value="data1.Id">@data1.User.UserName</MudSelectItem>
+
+                                if (data.Id == data1.StaffService)
+                                {
+                                    <MudSelectItem T="long" Value="data1.Id">@data1.User.UserName</MudSelectItem>
+                                }
+
                             }
-
                         }
-                    }
 
-                </MudSelect>
-                <MudTextField @bind-Value="EventStaffWorkModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-            </MudItem>
+                    </MudSelect>
+                    <MudTextField @bind-Value="EventStaffWorkModel.Description" For="@(() => EventStaffWorkModel.Description)" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                </MudItem>
 
-            <MudItem Class="d-flex justify-end">
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
-                    <FontLabel Fontweight="500" FontColor="white">Cancel</FontLabel>
-                </MudButton>
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
-                    <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
-                </MudButton>
-            </MudItem>
-        </MudCardContent>
-    </MudCard>
+                <MudItem Class="d-flex justify-end">
+                    <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
+                        <FontLabel Fontweight="500" FontColor="white">Cancel</FontLabel>
+                    </MudButton>
+                    <MudButton Class="mx-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary" >
+                        <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
+                    </MudButton>
+                </MudItem>
+            </MudCardContent>
+        </MudCard>
+    </EditForm>
 }
 else if (IsEdit)
 {
-    <MudCard Elevation="25" Class="my-2">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h6">Operator Work</MudText>
-            </CardHeaderContent>
-            <CardHeaderActions>
-                <MudIconButton Icon="@Icons.Material.TwoTone.Close" Color="Color.Error" Edge="Edge.End" OnClick="CancelForm"></MudIconButton>
-            </CardHeaderActions>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudItem>
-                <MudSelect T="long" @bind-Value="EventStaffWorkModel.EventId" Label="Event" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    @foreach (var data in GetAllevents())
-                    {
-                        <MudSelectItem T="long" Value="data.Id">@data.EventName</MudSelectItem>
-                    }
-                </MudSelect>
-
-                <MudSelect @bind-Value="EventStaffWorkModel.Service" Label="Event Service" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    @if (EventStaffWorkModel.EventId > 0)
+    <EditForm Model="@EventStaffWorkModel" OnValidSubmit="edit">
+        <DataAnnotationsValidator />
+        <MudCard Elevation="25" Class="my-2">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Operator Work</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Material.TwoTone.Close" Color="Color.Error" Edge="Edge.End" OnClick="CancelForm"></MudIconButton>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudItem>
+                    <MudSelect T="long" @bind-Value="EventStaffWorkModel.EventId" For="@(() => EventStaffWorkModel.EventId)" Label="Event" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var data in GetAllevents())
                         {
-                            foreach (var data in GetAllevents())
-                            {
-                                if (EventStaffWorkModel.EventId == data.Id)
-                                {
-                                    ServiceList = data.SelectedService.Split(",").ToList();
+                            <MudSelectItem T="long" Value="data.Id">@data.EventName</MudSelectItem>
+                        }
+                    </MudSelect>
 
-                                    foreach (var service in ServiceList)
+                    <MudSelect @bind-Value="EventStaffWorkModel.Service" For="@(() => EventStaffWorkModel.Service)" Label="Event Service" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @if (EventStaffWorkModel.EventId > 0)
+                            {
+                                foreach (var data in GetAllevents())
+                                {
+                                    if (EventStaffWorkModel.EventId == data.Id)
                                     {
-                                    <MudSelectItem Value="service.Trim()">@service</MudSelectItem>
+                                        ServiceList = data.SelectedService.Split(",").ToList();
+
+                                        foreach (var service in ServiceList)
+                                        {
+                                        <MudSelectItem Value="service.Trim()">@service</MudSelectItem>
+                                        }
                                     }
                                 }
                             }
-                        }
-                </MudSelect>
-                <MudSelect T="long" @bind-Value="EventStaffWorkModel.StaffId" Label="Staff" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    </MudSelect>
+                    <MudSelect T="long" @bind-Value="EventStaffWorkModel.StaffId" For="@(() => EventStaffWorkModel.StaffId)" Label="Staff" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
 
-                    @foreach (var data in GetAllservice())
-                    {
-
-                        foreach (var data1 in GetAlluser())
+                        @foreach (var data in GetAllservice())
                         {
 
-                            if (data.Id == data1.StaffService)
+                            foreach (var data1 in GetAlluser())
                             {
-                                <MudSelectItem T="long" Value="data1.Id">@data1.User.UserName</MudSelectItem>
+
+                                if (data.Id == data1.StaffService)
+                                {
+                                    <MudSelectItem T="long" Value="data1.Id">@data1.User.UserName</MudSelectItem>
+                                }
+
                             }
-
                         }
-                    }
 
-                </MudSelect>
-                <MudTextField @bind-Value="EventStaffWorkModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-            </MudItem>
-            <MudItem Class="d-flex justify-end">
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
-                    <FontLabel Fontweight="500" FontColor="white">Cancel</FontLabel>
-                </MudButton>
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="edit">
-                    <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
-                </MudButton>
-            </MudItem>
-        </MudCardContent>
-    </MudCard>
+                    </MudSelect>
+                    <MudTextField @bind-Value="EventStaffWorkModel.Description" For="@(() => EventStaffWorkModel.Description)" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                </MudItem>
+                <MudItem Class="d-flex justify-end">
+                    <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
+                        <FontLabel Fontweight="500" FontColor="white">Cancel</FontLabel>
+                    </MudButton>
+                    <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" >
+                        <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
+                    </MudButton>
+                </MudItem>
+            </MudCardContent>
+        </MudCard>
+    </EditForm>
 }
 else
 {
@@ -270,7 +276,6 @@ else
     {
         try
         {
-
             _EventStaffWorkRepository.Update(EventStaffWorkModel);
             Snackbar.Add(" record Update sucessfull", Severity.Success);
             GetAllEventStaffWork();

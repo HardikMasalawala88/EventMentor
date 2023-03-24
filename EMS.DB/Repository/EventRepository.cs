@@ -58,12 +58,17 @@ namespace EMS.DB.Repository
                 _myContext.Events.Add(eventModel);
             else
                 _myContext.Events.Update(eventModel);
-
+            
+            
+            
             _myContext.SaveChanges();
+
 
             //if (eventModel.Id is 0) 
             //    _repository.Insert(eventModel);
             //else _repository.Update(eventModel);
+
+
         }
 
         public void Update(Event eventModel)

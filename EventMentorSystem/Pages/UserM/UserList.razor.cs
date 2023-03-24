@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 
@@ -27,7 +29,16 @@ namespace EventMentorSystem.Pages.UserM
         private MudTable<User> tableRef;
         private IEnumerable<User> pagedData;
         private int totalItems;
-
+        private IEnumerable<string> Emailaddress(string pw)
+        {
+            if (string.IsNullOrWhiteSpace(pw))
+            {
+                yield return "email is required!";
+                yield break;
+            }
+            if (!Regex.IsMatch(pw, @"[a-z0-9]+@[a-z]+\.[a-z]{2,3}"))
+                yield return "Invalid email address.";
+        }
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -113,6 +124,7 @@ namespace EventMentorSystem.Pages.UserM
         {
             try
             {
+
                 _UserRepository.Update(userModel);
                 IsEdit = false;
                 tableRef.ReloadServerData();

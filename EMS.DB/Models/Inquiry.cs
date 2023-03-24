@@ -11,30 +11,42 @@ namespace EMS.DB.Models
     {
     
         [Required]
+        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
         public string Fullname { get; set; }
 
         [Required]
+        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "please enter valid contact no.")]
         public string MobileNo { get; set; }
 
         [Required]
+        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "please enter valid contact no.")]
         public string AltPhoneNo { get; set; }
 
         [Required]
+        [RegularExpression(@"[a-z0-9\\.]+@[a-z]+\.[a-z]{2,3}", ErrorMessage = "Invalid email address.")]
         public string Email { get; set; }
 
         [Required]
+        [StringLength(15, ErrorMessage = "Address Line1 length can't be more than 15.")]
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
+        [Required]
+        [StringLength(10, ErrorMessage = "Landmark length can't be more than 10.")]
         public string Landmark { get; set; }
+        [Required]
+        [RegularExpression(@"^[0-9]{6}$", ErrorMessage = "please enter valid Pincode.")]
         public string Pincode { get; set; }
 
         [Required]
+        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
         public string City { get; set; }
 
         [Required]
+        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
         public string State { get; set; }
 
         [Required]
+        [RegularExpression(@"^[0-9]{1,}$", ErrorMessage = "please enter valid Pincode.")]
         public int NoOfAttendee { get; set; }
 
         [Required]
@@ -43,9 +55,10 @@ namespace EMS.DB.Models
         [Required]
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
+
         public string Additionalnotes { get; set; }
         public string Status { get; set; }
-
+        [Required]
         public long EventCategoryId { get; set; }
         public EventCategory EventCategory { get; set; }
 

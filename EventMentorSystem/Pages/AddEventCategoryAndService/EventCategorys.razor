@@ -13,8 +13,10 @@
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
-<AuthorizeView>
+<AuthorizeView Context="demo">
     <Authorized>
+        <EditForm Model="@EventCategoryModel">
+            <DataAnnotationsValidator />
         <MudCard Elevation="25" Class="my-2">
             <MudCardHeader>
                 <CardHeaderContent>
@@ -23,16 +25,17 @@
             </MudCardHeader>
             <MudCardContent>
                 <MudItem>
-                    <MudTextField @bind-Value="EventCategoryModel.CategoryName" Label="Category Name" Variant="Variant.Outlined" HelperText="@error" Error="@showLeaveAlert" Margin="Margin.Normal"></MudTextField>
+                    <MudTextField @bind-Value="EventCategoryModel.CategoryName" For="@(() => EventCategoryModel.CategoryName)" Label="Category Name" Variant="Variant.Outlined" HelperText="@error" Error="@showLeaveAlert" Margin="Margin.Normal"></MudTextField>
                 </MudItem>
                 <MudItem Class="d-flex justify-end">
-                    <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save" StartIcon="@Icons.Material.TwoTone.Add" Size="Size.Large">
+                    <MudButton Class="mx-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary" OnClick="Save" StartIcon="@Icons.Material.TwoTone.Add" Size="Size.Large">
                         <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
                     </MudButton>
                 </MudItem>
             </MudCardContent>
         </MudCard>
-        <MudTable Elevation="25"  @ref="tableRef" T="EventCategory" ServerData="@(new Func<TableState, Task<TableData<EventCategory>>>(ServerReload))" Filter="new Func<EventCategory, bool>(Search)" @bind-customer="EventCategoryList">
+        </EditForm>
+        <MudTable Elevation="25" @ref="tableRef" T="EventCategory" ServerData="@(new Func<TableState, Task<TableData<EventCategory>>>(ServerReload))" Filter="new Func<EventCategory, bool>(Search)" @bind-customer="EventCategoryList">
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Category list</MudText>
                 <MudSpacer />
@@ -139,12 +142,8 @@
                 _EventCategoryRepository.InsertOrUpdate(EventCategoryModel);
                 Snackbar.Add(" record saved", Severity.Success);
                 showLeaveAlert = false;
-                GetAll();
-                await hubConnection.SendAsync("ServiceAddUpdate", EventCategoryModel);
-                NotificationModel.Message = $"{username} is add {EventCategoryModel.CategoryName}.";
-                NotificationModel.Title = "add category";
-                NotificationModel.UserId = userid;
-                await hubConnection.SendAsync("SendMessage", NotificationModel);
+                tableRef.ReloadServerData();
+                await hubConnection.SendAsync("CategoruAddUpdate", EventCategoryModel);
                 EventCategoryModel = new EventCategory();
             }
         }
@@ -160,11 +159,7 @@
         try
         {
             EventCategoryModel = EventCategoryList.FirstOrDefault(c => c.Id == id);
-            await hubConnection.SendAsync("ServiceAddUpdate", EventCategoryModel);
-            NotificationModel.Message = $"{username} is Edit category {id}.";
-            NotificationModel.Title = "Edit category";
-            NotificationModel.UserId = userid;
-            await hubConnection.SendAsync("SendMessage", NotificationModel);
+            await hubConnection.SendAsync("CategoruAddUpdate", EventCategoryModel);
             tableRef.ReloadServerData();
         }
         catch (Exception ex)
@@ -180,7 +175,7 @@
         {
             _EventCategoryRepository.Delete(id);
             Snackbar.Add("Category Data Deleted.", Severity.Success);
-            await hubConnection.SendAsync("ServiceAddUpdate", EventCategoryModel);
+            await hubConnection.SendAsync("CategoruAddUpdate", EventCategoryModel);
             NotificationModel.Message = $"{username} is delete category{id}.";
             NotificationModel.Title = "delete category";
             NotificationModel.UserId = userid;

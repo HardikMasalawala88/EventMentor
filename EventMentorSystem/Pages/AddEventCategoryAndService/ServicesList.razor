@@ -12,50 +12,49 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using Microsoft.AspNetCore.SignalR.Client
 
-<EditForm Model="@ServiceModel" OnSubmit="Save">
+<EditForm Model="@ServiceModel">
     <DataAnnotationsValidator />
-  
-        <MudCard Elevation="25" Class="my-2">
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Add / Edit Service </MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudItem>
-                    <MudTextField @bind-Value="ServiceModel.ServiceName" Label="Service Name" Variant="Variant.Outlined" For="@(() => ServiceModel.ServiceName)" Margin="Margin.Normal"></MudTextField>
-                </MudItem>
-                <MudItem Class="d-flex justify-end">
-                    <MudButton Class="mx-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary" StartIcon="@Icons.Material.TwoTone.Add" Size="Size.Large">
-                        <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
-                    </MudButton>
-                </MudItem>
-            </MudCardContent>
-        </MudCard>
+    <MudCard Elevation="25" Class="my-2">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Add / Edit Service</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudItem>
+                <MudTextField @bind-Value="ServiceModel.ServiceName" For="@(() => ServiceModel.ServiceName)" Label="Service Name" Variant="Variant.Outlined" HelperText="@error" Error="@showLeaveAlert" Margin="Margin.Normal"></MudTextField>
+            </MudItem>
+            <MudItem Class="d-flex justify-end">
+                <MudButton Class="mx-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary" OnClick="Save" StartIcon="@Icons.Material.TwoTone.Add" Size="Size.Large">
+                    <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
+                </MudButton>
+            </MudItem>
+        </MudCardContent>
+    </MudCard>
 </EditForm>
-        <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<CategoryService>>>(ServerReload))" Filter="new Func<CategoryService, bool>(Search)">
-            <ToolBarContent>
-                <MudText Typo="Typo.h6">Service list</MudText>
-                <MudSpacer />
-                <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent>
-            <HeaderContent>
-                <MudTh>Id</MudTh>
-                <MudTh>Service Name</MudTh>
-                <MudTh>Action</MudTh>
-            </HeaderContent>
-            <RowTemplate Context="data">
-                <MudTd DataLabel="Id">@data.Id</MudTd>
-                <MudTd DataLabel="Service Name">@data.ServiceName</MudTd>
-                <MudTd DataLabel="">
-                    <MudFab @onclick="@(()=>Edit(@data.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab @onclick="@(()=>Delete(@data.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-                </MudTd>
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
-            </PagerContent>
-        </MudTable>
+<MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<CategoryService>>>(ServerReload))" Filter="new Func<CategoryService, bool>(Search)">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Service list</MudText>
+        <MudSpacer />
+        <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Service Name</MudTh>
+        <MudTh>Action</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="data">
+        <MudTd DataLabel="Id">@data.Id</MudTd>
+        <MudTd DataLabel="Service Name">@data.ServiceName</MudTd>
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(()=>Edit(@data.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(()=>Delete(@data.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
+    </PagerContent>
+</MudTable>
 
 @code {
     [CascadingParameter(Name = "cascadeParameters")]
@@ -76,6 +75,8 @@
     private string searchString = "";
     private string userid;
     private string username;
+    private string error { get; set; }
+    private bool showLeaveAlert = false;
     private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
     protected override async Task OnInitializedAsync()
     {
@@ -119,25 +120,28 @@
     }
     private async Task Save()
     {
-        if (ServiceModel.Id > 0)
+        try
         {
-            _CategoryServiceRepository.Update(ServiceModel);
-            Snackbar.Add("Record updated", Severity.Success);
-            await hubConnection.SendAsync("ServiceAddUpdate", ServiceModel);
-            NotificationModel.Message = $"{username} is add {ServiceModel.ServiceName}.";
-            NotificationModel.Title = "add category";
-            NotificationModel.UserId = userid;
-            await hubConnection.SendAsync("SendMessage", NotificationModel);
-            ServiceModel = new CategoryService();
+            if (string.IsNullOrEmpty(ServiceModel.ServiceName))
+            {
+                error = "please enter a Service name";
+                showLeaveAlert = true;
+            }
+            else
+            {
+                _CategoryServiceRepository.InsertOrUpdate(ServiceModel);
+                Snackbar.Add(" record saved", Severity.Success);
+                showLeaveAlert = false;
+                await hubConnection.SendAsync("CategoruAddUpdate", ServiceModel);
+                ServiceModel = new CategoryService();
+            }
+            await tableRef.ReloadServerData();
         }
-        else
+        catch (Exception ex)
         {
-            _CategoryServiceRepository.Insert(ServiceModel);
-            Snackbar.Add("Record saved", Severity.Success);
-            ServiceModel = new CategoryService();
+            _parameters.ShowErrorMessages(ex);
         }
-        //GetAll();
-        tableRef.ReloadServerData();
+
     }
     private async Task Edit(long id)
     {
@@ -145,11 +149,7 @@
         {
             ServiceModel = _CategoryServiceRepository.GetList().FirstOrDefault(c => c.Id == id);
             await hubConnection.SendAsync("ServiceAddUpdate", ServiceModel);
-            NotificationModel.Message = $"{username} is Edit {ServiceModel.ServiceName}.";
-            NotificationModel.Title = "add category";
-            NotificationModel.UserId = userid;
-            await hubConnection.SendAsync("SendMessage", NotificationModel);
-            tableRef.ReloadServerData();
+            await tableRef.ReloadServerData();
         }
         catch (Exception ex)
         {
@@ -162,13 +162,9 @@
         {
             _CategoryServiceRepository.Delete(id);
             Snackbar.Add("Category Data Deleted.", Severity.Success);
-            tableRef.ReloadServerData();
-            //GetAll();
+            await tableRef.ReloadServerData();
             await hubConnection.SendAsync("ServiceAddUpdate", ServiceModel);
-            NotificationModel.Message = $"{username} is delete service.";
-            NotificationModel.Title = "add category";
-            NotificationModel.UserId = userid;
-            await hubConnection.SendAsync("SendMessage", NotificationModel);
+            await tableRef.ReloadServerData();
         }
         catch (Exception ex)
         {
@@ -177,8 +173,8 @@
     }
     private bool Search(CategoryService services)
     {
-        if (string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(searchString) 
-            && StringValid(services.ServiceName) 
+        if (string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(searchString)
+            && StringValid(services.ServiceName)
             && services.ServiceName.Contains(searchString.Trim(), StringComparison.OrdinalIgnoreCase))
         {
             return true;

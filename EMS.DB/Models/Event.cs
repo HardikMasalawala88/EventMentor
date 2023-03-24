@@ -10,25 +10,38 @@ namespace EMS.DB.Models
 {
     public class Event : BaseEntity
     {
+        [Required]
+        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
         public string EventName { get; set; }
-        
+        [Required]
         public string EventVenue { get; set; }
+        [Required]
+        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
         public string OrganizerName { get; set; }
+        [Required]
+        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "please enter valid contact no.")]
         public string OrganizerContact { get; set; }
+        [Required]
+        [RegularExpression(@"[a-z0-9\\.]+@[a-z]+\.[a-z]{2,3}", ErrorMessage = "Invalid email address.")]
         public string Email { get; set; }
+        
         public string Description { get; set; }
 
+        [Required]
         public string SlotType { get;set; }
-        
+
+        [Required]
         [DataType(DataType.Date)]
         public DateTime? FromDate { get; set; }
 
+
         [DataType(DataType.Date)]
         public DateTime? Todate { get; set; }
-
+        [Required]
         public bool IsApproved { get; set; }
+        
         public bool Ispaymentdone { get; set; }
-
+        
         public string SelectedService { get; set; }
 
         ////Foreign key for Standard
@@ -43,6 +56,7 @@ namespace EMS.DB.Models
 
         public virtual Payment Payment { get; set; }
 
+        [Required]
         public long OperatorId { get; set; }
         public Operator Operator { get; set; }
 

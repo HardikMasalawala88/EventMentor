@@ -18,58 +18,62 @@
 
 @if (IsEdit || IsAdd)
 {
-    <MudCard Elevation="25" Class="my-2">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h6">Add / Edit Events</MudText>
-            </CardHeaderContent>
-            <CardHeaderActions>
-                <MudIconButton Icon="@Icons.Material.TwoTone.Close" Color="Color.Error" Edge="Edge.End" OnClick="CancelForm"></MudIconButton>
-            </CardHeaderActions>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudItem>
-                <MudTextField @bind-Value="eventModel.EventName" Label="Event Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudSelect @bind-Value="eventModel.OperatorId" Label="Operator Name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    @foreach (var data in OperatorList)
-                        {
-                        <MudSelectItem Value="@data.Id">@data.User.FullName</MudSelectItem>
-                        }
-                </MudSelect>
-                <MudTextField @bind-Value="eventModel.EventVenue" Label="EventVenue" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="eventModel.OrganizerName" Label="Organizer Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="eventModel.Email" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudTextField @bind-Value="eventModel.OrganizerContact" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudRadioGroup @bind-SelectedOption="@eventModel.SlotType">
-                    <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
-                    <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
-                    <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
-                    <MudRadio Option="@(EventSlotType.MultipleDay.ToString())" Color="Color.Primary">@EventSlotType.MultipleDay.ToString()</MudRadio>
-                </MudRadioGroup>
-                <MudDatePicker Variant="Variant.Outlined" Label="From Date" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy" />
-                @if (eventModel.SlotType == EventSlotType.MultipleDay.ToString())
-                {
-                    <MudDatePicker Variant="Variant.Outlined" Label="To Date" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" />
-                }
-                <MudTextField @bind-Value="eventModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                <MudSelect @bind-Value="eventModel.CategoryId" Label="Select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    @foreach (var eventCategory in GetEventCategoryList())
-                        {
-                        <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
-                        }
-                </MudSelect>
-                <MudSwitch @bind-Checked="eventModel.IsApproved" Color="Color.Primary" Label="Approved?" />
-            </MudItem>
-            <MudItem Class="d-flex justify-end">
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
-                    <FontLabel Fontweight="500" FontColor="white">Cancel</FontLabel>
-                </MudButton>
-                <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
-                    <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
-                </MudButton>
-            </MudItem>
-        </MudCardContent>
-    </MudCard>
+    <EditForm Model="@eventModel" OnValidSubmit="Save">
+        <DataAnnotationsValidator />
+        <MudCard Elevation="25" Class="my-2">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Add / Edit Events</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Material.TwoTone.Close" Color="Color.Error" Edge="Edge.End" OnClick="CancelForm"></MudIconButton>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudItem>
+                    <MudTextField @bind-Value="eventModel.EventName"  For="@(() => eventModel.EventName)" Label="Event Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                    <MudSelect @bind-Value="eventModel.OperatorId" For="@(() => eventModel.OperatorId)" Label="Operator Name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var data in OperatorList)
+                            {
+                            <MudSelectItem Value="@data.Id">@data.User.FullName</MudSelectItem>
+                            }
+                    </MudSelect>
+                    <MudTextField @bind-Value="eventModel.EventVenue" For="@(() => eventModel.EventVenue)" Label="EventVenue" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                    <MudTextField @bind-Value="eventModel.OrganizerName" For="@(() => eventModel.OrganizerName)" Label="Organizer Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                    <MudTextField @bind-Value="eventModel.Email" For="@(() => eventModel.Email)" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                    <MudTextField @bind-Value="eventModel.OrganizerContact" For="@(() => eventModel.OrganizerContact)" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                    <MudRadioGroup @bind-SelectedOption="@eventModel.SlotType" For="@(() => eventModel.SlotType)" Required="true" RequiredError="this files required">
+                        <MudText>Select Slot time:</MudText>
+                        <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
+                        <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
+                        <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
+                        <MudRadio Option="@(EventSlotType.MultipleDay.ToString())" Color="Color.Primary">@EventSlotType.MultipleDay.ToString()</MudRadio>
+                    </MudRadioGroup>
+                    <MudDatePicker Variant="Variant.Outlined" For="@(() => eventModel.FromDate)" Label="From Date" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy" />
+                    @if (eventModel.SlotType == EventSlotType.MultipleDay.ToString())
+                    {
+                        <MudDatePicker Variant="Variant.Outlined" Label="To Date" For="@(() => eventModel.Todate)" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" />
+                    }
+                    <MudTextField @bind-Value="eventModel.Description" For="@(() => eventModel.Description)" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                    <MudSelect @bind-Value="eventModel.CategoryId" For="@(() => eventModel.CategoryId)" Label="Select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var eventCategory in GetEventCategoryList())
+                            {
+                            <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
+                            }
+                    </MudSelect>
+                    <MudSwitch @bind-Checked="eventModel.IsApproved" For="@(() => eventModel.IsApproved)" Color="Color.Primary" Label="Approved?" />
+                </MudItem>
+                <MudItem Class="d-flex justify-end">
+                    <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CancelForm">
+                        <FontLabel Fontweight="500" FontColor="white">Cancel</FontLabel>
+                    </MudButton>
+                    <MudButton Class="mx-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary" >
+                        <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
+                    </MudButton>
+                </MudItem>
+            </MudCardContent>
+        </MudCard>
+    </EditForm>
 }
 else
 {
@@ -79,6 +83,7 @@ else
         </MudButton>
     </MudItem>
 }
+
 <AuthorizeView Roles="Admin">
     <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<Event>>>(ServerReload))" T="Event" Filter="new Func<Event, bool>(Search)" Class="w-100" @bind-customer="eventList" OnRowClick="@RowClicked">
         <ToolBarContent>
@@ -380,7 +385,7 @@ else
             _EventRepository.Insert(eventModel);
             Snackbar.Add(" record saved", Severity.Success);
             tableRef.ReloadServerData();
-            Sendmail(eventModel.Email,eventModel.Id);
+            Sendmail(eventModel.Email, eventModel.Id);
             Operatorname(eventModel.OperatorId);
             NotificationMessagesModel.Message = $"Add Event  {eventModel.EventName}: By {name}.";
             NotificationMessagesModel.Title = "add Event";
@@ -391,7 +396,6 @@ else
             IsEdit = false;
             IsAdd = false;
             eventModel = new Event();
-
         }
         catch (Exception ex)
         {
@@ -420,7 +424,7 @@ else
     }
     private List<EventCategory> GetEventCategoryList()
     {
-        return  _EventCategoryRepository.GetList();
+        return _EventCategoryRepository.GetList();
     }
     private List<Operator> GetOperatorlist()
     {
@@ -467,7 +471,7 @@ else
         tableRef.ReloadServerData();
     }
     private string Message { get; set; } = "";
-    private void Sendmail(string email,long id)
+    private void Sendmail(string email, long id)
     {
         try
         {
@@ -479,7 +483,7 @@ else
 
                 var str = File.ReadAllText(EventDetailsEmailTemplate);
 
-                string eventlink = "https://localhost:44304/eventdetail/"+ StringCipher.Encrypt(Convert.ToString(id), StringCipher.Password);
+                string eventlink = "https://localhost:44304/eventdetail/" + StringCipher.Encode(Convert.ToString(id));
 
                 mail.Body = str.Replace("{{EVENTDETAILSLINK}}", eventlink);
                 mail.IsBodyHtml = true;

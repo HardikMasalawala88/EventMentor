@@ -9,6 +9,10 @@ namespace EMS.DB.Models
 {
     public class EventCategory : BaseEntity
     {
+
+        [Required]
+        [StringLength(15, ErrorMessage = "This field length can't be more than 15.")]
+        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
         public String CategoryName { get; set; }
         public virtual List<Inquiry> InquiryList { get; set; }
     }
