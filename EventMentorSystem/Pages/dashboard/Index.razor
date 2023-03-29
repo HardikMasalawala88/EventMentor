@@ -8,6 +8,8 @@
 @inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject IEventStaffWorkRepository _EventStaffWorkRepository;
 @inject IStaffRepository _StaffRepository;
+@inject NavigationManager _NavigationManager;
+
 
 <AuthorizeView Roles="Admin">
     <Authorized>
@@ -64,7 +66,7 @@
                     <ToolBarContent>
                         <MudText Typo="Typo.h6">Event Details</MudText>
                         <MudSpacer />
-                        <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                     </ToolBarContent>
                     <HeaderContent>
                         <MudTh>Event Name</MudTh>
@@ -78,7 +80,7 @@
                     <RowTemplate Context="data">
 
                         <MudTd DataLabel="Event Name">@data.EventName</MudTd>
-                        <MudTd DataLabel="">@data.OperatorId</MudTd>
+                        <MudTd DataLabel="">@data.Operator.User.FullName</MudTd>
                         <MudTd DataLabel="">@data.EventVenue</MudTd>
                         <MudTd DataLabel="">@data.OrganizerName</MudTd>
                         <MudTd DataLabel="">@data.OrganizerContact</MudTd>
@@ -106,7 +108,7 @@
                         <MudText Typo="Typo.h6">StaffWork Details</MudText>
 
                         <MudSpacer />
-                        <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                     </ToolBarContent>
                     <HeaderContent>
                         <MudTh>Event Name</MudTh>
@@ -149,18 +151,14 @@
                 <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="eventlink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.MiscellaneousServices" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
-                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Today EventNamed</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Today Event Name</MudText>
                         <MudText Typo="Typo.h5">
                             @if (OpratorWorkPlace is not null)
                             {
-                                foreach (var data in OpratorWorkPlace)
+                                @foreach (var data in GeteventforOperator())
                                 {
                                     @data.EventName
                                 }
-                            }
-                            else
-                            {
-                                @nowork
                             }
                         </MudText>
                     </div>
@@ -170,7 +168,7 @@
                 <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="eventlink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
-                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Today EventVenue</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Today Event Venue</MudText>
                         <MudText Typo="Typo.h5">
                             @if (OpratorWorkPlace is not null)
                             {
@@ -178,10 +176,6 @@
                                 {
                                     @data.EventVenue
                                 }
-                            }
-                            else
-                            {
-                                @nowork
                             }
                         </MudText>
                     </div>
@@ -197,7 +191,7 @@
                         <ToolBarContent>
                     <MudText Typo="Typo.h6">Event Details</MudText>
                             <MudSpacer />
-                            <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                            <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                         </ToolBarContent>
                         <HeaderContent>
                             <MudTh>Event Name</MudTh>
@@ -211,7 +205,7 @@
                         <RowTemplate Context="data">
 
                             <MudTd DataLabel="Event Name">@data.EventName</MudTd>
-                            <MudTd DataLabel="">@data.OperatorId</MudTd>
+                            <MudTd DataLabel="">@data.Operator.User.FullName</MudTd>
                             <MudTd DataLabel="">@data.EventVenue</MudTd>
                             <MudTd DataLabel="">@data.OrganizerName</MudTd>
                             <MudTd DataLabel="">@data.OrganizerContact</MudTd>
@@ -285,7 +279,7 @@
                         <ToolBarContent>
                     <MudText Typo="Typo.h6">Work Pending</MudText>
                             <MudSpacer />
-                            <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                            <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                         </ToolBarContent>
                         <HeaderContent>
                             <MudTh>Event Name</MudTh>
@@ -319,7 +313,7 @@
                     <MudText Typo="Typo.h6">Work Finish</MudText>
 
                             <MudSpacer />
-                            <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                            <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                         </ToolBarContent>
                         <HeaderContent>
                             <MudTh>Event Name</MudTh>

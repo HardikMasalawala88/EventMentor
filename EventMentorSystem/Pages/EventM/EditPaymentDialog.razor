@@ -3,26 +3,29 @@
 @inject IPaymentRepository _PaymentRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
+@inject NavigationManager NavigationManager; 
 
-<MudDialog>
-    <DialogContent>
-
-        <MudTextField @bind-Value="PaymentModel.PaymentMode" Label="PaymentMode" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.TotalAmount" Label="TotalAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.ReceivedAmount" Label="ReceivedAmount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.RemainingAmount" Label="RemainingAmount " Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.Transactionid" Label="Transactionid" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.EventId" Label="EventId" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="PaymentModel.UserId" Label="UserId" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-    </DialogContent>
-    <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Class="mx-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="Edit">
-            <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
-        </MudButton>
-    </DialogActions>
-</MudDialog>
+<EditForm Model="@PaymentModel" OnValidSubmit="Edit">
+    <DataAnnotationsValidator />
+    <MudDialog>
+        <DialogContent>
+            <MudTextField For="@(() => PaymentModel.PaymentMode)" @bind-Value="PaymentModel.PaymentMode" Label="Payment Mode" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField For="@(() => PaymentModel.TotalAmount)" @bind-Value="PaymentModel.TotalAmount" Label="Total Amount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField For="@(() => PaymentModel.ReceivedAmount)" @bind-Value="PaymentModel.ReceivedAmount" Label="Received Amount" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField For="@(() => PaymentModel.RemainingAmount)" @bind-Value="PaymentModel.RemainingAmount" Label="Remaining Amount " Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField For="@(() => PaymentModel.Transactionid)" @bind-Value="PaymentModel.Transactionid" Label="Transaction Id" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField For="@(() => PaymentModel.Description)" @bind-Value="PaymentModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField For="@(() => PaymentModel.EventId)" @bind-Value="PaymentModel.EventId" Label="Event" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+            <MudTextField For="@(() => PaymentModel.UserId)" @bind-Value="PaymentModel.UserId" Label="User" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel">Cancel</MudButton>
+            <MudButton Class="mx-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary">
+                <FontLabel Fontweight="500" FontColor="white">Add</FontLabel>
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
@@ -33,7 +36,23 @@
     public GlobalParameter _parameters { get; set; }
     public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
     private bool isReadOnly = false;
+    private HubConnection hubConnection;
     private List<Payment> PaymentList = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+        .Build();
+        hubConnection.On<Payment>("PaymentAddUpdate", (Payments) =>
+        {
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+
+    }
 
     protected override void OnInitialized()
     {
@@ -54,6 +73,7 @@
         try
         {
             _PaymentRepository.Update(paymentModel);
+            await hubConnection.SendAsync("PaymentAddUpdate", paymentModel);
             NotificationMessagesModel.Message = $"Edit Event payment {paymentModel.EventId}: By {paymentModel.UserId}.";
             NotificationMessagesModel.Title = "add payment";
             NotificationMessagesModel.UserId = _parameters.UserId;
@@ -71,4 +91,5 @@
         }
     }
     void Cancel() => MudDialog.Cancel();
+
 }

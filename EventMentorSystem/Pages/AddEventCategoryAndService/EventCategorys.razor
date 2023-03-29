@@ -3,16 +3,17 @@
 @using EMS.DB.Models
 @using  EMS.DB.Repository.Interface
 @using System.Collections.Generic;
-@inject ISnackbar Snackbar;
-@inject IEventCategoryRepository _EventCategoryRepository;
-@using Microsoft.AspNetCore.SignalR.Client
-@inject NavigationManager NavigationManager
-@implements IAsyncDisposable
-@using EventMentorSystem.Data
-@inject NavigationManager _NavigationManager
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.SignalR.Client
+@using EventMentorSystem.Data
+@inject ISnackbar Snackbar;
+@inject IEventCategoryRepository _EventCategoryRepository;
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+@inject NavigationManager _NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+
 <AuthorizeView Context="demo">
     <Authorized>
         <EditForm Model="@EventCategoryModel">
@@ -39,7 +40,7 @@
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Category list</MudText>
                 <MudSpacer />
-                <MudTextField Value="searchString" T="string" ValueChanged="@(s => OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField Value="searchString" T="string" ValueChanged="@(s => OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Id</MudTh>
@@ -49,7 +50,6 @@
             <RowTemplate Context="data">
                 <MudTd DataLabel="Id">@data.Id</MudTd>
                 <MudTd DataLabel="Category Name">@data.CategoryName</MudTd>
-
                 <MudTd DataLabel="">
                     <MudFab @onclick="@(()=>Edit(@data.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
                     <MudFab @onclick="@(()=>Delete(@data.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
@@ -82,6 +82,7 @@
     private IEnumerable<EventCategory> pagedData;
     private int totalItems;
     private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider
@@ -98,14 +99,13 @@
         hubConnection = new HubConnectionBuilder()
         .WithUrl(_NavigationManager.ToAbsoluteUri("/chathub"))
         .Build();
+
         hubConnection.On<EventCategory>("CategoruAddUpdate", (eventCategory) =>
         {
             GetAll();
             InvokeAsync(StateHasChanged);
         });
-        hubConnection = new HubConnectionBuilder()
-       .WithUrl(_NavigationManager.ToAbsoluteUri("/chathub"))
-       .Build();
+
         hubConnection.On<NotificationMessages>("SendMessage", (notificationMessages) =>
         {
 
@@ -125,6 +125,7 @@
 
     private List<EventCategory> GetAll()
     {
+        tableRef.ReloadServerData();
         EventCategoryList = _EventCategoryRepository.GetList();
         return EventCategoryList;
     }
@@ -132,20 +133,12 @@
     {
         try
         {
-            if (string.IsNullOrEmpty(EventCategoryModel.CategoryName))
-            {
-                error = "please enter a category name";
-                showLeaveAlert = true;
-            }
-            else
-            {
-                _EventCategoryRepository.InsertOrUpdate(EventCategoryModel);
-                Snackbar.Add(" record saved", Severity.Success);
-                showLeaveAlert = false;
-                tableRef.ReloadServerData();
-                await hubConnection.SendAsync("CategoruAddUpdate", EventCategoryModel);
-                EventCategoryModel = new EventCategory();
-            }
+            _EventCategoryRepository.InsertOrUpdate(EventCategoryModel);
+            await hubConnection.SendAsync("CategoruAddUpdate", EventCategoryModel);
+            Snackbar.Add(" record saved", Severity.Success);
+            showLeaveAlert = false;
+            tableRef.ReloadServerData();
+            EventCategoryModel = new EventCategory();
         }
         catch (Exception ex)
         {
@@ -215,7 +208,6 @@
         data = _EventCategoryRepository.GetList();
 
         data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
-        data = data.OrderByDirection(state.SortDirection, o => o.CategoryName);
         totalItems = data.Count();
 
         pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();

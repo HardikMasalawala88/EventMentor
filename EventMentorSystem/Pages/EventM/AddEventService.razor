@@ -6,17 +6,11 @@
 @inject ICategoryServiceRepository _CategoryServiceRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
+@inject NavigationManager NavigationManager; 
 
 <MudDialog>
     <DialogContent>
         <MudGrid>
-            @*<MudItem>
-                    <MudSelect @bind-Value="eventModel.CategoryId" T="long"
-                        SelectedValuesChanged="@(e => OnEventCategoryChange(e.FirstOrDefault()))"
-                        Label="select categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
-                        <MudSelectItem Value="@eventModel.CategoryId">@eventModel.Category.CategoryName</MudSelectItem>
-                    </MudSelect>
-                </MudItem>*@
             <MudItem>
                 <CustomMudSelect PlaceHolder="Select Service" MultiSelection="true" Variant="Variant.Outlined" Class="mb-2" Value="@eventModel.SelectedService"
                                  ValueChangedCallBack="@(e => OnSelectedPriorityChange(e))" SelectedValues="selectedServiceList">
@@ -37,7 +31,7 @@
 </MudDialog>
 
 @code {
-    
+
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter]
     public GlobalParameter _parameters { get; set; }
@@ -52,10 +46,25 @@
     public string name { get; set; }
     List<String> selectedServiceList = new List<String>();
     List<long> selectedServiceIdList = new List<long>();
+    private HubConnection hubConnection;
 
     public NotificationMessages NotificationMessagesModel { get; set; } = new NotificationMessages();
 
+    
+    protected override async Task OnInitializedAsync()
+    {
 
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+        .Build();
+        hubConnection.On<Event>("EventAddUpdate", (events) =>
+        {
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+
+    }
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -101,6 +110,7 @@
         try
         {
             _eventService.Update(eventModel);
+            await hubConnection.SendAsync("EventAddUpdate", eventModel);
             NotificationMessagesModel.Message = $"Edit Event service {eventModel.EventName}: By {name}.";
             NotificationMessagesModel.Title = "add service";
             NotificationMessagesModel.UserId = _parameters.UserId;

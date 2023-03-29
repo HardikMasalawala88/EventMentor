@@ -33,7 +33,10 @@ else
                         <MudText>Event Description : @EventModel.Description</MudText>
                         <MudText>Event Timeing : @EventModel.SlotType</MudText>
                         <MudText>Event FromDate : @EventModel.FromDate</MudText>
-                        <MudText>Event ToDate : @EventModel.Todate</MudText>
+                        @if (EventModel.SlotType == "MultipleDay")
+                        {
+                            <MudText>Event ToDate : @EventModel.Todate</MudText>
+                        }
                         <MudText>Event Venue : @EventModel.EventVenue</MudText>
                     </MudCardContent>
                 </MudCard>
@@ -98,7 +101,7 @@ else
                                         <MudItem md="2">@ValidCurrency(@PaymentList.ReceivedAmount)</MudItem>
                                         <MudItem md="2">@ValidCurrency(@PaymentList.RemainingAmount)</MudItem>
                                         <MudItem md="2">@PaymentList.Transactionid</MudItem>
-                                        <MudItem md="4">@PaymentList.CreatedOn.ToLocalTime()</MudItem>
+                                        <MudItem md="4">@PaymentList.CreatedOn.ToLongDateString()</MudItem>
                                     }
                                 </MudGrid>
                             </MudCardContent>
@@ -131,10 +134,7 @@ else
                                 }
                                 <MudItem md="4">@OperatorWork.Status</MudItem>
                             </MudGrid>
-
                         }
-
-
                     </MudCardContent>
                 </MudCard>
             </MudItem>
@@ -168,8 +168,13 @@ else
             {
                 EventId = evId.ToString();
                 GetEvent();
-                EventCategoryName = _EventCategoryRepository.GetById(EventModel.CategoryId);
                 GetAllPaymentsByEventId(EventId);
+                Getstaff();
+                GetEventStaffWork();
+                if (EventModel is not null && EventModel.CategoryId > 0)
+                {
+                    EventCategoryName = _EventCategoryRepository.GetById(EventModel.CategoryId);
+                }
             }
             else
             {
@@ -207,4 +212,5 @@ else
         var pdf = new PDFGenerator();
         pdf.Downloadpdf(payments, JS, filename);
     }
+
 }

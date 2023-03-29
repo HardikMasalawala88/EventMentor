@@ -38,7 +38,7 @@
                             <MudSelectItem Value="@data.Id">@data.User.FullName</MudSelectItem>
                             }
                     </MudSelect>
-                    <MudTextField @bind-Value="eventModel.EventVenue" For="@(() => eventModel.EventVenue)" Label="EventVenue" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                    <MudTextField @bind-Value="eventModel.EventVenue" For="@(() => eventModel.EventVenue)" Label="Event Venue" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
                     <MudTextField @bind-Value="eventModel.OrganizerName" For="@(() => eventModel.OrganizerName)" Label="Organizer Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
                     <MudTextField @bind-Value="eventModel.Email" For="@(() => eventModel.Email)" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
                     <MudTextField @bind-Value="eventModel.OrganizerContact" For="@(() => eventModel.OrganizerContact)" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
@@ -89,7 +89,7 @@ else
         <ToolBarContent>
             <MudText Typo="Typo.h6">Event list</MudText>
             <MudSpacer />
-            <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
             <MudTh>Action</MudTh>
@@ -112,7 +112,7 @@ else
             </MudTd>
             <MudTd DataLabel="Event Name">@(string.Concat("(#", @data.Id,") "))@data.EventName</MudTd>
 
-            <MudTd DataLabel="">@data.OperatorId</MudTd>
+            <MudTd DataLabel="">@data.Operator.User.FullName</MudTd>
             <MudTd DataLabel="">@data.EventVenue</MudTd>
             <MudTd DataLabel="">@data.OrganizerName@(string.Concat("(#", @data.OrganizerContact, ") "))</MudTd>
             <MudTd DataLabel="">@data.SlotType</MudTd>
@@ -198,7 +198,7 @@ else
                 <MudFab @onclick="@(() => Edit(@data))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
             </MudTd>
             <MudTd DataLabel="Event Name">@(string.Concat("(#", @data.Id,") "))@data.EventName</MudTd>
-            <MudTd DataLabel="">@data.OperatorId</MudTd>
+            <MudTd DataLabel="">@data.Operator.User.FullName</MudTd>
             <MudTd DataLabel="">@data.EventVenue</MudTd>
             <MudTd DataLabel="">@data.OrganizerName@(string.Concat("(#", @data.OrganizerContact, ")"))</MudTd>
             <MudTd DataLabel="">@data.SlotType</MudTd>
@@ -241,7 +241,7 @@ else
                 }
             </MudTd>
             <MudTd DataLabel="">
-                @if (@data.Category is not null)
+                @if (data.CategoryId >0)
                 {
                     @data.Category.CategoryName
                 }
@@ -263,6 +263,7 @@ else
 
     [CascadingParameter(Name = "cascadeParameters")]
     public GlobalParameter _parameters { get; set; }
+    private HubConnection hubConnection;
     //    AppDomain.CurrentDomain.BaseDirectory
     string EventDetailsEmailTemplate = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "MailTemplate", "EventDetails.html");
 
@@ -276,6 +277,7 @@ else
     private int totalItems;
     private int totalItemsOperator;
     private List<Event> eventList = new();
+    private List<Event> EventList = new();
     private List<EventCategory> eventcategoryList = new();
     private List<Operator> OperatorList = new();
     private string userId;
@@ -319,12 +321,31 @@ else
                 }
             }
         }
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+        .Build();
+        hubConnection.On<Event>("EventAddUpdate", (events) =>
+        {
+            GetAllforopertor();
+            GetAllevents();
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+
     }
 
     private List<Event> GetAllevents()
     {
+        tableRef.ReloadServerData();
         eventList = _EventRepository.GetList();
         return eventList;
+    }
+    private List<Event> GetAllforopertor()
+    {
+        tableRef.ReloadServerData();
+        EventList = _EventRepository.GetByOpertorId(userId);
+        return EventList;
     }
     private bool Search(Event events)
     {
@@ -373,7 +394,7 @@ else
         IEnumerable<Event> data;
         data = _EventRepository.GetByOpertorId(userId);
         data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
-        data = data.OrderByDirection(state.SortDirection, o => o.FromDate.Value);
+
         totalItemsOperator = data.Count();
         pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
         return new TableData<Event>() { TotalItems = totalItemsOperator, Items = pagedData };
@@ -384,6 +405,7 @@ else
         {
             _EventRepository.Insert(eventModel);
             Snackbar.Add(" record saved", Severity.Success);
+            await hubConnection.SendAsync("EventAddUpdate", eventModel);
             tableRef.ReloadServerData();
             Sendmail(eventModel.Email, eventModel.Id);
             Operatorname(eventModel.OperatorId);
@@ -451,6 +473,7 @@ else
         {
 
             _EventRepository.Delete(id);
+            await hubConnection.SendAsync("EventAddUpdate", eventModel);
             NotificationMessagesModel.Message = $"delete Event  {eventModel.EventName}: By {name}.";
             NotificationMessagesModel.Title = "delete Event";
             NotificationMessagesModel.UserId = _parameters.UserId;
@@ -477,7 +500,7 @@ else
         {
             using (MailMessage mail = new MailMessage())
             {
-                mail.From = new MailAddress("baruwalaom@gmail.com");
+                mail.From = new MailAddress("eventmentor3@gmail.com");
                 mail.To.Add(@email);
                 mail.Subject = "this is test1.";
 
@@ -491,7 +514,7 @@ else
 
                 using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
                 {
-                    smtp.Credentials = new NetworkCredential("baruwalaom@gmail.com", "nyjagskbmgrqvkkb");
+                    smtp.Credentials = new NetworkCredential("eventmentor3@gmail.com", "ifjwikzwvsguvksb");
                     smtp.EnableSsl = true;
                     smtp.Send(mail);
                 }

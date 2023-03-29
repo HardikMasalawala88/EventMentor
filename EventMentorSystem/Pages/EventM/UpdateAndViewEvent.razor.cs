@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 
 using System.IO;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace EventMentorSystem.Pages.EventM
 {
@@ -32,6 +33,9 @@ namespace EventMentorSystem.Pages.EventM
         [Inject] IPaymentRepository _PaymentRepository { get; set; }
         [Inject] IDialogService DialogService { get; set; }
 
+        [Inject] NavigationManager NavigationManager { get; set; }
+
+        private HubConnection hubConnection;
         private CategoryService CategoryServiceModel = new();
         //private List<CategoryService> eventservicelist = new();
         private List<EventCategory> EventCategoryList = new();
@@ -61,6 +65,21 @@ namespace EventMentorSystem.Pages.EventM
             }
 
             return base.OnAfterRenderAsync(firstRender);
+        }
+        protected override async Task OnInitializedAsync()
+        {
+            
+            hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+            .Build();
+            hubConnection.On<Event>("EventAddUpdate", (events) =>
+            {
+                GetAllevents();
+                InvokeAsync(StateHasChanged);
+            });
+
+            await hubConnection.StartAsync();
+
         }
         private List<CategoryService> GetAll()
         {
@@ -161,6 +180,7 @@ namespace EventMentorSystem.Pages.EventM
         {
             var parameters = new DialogParameters();
             parameters.Add("EventId", EventId);
+            parameters.Add("_parameters", _parameters);
             var options = new DialogOptions()
             {
                 CloseOnEscapeKey = false,

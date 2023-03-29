@@ -8,7 +8,7 @@ namespace EMS.DB.Models
     {
         [Required]
         [StringLength(15, ErrorMessage = "This field length can't be more than 15.")]
-        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
+        [RegularExpression(@"^[A-Za-z\s]+$", ErrorMessage = "please enter only alphabets.")]
         public String ServiceName{ get; set; }
         public virtual List<Inquiry> Inquiry { get; set; }
     }

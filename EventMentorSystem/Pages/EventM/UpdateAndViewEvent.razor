@@ -9,7 +9,9 @@
             <MudCard Elevation="10" Style="height: 100%" Class="pa-4 rounded-lg">
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h4">Event Details</MudText>
+                        <MudItem Class="d-flex justify-content-between">
+                            <MudText Typo="Typo.h4">Event Details</MudText>
+                        </MudItem>
                     </CardHeaderContent>
                     <CardHeaderActions>
                         <AuthorizeView Roles="Admin" Context="innerContext">
@@ -19,14 +21,43 @@
                 </MudCardHeader>
                 <MudDivider />
                 <MudCardContent>
-                    <MudText>Event Name : @EventModel.EventName </MudText>
-                    <MudText>Organizor Name : @EventModel.OrganizerName</MudText>
-                    <MudText>Organizor Contact : @EventModel.OrganizerContact</MudText>
-                    <MudText>Event Description : @EventModel.Description</MudText>
-                    <MudText>Event Timeing : @EventModel.SlotType</MudText>
-                    <MudText>Event FromDate : @EventModel.FromDate</MudText>
-                    <MudText>Event ToDate : @EventModel.Todate</MudText>
-                    <MudText>Event Venue : @EventModel.EventVenue</MudText>
+                    <MudText Typo="Typo.h6"  Class="d-flex justify-end">
+                        Last updated on :
+                        <MudIcon Icon="@Icons.Material.Filled.AccessAlarms" Color="Color.Primary" />
+                        @if (EventModel.UpdatedOn.HasValue)
+                        {
+                            @EventModel.UpdatedOn.Value.ToLongDateString()
+                        }
+                        else
+                        {
+                            @EventModel.CreatedOn.ToLongDateString()
+                        }
+                    </MudText>
+                    <MudGrid>
+                        <MudItem sm="6" md="6" lg="6">
+                            <MudText Typo="Typo.h6"><MudIcon Icon="@Icons.Material.Filled.Event" Color="Color.Primary" /> Event Name :@EventModel.EventName</MudText>
+                            <MudText Typo="Typo.h6">
+                                <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Primary" /> Organizor Name : @EventModel.OrganizerName
+                                @if (@EventModel is not null && !string.IsNullOrEmpty(@EventModel.OrganizerContact))
+                                {
+                                    @("(+91" + @EventModel.OrganizerContact + ")")
+                                }
+                            </MudText>
+
+                            <MudText Typo="Typo.h6"><MudIcon Icon="@Icons.Material.Filled.Description" Color="Color.Primary" /> Description :  @EventModel.Description</MudText>
+
+                        </MudItem>
+                        <MudItem sm="6" md="6" lg="6">
+                            <MudText Typo="Typo.h6"><MudIcon Icon="@Icons.Material.Filled.LocationOn" Color="Color.Primary" /> Event Venue : @EventModel.EventVenue</MudText>
+                            <MudText Typo="Typo.h6"><MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Primary" /> Event days: @EventModel.SlotType</MudText>
+                            <MudText Typo="Typo.h6"><MudIcon Icon="@Icons.Material.Filled.CalendarToday" Color="Color.Primary" /> Start Date :@EventModel.FromDate</MudText>
+                            @if (EventModel.SlotType == "MultipleDay")
+                            {
+                                <MudText Typo="Typo.h6"><MudIcon Icon="@Icons.Material.Filled.CalendarToday" Color="Color.Primary" /> Event ToDate : @EventModel.Todate</MudText>
+                            }
+                        </MudItem>
+                    </MudGrid>
+
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -46,17 +77,15 @@
                         </MudCardHeader>
                         <MudDivider />
                         <MudCardContent>
-                            <MudText>category :@EventCategoryName.CategoryName</MudText>
-                            <MudText>
-                                Service:
+                            <MudText Typo="Typo.h6">category :@EventCategoryName.CategoryName</MudText>
+                            <MudText Typo="Typo.h6">Service:
                                 @if (EventModel.SelectedService != null) { selectedServiceList = EventModel.SelectedService.Split(',').ToList(); }
                                 @foreach (var service in selectedServiceList)
-                                {<MudChip>@service</MudChip>}
+                                {
+                                <MudChip Color="Color.Info">@service</MudChip>                                }
                             </MudText>
                         </MudCardContent>
                     </MudCard>
-
-
                 </MudItem>
                 <MudItem xs="12">
                     <MudCard Elevation="10" Style="height: 100%" Class="pa-4 rounded-lg">
@@ -64,9 +93,9 @@
                             <CardHeaderContent>
                                 <MudText Typo="Typo.h4">
                                     Event payment:
-                                    @if (PaymentList is not null && PaymentList.Any())
+                    @if (PaymentList is not null && PaymentList.Any())
                                     {
-                                        @ValidCurrency(PaymentList.FirstOrDefault().TotalAmount)
+                        @ValidCurrency(PaymentList.FirstOrDefault().TotalAmount)
                                     }
                                 </MudText>
                             </CardHeaderContent>
@@ -101,7 +130,7 @@
                                     <MudItem md="2">@ValidCurrency(@payment.ReceivedAmount)</MudItem>
                                     <MudItem md="2">@ValidCurrency(@payment.RemainingAmount)</MudItem>
                                     <MudItem md="2">@payment.Transactionid</MudItem>
-                                    <MudItem md="4">@payment.CreatedOn.ToLocalTime()</MudItem>
+                                    <MudItem md="4">@payment.CreatedOn.ToLongDateString()</MudItem>
                                 </MudGrid>
                             }
 
@@ -123,9 +152,9 @@
                 <MudDivider />
                 <MudCardContent>
                     <MudGrid>
-                        <MudItem md="4">Service</MudItem>
-                        <MudItem md="4">Staff Name</MudItem>
-                        <MudItem md="4">Status</MudItem>
+                        <MudItem md="4"><MudText Typo="Typo.h6">Service</MudText></MudItem>
+                        <MudItem md="4"><MudText Typo="Typo.h6">Staff Name</MudText></MudItem>
+                        <MudItem md="4"><MudText Typo="Typo.h6">Status</MudText></MudItem>
                     </MudGrid>
                     @foreach (var OperatorWork in GetEventStaffWork())
                     {
@@ -140,11 +169,8 @@
                         </MudGrid>
 
                     }
-
-
                 </MudCardContent>
             </MudCard>
         </MudItem>
-
     </MudGrid>
 </MudContainer>

@@ -5,6 +5,7 @@ using EventMentorSystem.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using MudBlazor;
 using System;
@@ -23,6 +24,7 @@ namespace EventMentorSystem.Pages.UserM
         public GlobalParameter _parameters { get; set; }
         [Inject] SignInManager<User> SignInManager { get; set; }
         [Inject] ISnackbar _snackbar { get; set; }
+
         [Inject] UserManager<User> UserManager { get; set; }
 
 
@@ -33,6 +35,23 @@ namespace EventMentorSystem.Pages.UserM
         private Operator OperatorModel = new();
         private Admin AdminModel = new();
         private Staff StaffModel = new();
+        private HubConnection hubConnection;
+        protected override async Task OnInitializedAsync()
+        {
+
+            hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+            .Build();
+            hubConnection.On<User>("EventAddUpdate", (events) =>
+            {
+               
+                InvokeAsync(StateHasChanged);
+            });
+
+            await hubConnection.StartAsync();
+
+        }
+
 
         private IEnumerable<string> Emailaddress(string pw)
         {
@@ -97,13 +116,15 @@ namespace EventMentorSystem.Pages.UserM
                                 await UserManager.AddToRoleAsync(user, role);
                             }
                         }
-                        UserModel = new User();
+                        
                         _snackbar.Add("Added successfully", Severity.Success);
                         OnCancelEvent.InvokeAsync();
                         StateHasChanged();
                     }
 
                 }
+                await hubConnection.SendAsync("UsersAddUpdate", UserModel);
+                UserModel = new User();
             }
             catch (Exception ex)
             {

@@ -7,8 +7,8 @@
         }
         <MudDivider Class="my-2" />
         <AuthorizeView Roles="Admin">
-            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard" IconColor="Color.Primary">Dashboard</MudNavLink>
-            <MudNavLink Href="/Inquirylist" Icon="@Icons.Material.TwoTone.AppRegistration" IconColor="Color.Primary">Inquiries</MudNavLink>
+            <MudNavLink Href="/"  Icon="@Icons.Material.Outlined.Dashboard" IconColor="Color.Primary">Dashboard</MudNavLink>
+            <MudNavLink Href="/inquirylist" Icon="@Icons.Material.TwoTone.AppRegistration" IconColor="Color.Primary">Inquiries</MudNavLink>
             <MudNavLink Href="/eventlist" Icon="@Icons.Material.TwoTone.Event" IconColor="Color.Primary">Events</MudNavLink>
             <MudNavLink Href="/staffworkgivenlist" Icon="@Icons.Material.TwoTone.Category" IconColor="Color.Primary">Event Work</MudNavLink>
             <MudNavLink Href="/viewpaymentlist" Icon="@Icons.Material.TwoTone.Payment" IconColor="Color.Primary">Payments</MudNavLink>
@@ -20,7 +20,7 @@
 
         </AuthorizeView>
         <AuthorizeView Roles="Operator">
-            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard" IconColor="Color.Primary">Dashboard</MudNavLink>
+            <MudNavLink Href="/"  Icon="@Icons.Material.Outlined.Dashboard" IconColor="Color.Primary">Dashboard</MudNavLink>
             <MudNavLink Href="/eventlist" Icon="@Icons.Material.TwoTone.Event" IconColor="Color.Primary">Events</MudNavLink>
             <MudNavLink Href="/staffworkgivenlist" Icon="@Icons.Material.TwoTone.Category" IconColor="Color.Primary">Event Work</MudNavLink>
             <MudNavLink Href="/eventcategorylist" Icon="@Icons.Material.TwoTone.ViewList" IconColor="Color.Primary">Categories</MudNavLink>
@@ -29,7 +29,7 @@
             <MudNavLink Href="/identity/account/logout" Icon="@Icons.Material.Filled.Logout" IconColor="Color.Primary">Logout</MudNavLink>
         </AuthorizeView>
         <AuthorizeView Roles="Staff">
-            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard" IconColor="Color.Primary">Dashboard</MudNavLink>
+            <MudNavLink Href="/"  Icon="@Icons.Material.Outlined.Dashboard" IconColor="Color.Primary">Dashboard</MudNavLink>
             <MudNavLink Href="/viewstaffworklist" Icon="@Icons.Material.TwoTone.Category" IconColor="Color.Primary">View Work</MudNavLink>
             <MudNavLink Href="/identity/account/logout" Icon="@Icons.Material.Filled.Logout" IconColor="Color.Primary">Logout</MudNavLink>
         </AuthorizeView>

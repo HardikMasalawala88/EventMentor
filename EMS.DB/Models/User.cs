@@ -13,7 +13,7 @@ namespace EMS.DB.Models
     {
         [Required]
         [StringLength(30, ErrorMessage = "This field length can't be more than 30.")]
-        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
+        [RegularExpression(@"^[A-Za-z\s]+$", ErrorMessage = "please enter only alphabets.")]
         public string FullName { get; set; }
 
         [Required]

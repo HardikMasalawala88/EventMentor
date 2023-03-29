@@ -6,6 +6,7 @@
 @inject IStaffRepository _StaffRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
+@inject NavigationManager NavigationManager;
 @inject IDialogService DialogService;
 @using EMS.DB.Constant
 
@@ -13,7 +14,7 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">Worklist</MudText>
         <MudSpacer />
-        <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>Action</MudTh>
@@ -43,13 +44,13 @@
         <MudTd DataLabel="Id">
             @if (context.Status == Status.pending.ToString())
             {
-<MudAlert Severity="Severity.Success">@context.Status</MudAlert> }
+<MudAlert Severity="Severity.Error">@context.Status</MudAlert> }
                     else if (context.Status == Status.OnProcess.ToString())
                     {
 <MudAlert Severity="Severity.Warning">@context.Status</MudAlert> }
                     else
                     {
-<MudAlert Severity="Severity.Error">@context.Status</MudAlert>                    }
+<MudAlert Severity="Severity.Success">@context.Status</MudAlert>                    }
         </MudTd>
     </RowTemplate>
     <PagerContent>
@@ -65,7 +66,7 @@
     private IEnumerable<EventStaffWork> pagedData;
     [CascadingParameter(Name = "cascadeParameters")]
     public GlobalParameter _parameters { get; set; }
-
+    private HubConnection hubConnection;
     private bool IsEdit;
     private bool IsAdd;
     private bool IsStatus;
@@ -102,7 +103,21 @@
                 }
             }
         }
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+            .Build();
+
+        hubConnection.On<EventStaffWork>("EventAddUpdate", (events) =>
+        {
+            tableRef.ReloadServerData();
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+
     }
+   
     private bool Search(EventStaffWork EventStaffWorks)
     {
         if (string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(searchString)
@@ -135,7 +150,6 @@
         data = _EventStaffWorkRepository.GetListByStaff(userId);
 
         data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
-        data = data.OrderByDirection(state.SortDirection, o => o.Event.FromDate.Value);
         totalItemsOperator = data.Count();
 
         pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
@@ -194,4 +208,6 @@
         searchString = text;
         tableRef.ReloadServerData();
 
-    } }
+    }
+
+    }

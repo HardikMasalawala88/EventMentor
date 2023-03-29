@@ -8,7 +8,9 @@
 @inject IEventCategoryRepository _EventCategoryRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
-@inject IDialogService DialogService
+@inject IDialogService DialogService;
+@inject NavigationManager NavigationManager;
+
 @*<h3>AddStaffDialog</h3>*@
 <EditForm Model="@staffModel" OnValidSubmit="Save">
     <DataAnnotationsValidator />
@@ -19,10 +21,10 @@
                     <MudTextField @bind-Value="staffModel.User.UserName" For="@(() => staffModel.User.UserName)" Class="m-0" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
                 </MudItem>
                 <MudItem lg="4" md="4" xs="12">
-                    <MudTextField @bind-Value="staffModel.User.ContactNo" For="@(() => staffModel.User.ContactNo)" Class="m-0" Label="MobileNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                    <MudTextField @bind-Value="staffModel.User.ContactNo" For="@(() => staffModel.User.ContactNo)" Class="m-0" Label="Mobile No" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
                 </MudItem>
                 <MudItem lg="4" md="4" xs="12">
-                    <MudTextField @bind-Value="staffModel.User.Email" For="@(() => staffModel.User.Email)" Class="m-0" Label="AltPhoneNo" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                    <MudTextField @bind-Value="staffModel.User.Email" For="@(() => staffModel.User.Email)" Class="m-0" Label="AltPhone No" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
                 </MudItem>
                 <MudItem>
                     <MudSelect @bind-Value="staffModel.StaffService" For="@(() => staffModel.StaffService)" Label="select Service" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Required="true" RequiredError="Service is required.">
@@ -50,6 +52,23 @@
     private CategoryService ServiceModel = new();
     private List<CategoryService> ServiceList = new();
     private string searchString = "";
+    private HubConnection hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+        .Build();
+        hubConnection.On<Staff>("staffAddUpdate", (staffs) =>
+        {
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+
+    }
+
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -81,20 +100,19 @@
         staffModel = StaffModel;
         base.OnInitialized();
     }
-    private void Save()
+    private async Task Save()
     {
         try
         {
             _StaffRepository.Update(staffModel);
+            //await hubConnection.SendAsync("ServiceAddUpdate", StaffModel);
             MudDialog.Close(DialogResult.Ok(true));
             staffModel = new Staff();
-
         }
         catch (Exception ex)
         {
             _parameters.ShowErrorMessages(ex);
         }
-
     }
     private void CancelForm()
     {

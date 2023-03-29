@@ -29,8 +29,9 @@ namespace EMS.DB.Repository
         public async Task<List<NotificationMessages>> GetMessages(string userId)
         {
             using AppDbContext _myContext = base.GetContext();
-            return await _myContext.NotificationMessages.Include(x => x.User).Where(x => x.UserId == userId).ToListAsync();
+            return await _myContext.NotificationMessages.Include(x => x.User).Where(x => x.UserId == userId && x.CreatedOn==DateTime.Today).ToListAsync();
         }
+
 
         public async Task InsertAsync(NotificationMessages NotificationMessageModel)
         {

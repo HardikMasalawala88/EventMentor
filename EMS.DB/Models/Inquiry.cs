@@ -11,7 +11,7 @@ namespace EMS.DB.Models
     {
     
         [Required]
-        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
+        [RegularExpression(@"^[A-Za-z\s]+$", ErrorMessage = "please enter only alphabets.")]
         public string Fullname { get; set; }
 
         [Required]
@@ -27,22 +27,22 @@ namespace EMS.DB.Models
         public string Email { get; set; }
 
         [Required]
-        [StringLength(15, ErrorMessage = "Address Line1 length can't be more than 15.")]
+        [StringLength(20, ErrorMessage = "Address Line1 length can't be more than 20.")]
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
         [Required]
-        [StringLength(10, ErrorMessage = "Landmark length can't be more than 10.")]
+        [StringLength(15, ErrorMessage = "Landmark length can't be more than 15.")]
         public string Landmark { get; set; }
         [Required]
         [RegularExpression(@"^[0-9]{6}$", ErrorMessage = "please enter valid Pincode.")]
         public string Pincode { get; set; }
 
         [Required]
-        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
+        [RegularExpression(@"^[A-Za-z\s]+$", ErrorMessage = "please enter only alphabets.")]
         public string City { get; set; }
 
         [Required]
-        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
+        [RegularExpression(@"^[A-Za-z\s]+$", ErrorMessage = "please enter only alphabets.")]
         public string State { get; set; }
 
         [Required]

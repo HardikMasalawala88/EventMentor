@@ -3,6 +3,7 @@ using EMS.DB.Models;
 using EventMentorSystem.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor;
 using System;
 using System.Collections.Generic;
@@ -35,12 +36,13 @@ namespace EventMentorSystem.Pages.dashboard
         private MudTable<EventStaffWork> tableRefEventStaffWork;
         private int totalItems;
         private int totaleventforOprator;
-        private string nowork = "No Work";
+        public string nowork = "No Work";
         private List<Event> OpratorWorkPlace;
         private string userId;
         private int totalItemsOperator;
         private List<EventStaffWork> EventStaffWorkList = new();
         private List<EventStaffWork> StaffWorkList = new();
+        private HubConnection hubConnection;
 
         [Inject]
         public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
@@ -69,6 +71,23 @@ namespace EventMentorSystem.Pages.dashboard
                     }
                 }
             }
+            hubConnection = new HubConnectionBuilder()
+       .WithUrl(_NavigationManager.ToAbsoluteUri("/chathub"))
+       .Build();
+            hubConnection.On<Event>("EventAddUpdate", (events) =>
+            {
+                GetAllevents();
+                InvokeAsync(StateHasChanged);
+            });
+            hubConnection.On<EventStaffWork>("WorkAddUpdate", (EventStaffWorks) =>
+            {
+                GetstaffWork();
+                GetAllTodate();
+                InvokeAsync(StateHasChanged);
+            });
+
+            await hubConnection.StartAsync();
+
         }
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
@@ -82,6 +101,8 @@ namespace EventMentorSystem.Pages.dashboard
                 GetstaffWork();
                 GeteventTotal();
                 GeteventforOperator();
+               
+                StateHasChanged();
             }
 
             return base.OnAfterRenderAsync(firstRender);
@@ -89,9 +110,9 @@ namespace EventMentorSystem.Pages.dashboard
 
         private List<Event> GetAllevents()
         {
+            tableRef.ReloadServerData();
             eventList = _EventRepository.GetList();
             Totalevent = eventList.Count();
-            StateHasChanged();
             return eventList;
         }
         
@@ -102,13 +123,11 @@ namespace EventMentorSystem.Pages.dashboard
         private List<Event> GeteventforOperator()
         {
             OpratorWorkPlace = _EventRepository.GetListToday(userId);
-            StateHasChanged();
             return OpratorWorkPlace;
         }
         private List<Staff> Getstaff()
         {
             stafflist = _StaffRepository.GetStaffByUserId(userId);
-            StateHasChanged();
             return stafflist;
         }
         private List<User> GetUserList()
@@ -128,14 +147,21 @@ namespace EventMentorSystem.Pages.dashboard
         }
         private List<EventStaffWork> GetAllTodate()
         {
+            if (tableRefEventStaffWork is not null)
+            {
+                tableRefEventStaffWork.ReloadServerData();
+            }
             EventStaffWorkList = _EventStaffWorkRepository.GetListToday();
             return EventStaffWorkList;
         }
         private List<EventStaffWork> GetstaffWork()
         {
+            if (tableRefEventStaffWork is not null)
+            {
+                tableRefEventStaffWork.ReloadServerData();
+            }
             StaffWorkList = _EventStaffWorkRepository.GetListByStaff(userId);
             TotalWork = StaffWorkList.Count();
-            StateHasChanged();
             return StaffWorkList;
         }
 

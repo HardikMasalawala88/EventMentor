@@ -7,6 +7,9 @@
 @inject IEventCategoryRepository _EventCategoryRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject IDialogService DialogService
+@inject NavigationManager NavigationManager;
+
+
 <MudDialog>
     <DialogContent>
         <MudGrid>
@@ -17,16 +20,16 @@
                 <MudTextField @bind-Value="inquiryModel.Fullname" Class="m-0" Label="Full Name" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.MobileNo" Class="m-0" Label="MobileNo" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.MobileNo" Class="m-0" Label="Mobile No" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.AltPhoneNo" Class="m-0" Label="AltPhoneNo" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.AltPhoneNo" Class="m-0" Label="AltPhone No" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
                 <MudTextField @bind-Value="inquiryModel.Email" Class="m-0" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudTextField @bind-Value="inquiryModel.NoOfAttendee" Class="m-0" Label="NoOfAttendee" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
+                <MudTextField @bind-Value="inquiryModel.NoOfAttendee" Class="m-0" Label="No Of Attendee" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
                 <MudTextField @bind-Value="inquiryModel.AddressLine1" Class="m-0" Label="AddressLine1" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
@@ -47,7 +50,7 @@
                 <MudTextField @bind-Value="inquiryModel.State" Class="m-0" Label="State" Variant="Variant.Outlined" Margin="Margin.Normal" ReadOnly="isReadOnly"></MudTextField>
             </MudItem>
             <MudItem lg="4" md="4" xs="12">
-                <MudText>SlotType</MudText>
+                <MudText>Slot Type</MudText>
                 <MudRadioGroup @bind-SelectedOption="@inquiryModel.SlotType">
                     <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
                     <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
@@ -67,7 +70,7 @@
         <MudItem lg="4" md="4" xs="12">
             
             <MudSelect @bind-Value="inquiryModel.EventCategoryId" T="long"  Label="selected categorys" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                @foreach (var eventCategory in EventCategoryList)
+                @foreach (var eventCategory in GetEventCategoryList())
                 {
                     <MudSelectItem Value="@eventCategory.Id">@eventCategory.CategoryName</MudSelectItem>
                 }
@@ -80,11 +83,23 @@
 
     </DialogContent>
     <DialogActions>
-        @if (!string.IsNullOrEmpty(inquiryModel.Additionalnotes))
+        @if (!string.IsNullOrEmpty(inquiryModel.Additionalnotes) && !checkevent(inquiryModel.Id).Any())
         {
-            <MudButton OnClick="()=>reject(inquiryModel.Id)" Variant="Variant.Filled" Color="Color.Error">Reject Inquiry</MudButton>
-            <MudButton OnClick="@(() => OpenDialog(inquiryModel,eventModel))" Variant="Variant.Filled" Color="Color.Primary">Create Event</MudButton>
+            <MudButton OnClick="() => reject(inquiryModel.Id)" Variant="Variant.Filled" Color="Color.Error">Reject Inquiry</MudButton>
+            <MudButton OnClick="@(() => OpenDialog(inquiryModel, eventModel))" Variant="Variant.Filled" Color="Color.Primary">Create Event</MudButton>
         }
+        else
+        {
+            if (checkevent(inquiryModel.Id).Any())
+            {
+                <MudButton Variant="Variant.Filled">
+                    <FontLabel Fontweight="500" FontColor="ToryBlue">
+                        <MudLink Href="/eventlist"  Underline="Underline.None">Go to Event</MudLink>
+                    </FontLabel>
+                </MudButton>
+            }
+        }
+
         <MudButton OnClick="CancelForm" Variant="Variant.Filled" Color="Color.Error">Cancel</MudButton>
         <MudButton Color="Color.Primary" OnClick="Save" Variant="Variant.Filled">Edit</MudButton>
 
@@ -99,8 +114,26 @@
     private Inquiry inquiryModel = new();
     private List<EventCategory> EventCategoryList = new();
     private Event eventModel = new();
+    private List<Event> eventlist = new();
 
     private List<Inquiry> inquiryList = new();
+
+    private HubConnection hubConnection;
+    protected override async Task OnInitializedAsync()
+    {
+
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+        .Build();
+        hubConnection.On<Inquiry>("InquiryAddUpdate", (inquirys) =>
+        {
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+
+    }
+
 
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
@@ -109,6 +142,12 @@
     {
         inquiryList = _InquiryRepository.GetLists();
         return inquiryList;
+    }
+
+    private List<Event> checkevent(long id)
+    {
+        eventlist = _EventRepository.CheckEvent(id);
+        return eventlist;
     }
 
     protected override void OnInitialized()
@@ -120,17 +159,19 @@
         inquiryModel = InquiryModel;
         base.OnInitialized();
     }
-    private void GetEventCategoryList()
+    private List<EventCategory> GetEventCategoryList()
     {
         EventCategoryList = _EventCategoryRepository.GetList();
+        return EventCategoryList;
     }
 
-    private void Save()
+    private async Task Save()
     {
         try
         {
             _InquiryRepository.Insert(inquiryModel);
             MudDialog.Close(DialogResult.Ok(true));
+            await hubConnection.SendAsync("InquiryAddUpdate", inquiryModel);
             inquiryModel = new Inquiry();
 
         }
@@ -141,13 +182,13 @@
 
     }
 
-    private void reject(long id)
+    private async Task reject(long id)
     {
         try
         {
             _InquiryRepository.Delete(id);
+            await hubConnection.SendAsync("InquiryAddUpdate", inquiryModel);
             GetLists();
-
             MudDialog.Close(DialogResult.Ok(true));
             inquiryModel = new Inquiry();
             Snackbar.Add("Inquiry Rejected Successfull.", Severity.Success);
@@ -155,7 +196,7 @@
         }
         catch (Exception ex)
         {
-            _parameters.ShowErrorMessages(ex);
+            await _parameters.ShowErrorMessages(ex);
         }
 
     }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace EMS.DB.Migrations
 {
-    public partial class initial : Migration
+    public partial class initail : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -361,7 +361,7 @@ namespace EMS.DB.Migrations
                     OrganizerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OrganizerContact = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SlotType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FromDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Todate = table.Column<DateTime>(type: "datetime2", nullable: true),

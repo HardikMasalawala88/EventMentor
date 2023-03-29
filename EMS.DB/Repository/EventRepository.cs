@@ -30,7 +30,7 @@ namespace EMS.DB.Repository
         public List<Event> GetList()
         {
             using AppDbContext _myContext = base.GetContext();
-            return _myContext.Events.Include(x => x.Inquiry).Include(x => x.Operator).Include(x => x.Category).ToList();
+            return _myContext.Events.Include(x => x.Inquiry).Include(x => x.Operator.User).Include(x => x.Category).ToList();
             //_appDbContext.Events.Include(x => x.Category).ToList();
             //return _appDbContext.Events.Include(x => x.Inquiry).ToList();
         }
@@ -44,7 +44,12 @@ namespace EMS.DB.Repository
         public List<Event> GetByOpertorId(string id)
         {
             using AppDbContext _myContext = base.GetContext();
-            return _myContext.Events.Include(x => x.Operator).Where(e=>e.Operator.UserId==id).ToList();
+            return _myContext.Events.Include(x => x.Operator.User).Include(x=>x.Category).Where(e=>e.Operator.UserId==id).ToList();
+        }
+        public List<Event> CheckEvent(long id)
+        {
+            using AppDbContext _myContext = base.GetContext();
+            return _myContext.Events.Include(x => x.Inquiry).Where(e => e.InquiryId== id).ToList();
         }
         public List<Event> GetListToday(string id)
         {
@@ -103,7 +108,7 @@ namespace EMS.DB.Repository
         public List<Event> GetListFromDashboard(DateTime? startDate, DateTime? endDate)
         {
             using AppDbContext _myContext = base.GetContext();
-            return _myContext.Events.Where(c => c.FromDate >= startDate.Value && c.FromDate <= endDate.Value).ToList();
+            return _myContext.Events.Include(x => x.Operator.User).Where(c => c.FromDate >= startDate.Value && c.FromDate <= endDate.Value).ToList();
         }
     }
 }

@@ -11,12 +11,12 @@ namespace EMS.DB.Models
     public class Event : BaseEntity
     {
         [Required]
-        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
+        [RegularExpression(@"^[A-Za-z\s]+$", ErrorMessage = "please enter only alphabets.")]
         public string EventName { get; set; }
         [Required]
         public string EventVenue { get; set; }
         [Required]
-        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
+        [RegularExpression(@"^[A-Za-z\s]+$", ErrorMessage = "please enter only alphabets.")]
         public string OrganizerName { get; set; }
         [Required]
         [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "please enter valid contact no.")]
@@ -24,7 +24,7 @@ namespace EMS.DB.Models
         [Required]
         [RegularExpression(@"[a-z0-9\\.]+@[a-z]+\.[a-z]{2,3}", ErrorMessage = "Invalid email address.")]
         public string Email { get; set; }
-        
+        [Required]
         public string Description { get; set; }
 
         [Required]

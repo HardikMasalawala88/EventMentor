@@ -1,13 +1,13 @@
 ﻿@page "/AddUser"
 @attribute [Authorize(Roles = "Admin")]
 @using  EMS.DB.Repository.Interface
+@using EMS.DB.Constant
 @inject IUserRepository _UserRepository;
 @inject IStaffRepository _StaffRepository;
 @inject IOperatorRepository _OperatorRepository;
 @inject IAdminRepository _AdminRepository;
 @inject ISnackbar Snackbar;
-@using EMS.DB.Constant
-@attribute [Authorize(Roles = "Admin")]
+@inject NavigationManager NavigationManager;
 
 @if (_parameters.IsUserLoggedIn())
 {

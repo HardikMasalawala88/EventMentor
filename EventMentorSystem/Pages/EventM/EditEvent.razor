@@ -5,59 +5,61 @@
 @inject IOperatorRepository _OperatorRepository;
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject ISnackbar Snackbar;
+@inject NavigationManager NavigationManager;
+@implements IAsyncDisposable
 <EditForm Model="@eventModel" OnValidSubmit="Save">
-    <DataAnnotationsValidator/>
-        <MudDialog>
-            <DialogContent>
-                <MudGrid>
-                    <MudItem lg="4" md="4" xs="12">
-                        <MudTextField @bind-Value="eventModel.EventName" For="@(() => eventModel.EventName)" Class="m-0" Label="Event Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                    </MudItem>
-                    <MudItem lg="4" md="4" xs="12">
-                        <MudSelect @bind-Value="eventModel.OperatorId" For="@(() => eventModel.OperatorId)" Label="Operator Name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                            @foreach (var data in OperatorList)
-                            {
-                                <MudSelectItem Value="@data.Id">@data.User.FullName</MudSelectItem>
-                            }
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem lg="4" md="4" xs="12">
-                        <MudTextField @bind-Value="eventModel.EventVenue" For="@(() => eventModel.EventVenue)" Class="m-0" Label="EventVenue" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                    </MudItem>
-                    <MudItem lg="4" md="4" xs="12">
-                        <MudTextField @bind-Value="eventModel.OrganizerName" For="@(() => eventModel.OrganizerName)" Class="m-0" Label="Organizer Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                    </MudItem>
-                    <MudItem lg="4" md="4" xs="12">
-                        <MudTextField @bind-Value="eventModel.OrganizerContact" For="@(() => eventModel.OrganizerContact)" Class="m-0" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
-                    </MudItem>
-                    <MudItem lg="4" md="4" xs="12">
-                        <MudSelect @bind-Value="@eventModel.SlotType" For="@(() => eventModel.SlotType)" Class="m-0" T="string" Label="slot" Variant="Variant.Outlined">
-                            <MudSelectItem Value="@(EventSlotType.Morning.ToString())" />
-                            <MudSelectItem Value="@(EventSlotType.Evening.ToString())" />
-                            <MudSelectItem Value="@(EventSlotType.FullDay.ToString())" />
-                            <MudSelectItem Value="@(EventSlotType.MultipleDay.ToString())" />
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem lg="2" md="2" xs="12">
-                        <MudDatePicker Label="From Date" Class="m-0" For="@(() => eventModel.FromDate)" Variant="Variant.Outlined" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy" />
-                    </MudItem>
-                    <MudItem lg="2" md="2" xs="12">
-                        <MudDatePicker Label="To Date" Class="m-0" For="@(() => eventModel.Todate)" Variant="Variant.Outlined" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" />
-                    </MudItem>
-                    <MudItem lg="4" md="4" xs="12">
-                        <MudSwitch @bind-Checked="eventModel.IsApproved" For="@(() => eventModel.IsApproved)" Class="m-0" Color="Color.Primary" Label="Approved?" />
-                        <MudSwitch @bind-Checked="eventModel.Ispaymentdone" For="@(() => eventModel.Ispaymentdone)" Class="m-0" Color="Color.Primary" Label="Payment Done?" />
-                    </MudItem>
-                    <MudItem lg="12" md="12" xs="12">
-                        <MudTextField T="string" @bind-Value="eventModel.Description" Class="m-0" Label="Description" Variant="Variant.Outlined" Lines="2" />
-                    </MudItem>
-                </MudGrid>
-    </DialogContent>
-    <DialogActions>
-        <MudButton Color="Color.Primary" ButtonType="ButtonType.Submit" Variant="Variant.Filled">Update</MudButton>
-    </DialogActions>
-</MudDialog>
-   
+    <DataAnnotationsValidator />
+    <MudDialog>
+        <DialogContent>
+            <MudGrid>
+                <MudItem lg="4" md="4" xs="12">
+                    <MudTextField @bind-Value="eventModel.EventName" For="@(() => eventModel.EventName)" Class="m-0" Label="Event Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                </MudItem>
+                <MudItem lg="4" md="4" xs="12">
+                    <MudSelect @bind-Value="eventModel.OperatorId" For="@(() => eventModel.OperatorId)" Label="Operator Name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var data in OperatorList)
+                        {
+                            <MudSelectItem Value="@data.Id">@data.User.FullName</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem lg="4" md="4" xs="12">
+                    <MudTextField @bind-Value="eventModel.EventVenue" For="@(() => eventModel.EventVenue)" Class="m-0" Label="Event Venue" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                </MudItem>
+                <MudItem lg="4" md="4" xs="12">
+                    <MudTextField @bind-Value="eventModel.OrganizerName" For="@(() => eventModel.OrganizerName)" Class="m-0" Label="Organizer Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                </MudItem>
+                <MudItem lg="4" md="4" xs="12">
+                    <MudTextField @bind-Value="eventModel.OrganizerContact" For="@(() => eventModel.OrganizerContact)" Class="m-0" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+                </MudItem>
+                <MudItem lg="4" md="4" xs="12">
+                    <MudSelect @bind-Value="@eventModel.SlotType" For="@(() => eventModel.SlotType)" Class="m-0" T="string" Label="Event Slot Time" Variant="Variant.Outlined">
+                        <MudSelectItem Value="@(EventSlotType.Morning.ToString())" />
+                        <MudSelectItem Value="@(EventSlotType.Evening.ToString())" />
+                        <MudSelectItem Value="@(EventSlotType.FullDay.ToString())" />
+                        <MudSelectItem Value="@(EventSlotType.MultipleDay.ToString())" />
+                    </MudSelect>
+                </MudItem>
+                <MudItem lg="2" md="2" xs="12">
+                    <MudDatePicker Label="From Date" Class="m-0" For="@(() => eventModel.FromDate)" Variant="Variant.Outlined" @bind-Date="eventModel.FromDate" DateFormat="dd.MM.yyyy" />
+                </MudItem>
+                <MudItem lg="2" md="2" xs="12">
+                    <MudDatePicker Label="To Date" Class="m-0" For="@(() => eventModel.Todate)" Variant="Variant.Outlined" @bind-Date="eventModel.Todate" DateFormat="dd.MM.yyyy" />
+                </MudItem>
+                <MudItem lg="4" md="4" xs="12">
+                    <MudSwitch @bind-Checked="eventModel.IsApproved" For="@(() => eventModel.IsApproved)" Class="m-0" Color="Color.Primary" Label="Approved?" />
+                    <MudSwitch @bind-Checked="eventModel.Ispaymentdone" For="@(() => eventModel.Ispaymentdone)" Class="m-0" Color="Color.Primary" Label="Payment Done?" />
+                </MudItem>
+                <MudItem lg="12" md="12" xs="12">
+                    <MudTextField T="string" @bind-Value="eventModel.Description" Class="m-0" Label="Description" Variant="Variant.Outlined" Lines="2" />
+                </MudItem>
+            </MudGrid>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Primary" ButtonType="ButtonType.Submit" Variant="Variant.Filled">Update</MudButton>
+        </DialogActions>
+    </MudDialog>
+
 </EditForm>
 
 
@@ -75,6 +77,23 @@
     private List<Operator> OperatorList = new();
     private List<Operator> operatorlist = new();
     private string name { get; set; }
+    private HubConnection hubConnection;
+
+   
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+            .Build();
+
+        hubConnection.On<Event>("EventAddUpdate", (events) =>
+        {
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+    }
 
 
     protected override void OnInitialized()
@@ -101,7 +120,6 @@
     private List<Operator> GetOperatorlist()
     {
         OperatorList = _OperatorRepository.GetLists();
-        StateHasChanged();
         return OperatorList;
     }
     private List<Event> GetAllevents()
@@ -111,8 +129,8 @@
     }
     private void Operatorname()
     {
-        operatorlist= _OperatorRepository.GetById(eventModel.OperatorId);
-        foreach(var data in operatorlist)
+        operatorlist = _OperatorRepository.GetById(eventModel.OperatorId);
+        foreach (var data in operatorlist)
         {
             name = data.User.FullName;
         }
@@ -123,8 +141,8 @@
         try
         {
             _EventRepository.Update(eventModel);
-            MudDialog.Close(DialogResult.Ok(true));
-            NotificationMessagesModel.Message = $"Edit Event  {eventModel.EventName}: By {name}.";
+            await hubConnection.SendAsync("EventAddUpdate", eventModel);
+            NotificationMessagesModel.Message = $"Edit Event  {eventModel.EventName}: By .";
             NotificationMessagesModel.Title = "Edit Event";
             NotificationMessagesModel.UserId = _parameters.UserId;
             NotificationMessagesModel.EventId = eventModel.Id;
@@ -132,6 +150,7 @@
             await _parameters.hubConnection.SendAsync("SendMessage", NotificationMessagesModel);
             Snackbar.Add("Data Update Successfull.", Severity.Success);
             eventModel = new Event();
+            MudDialog.Close(DialogResult.Ok(true));
             StateHasChanged();
         }
         catch (Exception ex)
@@ -139,6 +158,13 @@
             _parameters.ShowErrorMessages(ex);
         }
 
+    }
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
     }
 
 }

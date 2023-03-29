@@ -8,12 +8,14 @@
 @inject IUserRepository _UserRepository;
 @inject IStaffRepository _StaffRepository;
 @inject ICategoryServiceRepository _CategoryServiceRepository;
-@inject IDialogService DialogService
+@inject IDialogService DialogService;
+@inject NavigationManager NavigationManager;
+
         <MudTable Elevation="25"  @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<Staff>>>(ServerReload))" T="Staff"  Filter="new Func<Staff, bool>(Search)" @bind-customer="StaffList" HorizontalScrollbar="true" Breakpoint="Breakpoint.Sm" Class="my-2">
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Update Staff List</MudText>
                 <MudSpacer />
-                <MudTextField Value="searchString" T="string"  ValueChanged="@(s => OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField Value="searchString" T="string" ValueChanged="@(s => OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Action</MudTh>
@@ -63,7 +65,23 @@
     private MudTable<Staff> tableRef;
     private IEnumerable<Staff> pagedData;
     private int totalItems;
+    private HubConnection hubConnection;
 
+    protected override async Task OnInitializedAsync()
+    {
+
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+        .Build();
+        hubConnection.On<Staff>("staffAddUpdate", (staffs) =>
+        {
+            tableRef.ReloadServerData();
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+
+    }
     private List<CategoryService> GetAll()
     {
         Servicelist = _CategoryServiceRepository.GetList();
@@ -117,25 +135,6 @@
     }
 
 
-    //private bool Search(User user)
-    //{
-    //    if (StringValid(user.UserName)
-    //    && StringValid(user.ContactNo)
-    //    && StringValid(user.Email)
-    //    && StringValid(user.Useraddress)
-    //    &&
-    //    user.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-    //    || user.ContactNo.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-    //    || user.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-    //    || user.Useraddress.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-    //    )
-    //    {
-    //        return true;
-    //    }
-
-    //    return false;
-    //}
-
     private async Task<TableData<Staff>> ServerReload(TableState state)
     {
         IEnumerable<Staff> data;
@@ -144,7 +143,6 @@
         data = _StaffRepository.GetList();
 
         data = data.Where(selectedModel => { return Search(selectedModel); }).ToArray();
-        data = data.OrderByDirection(state.SortDirection, o => o.User.FullName);
         totalItems = data.Count();
 
         pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
@@ -161,20 +159,6 @@
         return false;
     }
 
-    private void Save()
-    {
-        try
-        {
-            _StaffRepository.Insert(StaffModel);
-            tableRef.ReloadServerData();
-            //GetAllstaff();
-            StaffModel = new Staff();
-        }
-        catch (Exception ex)
-        {
-            _parameters.ShowErrorMessages(ex);
-        }
-    }
 
     private void ShowAddForm()
     {
@@ -201,13 +185,14 @@
         userModel = new User();
     }
 
-    private void Delete(long id)
+    private async Task Delete(long id)
     {
         try
         {
             _StaffRepository.Delete(id);
             tableRef.ReloadServerData();
-            //GetAlluser();
+            await hubConnection.SendAsync("ServiceAddUpdate", StaffModel);
+
         }
         catch (Exception ex)
         {

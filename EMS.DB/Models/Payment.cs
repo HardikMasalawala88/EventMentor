@@ -11,7 +11,7 @@ namespace EMS.DB.Models
     {
         
         [Required]
-        [RegularExpression(@"^[A-Za-z]+$", ErrorMessage = "please enter only alphabets.")]
+        [RegularExpression(@"^[A-Za-z\s]+$", ErrorMessage = "please enter only alphabets.")]
         public string PaymentMode { get; set; }
 
         [Required]
