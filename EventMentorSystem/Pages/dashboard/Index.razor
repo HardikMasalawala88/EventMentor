@@ -19,7 +19,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Events</MudText>
-                        <MudText Typo="Typo.h5">@Totalevent</MudText>
+                        <MudText Typo="Typo.h6">@Totalevent</MudText>
                     </div>
                 </MudPaper>
             </MudItem>
@@ -28,7 +28,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Users</MudText>
-                        <MudText Typo="Typo.h5">@Totaluser</MudText>
+                        <MudText Typo="Typo.h6">@Totaluser</MudText>
                     </div>
                 </MudPaper>
             </MudItem>
@@ -37,7 +37,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.MiscellaneousServices" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Service</MudText>
-                        <MudText Typo="Typo.h5">@Totalservice</MudText>
+                        <MudText Typo="Typo.h6">@Totalservice</MudText>
                     </div>
                 </MudPaper>
             </MudItem>
@@ -69,11 +69,11 @@
                         <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                     </ToolBarContent>
                     <HeaderContent>
-                        <MudTh>Event Name</MudTh>
-                        <MudTh>Operator name</MudTh>
-                        <MudTh>Event Venue</MudTh>
-                        <MudTh>Organizer Name</MudTh>
-                        <MudTh>Organizer contact </MudTh>
+                        <MudTh>Event</MudTh>
+                        <MudTh>Operator Name</MudTh>
+                        <MudTh>Venue</MudTh>
+                        <MudTh>Organizer Name(#Contact)</MudTh>
+                        @*<MudTh>Organizer Contact No</MudTh>*@
                         <MudTh>Event Date</MudTh>
 
                     </HeaderContent>
@@ -82,8 +82,8 @@
                         <MudTd DataLabel="Event Name">@data.EventName</MudTd>
                         <MudTd DataLabel="">@data.Operator.User.FullName</MudTd>
                         <MudTd DataLabel="">@data.EventVenue</MudTd>
-                        <MudTd DataLabel="">@data.OrganizerName</MudTd>
-                        <MudTd DataLabel="">@data.OrganizerContact</MudTd>
+                        <MudTd DataLabel="">@data.OrganizerName@(string.Concat("(#", @data.OrganizerContact, ")"))</MudTd>
+                        @*<MudTd DataLabel="">@data.OrganizerContact</MudTd>*@
                         <MudTd DataLabel="">
                             @data.FromDate?.ToLongDateString()
                             @if (@data.Todate.HasValue)
@@ -111,8 +111,8 @@
                         <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                     </ToolBarContent>
                     <HeaderContent>
-                        <MudTh>Event Name</MudTh>
-                        <MudTh>Event Venue</MudTh>
+                        <MudTh>Event</MudTh>
+                        <MudTh>Venue</MudTh>
                         @*<MudTh>Staff Name</MudTh>*@
                         <MudTh>From Date</MudTh>
                         <MudTh>Service</MudTh>
@@ -143,7 +143,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Events</MudText>
-                        <MudText Typo="Typo.h5">@totaleventforOprator</MudText>
+                        <MudText Typo="Typo.h6">@totaleventforOprator</MudText>
                     </div>
                 </MudPaper>
             </MudItem>
@@ -152,7 +152,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.MiscellaneousServices" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Today Event Name</MudText>
-                        <MudText Typo="Typo.h5">
+                        <MudText Typo="Typo.h6">
                             @if (OpratorWorkPlace is not null)
                             {
                                 @foreach (var data in GeteventforOperator())
@@ -169,7 +169,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Today Event Venue</MudText>
-                        <MudText Typo="Typo.h5">
+                        <MudText Typo="Typo.h6">
                             @if (OpratorWorkPlace is not null)
                             {
                                 foreach (var data in OpratorWorkPlace)
@@ -194,11 +194,11 @@
                             <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                         </ToolBarContent>
                         <HeaderContent>
-                            <MudTh>Event Name</MudTh>
-                            <MudTh>Operator name</MudTh>
-                            <MudTh>Event Venue</MudTh>
-                            <MudTh>Organizer Name</MudTh>
-                            <MudTh>Organizer contact </MudTh>
+                            <MudTh>Event</MudTh>
+                            <MudTh>Operator Name</MudTh>
+                            <MudTh>Venue</MudTh>
+                            <MudTh>Organizer Name(#Contact)</MudTh>
+                            @*<MudTh>Organizer Contact No</MudTh>*@
                             <MudTh>Event Date</MudTh>
 
                         </HeaderContent>
@@ -207,8 +207,8 @@
                             <MudTd DataLabel="Event Name">@data.EventName</MudTd>
                             <MudTd DataLabel="">@data.Operator.User.FullName</MudTd>
                             <MudTd DataLabel="">@data.EventVenue</MudTd>
-                            <MudTd DataLabel="">@data.OrganizerName</MudTd>
-                            <MudTd DataLabel="">@data.OrganizerContact</MudTd>
+                            <MudTd DataLabel="">@data.OrganizerName@(string.Concat("(#", @data.OrganizerContact, ")"))</MudTd>
+                            @*<MudTd DataLabel="">@data.OrganizerContact</MudTd>*@
                             <MudTd DataLabel="">
                                 @data.FromDate?.ToLongDateString()
                                 @if (@data.Todate.HasValue)
@@ -235,7 +235,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Work</MudText>
-                        <MudText Typo="Typo.h5">@TotalWork</MudText>
+                        <MudText Typo="Typo.h6">@TotalWork</MudText>
                     </div>
                 </MudPaper>
             </MudItem>
@@ -246,7 +246,7 @@
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Todate WorkPlace</MudText>
                         @foreach (var data in EventStaffWorkList)
                         {
-                            <MudText Typo="Typo.h5">@data.Event.EventVenue</MudText>
+                            <MudText Typo="Typo.h6">@data.Event.EventVenue</MudText>
                         }
                     </div>
                 </MudPaper>
@@ -262,7 +262,8 @@
                             {
                                 if (staff.StaffService == service.Id)
                                 {
-                                    <MudText Typo="Typo.h5">@service.ServiceName</MudText>
+                                    <MudText Typo="Typo.h6
+                                             ">@service.ServiceName</MudText>
                                 }
                             }
                         }
@@ -282,8 +283,8 @@
                             <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                         </ToolBarContent>
                         <HeaderContent>
-                            <MudTh>Event Name</MudTh>
-                            <MudTh>Event Venue</MudTh>
+                            <MudTh>Event</MudTh>
+                            <MudTh>Venue</MudTh>
                             @*<MudTh>Staff Name</MudTh>*@
                             <MudTh>From Date</MudTh>
                             <MudTh>Service</MudTh>
@@ -316,8 +317,8 @@
                             <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                         </ToolBarContent>
                         <HeaderContent>
-                            <MudTh>Event Name</MudTh>
-                            <MudTh>Event Venue</MudTh>
+                            <MudTh>Event</MudTh>
+                            <MudTh>Venue</MudTh>
                             @*<MudTh>Staff Name</MudTh>*@
                             <MudTh>From Date</MudTh>
                             <MudTh>Service</MudTh>
@@ -335,7 +336,6 @@
                             <MudTablePager PageSizeOptions="new int[] { 5,10,20,50}" />
                         </PagerContent>
                     </MudTable>
-               
             </MudItem>
         </MudGrid>
     </Authorized>

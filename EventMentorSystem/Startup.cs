@@ -13,14 +13,10 @@ using Microsoft.AspNetCore.ResponseCompression;
 using BlazorServerSignalRApp.Server.SignalRHubs;
 using System.Linq;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.AspNetCore.Components.Authorization;
-using EventMentorSystem.Authentication;
 using EMS.DB.Models;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using System;
-using System.Threading.Tasks;
 
 namespace EventMentorSystem
 {
@@ -39,6 +35,8 @@ namespace EventMentorSystem
         {
             services.AddAuthentication("Identity.Application").AddCookie();
             #region Connection String
+            services.AddControllers();
+
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();

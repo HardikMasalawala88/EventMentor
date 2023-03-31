@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Pages\Shared\login.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="Pages\Error.cshtml" />
     <None Include="Pages\AddEventCategoryAndService\EventCategorys.razor" />
     <None Include="Pages\AddEventCategoryAndService\ServicesList.razor" />
@@ -29,6 +33,8 @@
     <None Include="Shared\Common\CustomMudSelect\CustomMudSelect.razor" />
     <None Include="Shared\Common\CustomMudTextField\CustomMudTextField.razor" />
     <None Include="Shared\Common\FontLabel\FontLabel.razor" />
+    <None Include="wwwroot\landingpage\fonts\fontawesome-webfont.svg" />
+    <None Include="wwwroot\landingpage\fonts\fontawesome-webfont.woff2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,7 +62,6 @@
 
   <ItemGroup>
     <Folder Include="obj\" />
-    <Folder Include="wwwroot\Image\" />
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace EMS.DB.Models
@@ -35,11 +37,14 @@ namespace EMS.DB.Models
         [Required]
         public long EventId { get; set; }
 
+        [JsonIgnore]
+        [IgnoreDataMember]
         public Event Event { get; set; }
 
         [Required]
         public string UserId { get; set; }
-
+        [JsonIgnore]
+        [IgnoreDataMember]
         public User User { get; set; }
 
     }

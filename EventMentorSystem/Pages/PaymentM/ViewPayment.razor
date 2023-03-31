@@ -81,15 +81,15 @@
             <HeaderContent>
                 <MudTh>Action</MudTh>
                 <MudTh>Id</MudTh>
-                <MudTh>Event Name</MudTh>
-                <MudTh>Organizor Name</MudTh>
-                <MudTh>OrganizorNo</MudTh>
-                <MudTh>From date</MudTh>
-                <MudTh>Payment method</MudTh>
+                <MudTh>Event</MudTh>
+                <MudTh>Organizer Name(#Contact)</MudTh>
+                @*<MudTh>Organizer No</MudTh>*@
+                <MudTh>From Date</MudTh>
+                <MudTh>Payment Mode</MudTh>
                 <MudTh>Total Amount</MudTh>
-                <MudTh>ReceivedAmount</MudTh>
-                <MudTh>RemainingAmount</MudTh>
-                <MudTh>transactionId</MudTh>
+                <MudTh>Received Amount</MudTh>
+                <MudTh>Remaining Amount</MudTh>
+                <MudTh>Transaction Id</MudTh>
                 <MudTh>Description</MudTh>
             </HeaderContent>
             <RowTemplate>
@@ -99,8 +99,8 @@
                 </MudTd>
                 <MudTd DataLabel="Id">@context.Id</MudTd>
                 <MudTd DataLabel="Id">@context.Event.EventName</MudTd>
-                <MudTd DataLabel="Id">@context.Event.OrganizerName</MudTd>
-                <MudTd DataLabel="Id">@context.Event.OrganizerContact</MudTd>
+                <MudTd DataLabel="Id">@context.Event.OrganizerName@(string.Concat("(#", @context.Event.OrganizerContact, ") "))</MudTd>
+                @*<MudTd DataLabel="Id">@context.Event.OrganizerContact</MudTd>*@
                 <MudTd DataLabel="Id">@context.Event.FromDate?.ToLongDateString()</MudTd>
                 <MudTd DataLabel="Id">@context.PaymentMode</MudTd>
                 <MudTd DataLabel="Id">@ValidCurrency(context.TotalAmount)</MudTd>

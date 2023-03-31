@@ -4,6 +4,7 @@
 @inherits LayoutComponentBase
 @inject INotificationMessagesRepository _NotificationMessagesRepository;
 @inject NavigationManager _NavigationManager
+@inject IDialogService DialogService
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -21,13 +22,13 @@
                 <div class='ikrNotificationItems' style="color:black">
                     @foreach (var nmobj in allNotificationMgs)
                     {
-                       
-                            <div class='ikrsingleNotiDiv' onclick="location.href='https://localhost:44304/EditEvent/@nmobj.EventId';">
-                                <h5 style="font-size: 20px; margin-top: 10px;">Event:@nmobj.Title</h5>
-                                <div class='ikrNotificationBody'>@nmobj.Message</div>
-                                <div class='ikrNotiCreatedDate'>updated by: at @nmobj.CreatedOn.ToLongDateString()</div>
-                                <hr style="margin:5px;" />
-                            </div>
+
+                        <div class='ikrsingleNotiDiv' onclick="location.href='https://localhost:44304/EditEvent/@nmobj.EventId';">
+                            <h5 style="font-size: 20px; margin-top: 10px;">Event:@nmobj.Title</h5>
+                            <div class='ikrNotificationBody'>@nmobj.Message</div>
+                            <div class='ikrNotiCreatedDate'>updated by: at @nmobj.CreatedOn.ToLongDateString()</div>
+                            <hr style="margin:5px;" />
+                        </div>
                     }
                 </div>
                 <div class="ikrSeeAll"><a href="#">see all</a></div>
@@ -39,7 +40,7 @@
             </MudMenu>
         </MudAppBar>
         <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-         <NavMenu />
+            <NavMenu />
         </MudDrawer>
         <MudMainContent>
             <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
@@ -48,6 +49,9 @@
         </MudMainContent>
     </CascadingValue>
 </MudLayout>
+
+
+
 
 @code {
     [Inject] ISnackbar Snackbar { get; set; }
@@ -185,6 +189,7 @@
         //
         _NavigationManager.NavigateTo($"/identity/account/logout", true);
     }
+    
 
     private async Task RefreshNotification()
     {

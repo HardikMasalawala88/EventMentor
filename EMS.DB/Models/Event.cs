@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace EMS.DB.Models
@@ -51,9 +53,11 @@ namespace EMS.DB.Models
 
         public long CategoryId { get; set; } = 0;
         public EventCategory Category { get; set; }
-
+        [JsonIgnore]
+        [IgnoreDataMember]
         public virtual List<EventStaffWork> EventStaffWork { get; set; }
-
+        [JsonIgnore]
+        [IgnoreDataMember]
         public virtual Payment Payment { get; set; }
 
         [Required]

@@ -17,17 +17,17 @@
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Action</MudTh>
-                <MudTh>Fullname</MudTh>
-                <MudTh>MobileNo</MudTh>
-                <MudTh>AltPhoneNo</MudTh>
+                <MudTh>Full Name</MudTh>
+                <MudTh>Contact No(#AltPhone No)</MudTh>
+                @*<MudTh>AltPhone No</MudTh>*@
                 <MudTh>Email</MudTh>
-                <MudTh>AddressLine</MudTh>
-                <MudTh>NoOfAttendee</MudTh>
-                <MudTh>SlotType</MudTh>
+                <MudTh>Addressline</MudTh>
+                <MudTh>No Of Attendee</MudTh>
+                <MudTh>Slot Type</MudTh>
                 @*<MudTh>FromDate</MudTh>
                     <MudTh>ToDate</MudTh>*@
-                <MudTh>date</MudTh>
-                <MudTh>Additionalnotes</MudTh>
+                <MudTh>Date</MudTh>
+                <MudTh>Additional Notes</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="">
@@ -37,8 +37,8 @@
                     <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
                 </MudTd>
                 <MudTd DataLabel="Event Name">@context.Fullname</MudTd>
-                <MudTd DataLabel="">@context.MobileNo</MudTd>
-                <MudTd DataLabel="">@context.AltPhoneNo</MudTd>
+                <MudTd DataLabel="">@context.MobileNo @(string.Concat("(#", context.AltPhoneNo, ")"))</MudTd>
+                @*<MudTd DataLabel="">@context.AltPhoneNo</MudTd>*@
                 <MudTd DataLabel="">@context.Email</MudTd>
                 <MudTd DataLabel="">@context.AddressLine1 , @context.AddressLine2,@context.Landmark,@context.Pincode,@context.City,@context.State</MudTd>
                 <MudTd DataLabel="">@context.NoOfAttendee</MudTd>

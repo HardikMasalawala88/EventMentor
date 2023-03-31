@@ -110,7 +110,9 @@ namespace EventMentorSystem.Pages.dashboard
 
         private List<Event> GetAllevents()
         {
+            if (tableRef is not null) { 
             tableRef.ReloadServerData();
+            }
             eventList = _EventRepository.GetList();
             Totalevent = eventList.Count();
             return eventList;

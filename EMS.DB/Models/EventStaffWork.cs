@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace EMS.DB.Models
 {
@@ -17,7 +19,8 @@ namespace EMS.DB.Models
         public Staff Staff { get; set; }
         [Required]
         public long EventId { get; set; }
-
+        [JsonIgnore]
+        [IgnoreDataMember]
         public Event Event { get; set; }
 
 
