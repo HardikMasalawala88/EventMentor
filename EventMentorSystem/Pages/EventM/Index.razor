@@ -43,7 +43,7 @@
                     <MudTextField @bind-Value="eventModel.Email" For="@(() => eventModel.Email)" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
                     <MudTextField @bind-Value="eventModel.OrganizerContact" For="@(() => eventModel.OrganizerContact)" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
                     <MudRadioGroup @bind-SelectedOption="@eventModel.SlotType" For="@(() => eventModel.SlotType)" Required="true" RequiredError="this files required">
-                        <MudText>Select Slot time:</MudText>
+                        <MudText>Select Slot Type:</MudText>
                         <MudRadio Option="@(EventSlotType.Morning.ToString())" Color="Color.Primary">@EventSlotType.Morning.ToString()</MudRadio>
                         <MudRadio Option="@(EventSlotType.Evening.ToString())" Color="Color.Primary">@EventSlotType.Evening.ToString()</MudRadio>
                         <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
@@ -87,7 +87,7 @@ else
 <AuthorizeView Roles="Admin">
     <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<Event>>>(ServerReload))" T="Event" Filter="new Func<Event, bool>(Search)" Class="w-100" @bind-customer="eventList" OnRowClick="@RowClicked">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Event list</MudText>
+            <MudText Typo="Typo.h6"><b>Events</b></MudText>
             <MudSpacer />
             <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
         </ToolBarContent>
@@ -175,7 +175,7 @@ else
 
     <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<Event>>>(ServerReloadForOprator))" T="Event" Filter="new Func<Event, bool>(Search)" Class="w-100" @bind-customer="eventList" OnRowClick="@RowClicked">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Event list</MudText>
+            <MudText Typo="Typo.h6"><b>Events</b></MudText>
             <MudSpacer />
             <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
@@ -186,7 +186,7 @@ else
             <MudTh>Venue</MudTh>
             <MudTh>Organizer(#Contact)</MudTh>
             @*<MudTh>Description</MudTh>*@
-            <MudTh>SlotType</MudTh>
+            <MudTh>Slot Type</MudTh>
             <MudTh>Event date</MudTh>
             <MudTh>Approved</MudTh>
             <MudTh>Payment</MudTh>

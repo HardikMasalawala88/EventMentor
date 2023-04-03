@@ -45,9 +45,9 @@ namespace EventMentorSystem.Pages.UserM
             hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
             .Build();
-            hubConnection.On<User>("EventAddUpdate", (events) =>
+            hubConnection.On<User>("UsersAddUpdate", (user) =>
             {
-                tableRef.ReloadServerData();
+                GetAllUsers();
                 InvokeAsync(StateHasChanged);
             });
 
@@ -68,6 +68,7 @@ namespace EventMentorSystem.Pages.UserM
         }
         private List<User> GetAllUsers()
         {
+            tableRef.ReloadServerData();
             userList = _UserRepository.GetAllUser();
             return userList;
         }

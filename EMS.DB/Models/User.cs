@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace EMS.DB.Models
@@ -33,8 +35,11 @@ namespace EMS.DB.Models
         public DateTime UserJoiningDate { get; set; } = DateTime.Today;
 
         public bool IsActive { get; set; }
-
+        [JsonIgnore]
+        [IgnoreDataMember]
         public virtual Staff Staffs { get; set; }
+        [JsonIgnore]
+        [IgnoreDataMember]
 
         public virtual Operator Operators { get; set; }
     }

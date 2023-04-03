@@ -28,7 +28,7 @@ namespace EMS.DB.Repository
         public List<Inquiry> GetLists()
         {
             using AppDbContext _myContext = base.GetContext();
-            return _myContext.Inquiries.ToList();
+            return _myContext.Inquiries.Where(x=>x.IsActive==false).ToList();
             //_appDbContext.Events.Include(x => x.Category).ToList();
             //return _appDbContext.Events.Include(x => x.Inquiry).ToList();
         }

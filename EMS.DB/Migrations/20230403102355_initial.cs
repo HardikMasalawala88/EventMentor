@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace EMS.DB.Migrations
 {
-    public partial class initail : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -226,8 +226,7 @@ namespace EMS.DB.Migrations
                 name: "NotificationMessages",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
@@ -312,9 +311,9 @@ namespace EMS.DB.Migrations
                     MobileNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AltPhoneNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AddressLine1 = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    AddressLine1 = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     AddressLine2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Landmark = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Landmark = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     Pincode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: false),

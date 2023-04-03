@@ -10,38 +10,23 @@
     ViewData["Title"] = "Log out";
 }
 
-@*<ul class="navbar-nav">
-    @if (SignInManager.IsSignedIn(User))
-    {
-        <li class="nav-item">
-            <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
-        </li>
-        <li class="nav-item">
-            <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
-                <button id="logout" type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-            </form>
-        </li>
-    }
-    else
-    {
-        <li class="nav-item">
-            <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
-        </li>
-    }
-</ul>*@
-
 <header>
-    <h1 style="text-align:center;">@ViewData["Title"]</h1>
+    <img width="150px" height="150px" class="lockout" src="~/Image/logout.png" />
+    <h1 style="text-align:center;padding:5px">@ViewData["Title"]</h1>
     @{
         if (User.Identity.IsAuthenticated)
         {
             <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                <button type="submit" class="nav-link btn btn-link text-dark">Click here to Logout</button>
+                <button type="submit" class="button-34" style="background-color: #594ae2;">Click here to Logout</button>
             </form>
         }
         else
         {
-            <p>You have successfully logged out of the application.</p>
+            
+                <p style="text-align: center;font-size:20px;margin-bottom:10px;">You have successfully logged out of the application.</p>
+                <div style="text-align: center;" >
+                <a href="https://localhost:44304/identity/account/login"class="loginlink">Go to login.</a>
+                </div>
         }
     }
 </header>

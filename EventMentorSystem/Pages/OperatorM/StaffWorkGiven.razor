@@ -163,7 +163,7 @@ else
 
 <MudTable Elevation="25" @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<EventStaffWork>>>(ServerReload))" T="EventStaffWork" Filter="new Func<EventStaffWork, bool>(Search)" Class="w-100" @bind-customer="EventStaffWorkList">
     <ToolBarContent>
-        <MudText Typo="Typo.h6"> Staff Worklist</MudText>
+        <MudText Typo="Typo.h6"><b>Event Work</b></MudText>
         <MudSpacer />
         <MudTextField Value="searchString" T=" string" ValueChanged="@(s => OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
     </ToolBarContent>

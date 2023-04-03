@@ -71,6 +71,7 @@ namespace EMS.DB.Repository
             else
                 _myContext.EventStaffWorks.Update(EventStaffWorkModel);
 
+
             _myContext.SaveChanges();
         }
         public List<EventStaffWork> GetListFromWork(DateTime? startDate, DateTime? endDate)

@@ -13,7 +13,7 @@
 
         <MudTable Elevation="25"  @ref="tableRef" ServerData="@(new Func<TableState, Task<TableData<Staff>>>(ServerReload))" T="Staff"  Filter="new Func<Staff, bool>(Search)" @bind-customer="StaffList" HorizontalScrollbar="true" Breakpoint="Breakpoint.Sm" Class="my-2">
             <ToolBarContent>
-                <MudText Typo="Typo.h6">Update Staff List</MudText>
+                <MudText Typo="Typo.h6"><b>Staffs</b></MudText>
                 <MudSpacer />
                 <MudTextField Value="searchString" T="string" ValueChanged="@(s => OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
             </ToolBarContent>
@@ -60,8 +60,8 @@
     private User userModel = new();
     private Staff StaffModel = new();
     private List<CategoryService> Servicelist = new();
-    private List<User> userList = new();
     private List<Staff> StaffList = new();
+    private List<User> userList = new();
     private MudTable<Staff> tableRef;
     private IEnumerable<Staff> pagedData;
     private int totalItems;
@@ -75,7 +75,12 @@
         .Build();
         hubConnection.On<Staff>("staffAddUpdate", (staffs) =>
         {
-            tableRef.ReloadServerData();
+            GetAllUser();
+            if (tableRef is not null)
+            {
+
+                tableRef.ReloadServerData();
+            }
             InvokeAsync(StateHasChanged);
         });
 
@@ -91,24 +96,24 @@
     {
         if (firstRender)
         {
-            GetAlluser();
+
             GetAllstaff();
         }
 
         return base.OnAfterRenderAsync(firstRender);
     }
 
-    private List<User> GetAlluser()
-    {
-        userList = _UserRepository.GetAllUser();
-        return userList;
-    }
+
     private List<Staff> GetAllstaff()
     {
         StaffList = _StaffRepository.GetList();
         return StaffList;
     }
-
+    private List<User> GetAllUser()
+    {
+        userList = _UserRepository.GetAllUser();
+        return userList;
+    }
 
     private bool Search(Staff Staffs)
     {

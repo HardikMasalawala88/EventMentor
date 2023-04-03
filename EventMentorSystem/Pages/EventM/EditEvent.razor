@@ -33,7 +33,7 @@
                     <MudTextField @bind-Value="eventModel.OrganizerContact" For="@(() => eventModel.OrganizerContact)" Class="m-0" Label="Organizer Contact" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
                 </MudItem>
                 <MudItem lg="4" md="4" xs="12">
-                    <MudSelect @bind-Value="@eventModel.SlotType" For="@(() => eventModel.SlotType)" Class="m-0" T="string" Label="Event Slot Time" Variant="Variant.Outlined">
+                    <MudSelect @bind-Value="@eventModel.SlotType" For="@(() => eventModel.SlotType)" Class="m-0" T="string" Label="Event Slot Type" Variant="Variant.Outlined">
                         <MudSelectItem Value="@(EventSlotType.Morning.ToString())" />
                         <MudSelectItem Value="@(EventSlotType.Evening.ToString())" />
                         <MudSelectItem Value="@(EventSlotType.FullDay.ToString())" />
@@ -142,7 +142,7 @@
         {
             _EventRepository.Update(eventModel);
             await hubConnection.SendAsync("EventAddUpdate", eventModel);
-            NotificationMessagesModel.Message = $"Edit Event  {eventModel.EventName}: By .";
+            NotificationMessagesModel.Message = $"Event {eventModel.EventName} updated by {_parameters.LoggedInUser.FullName}({_parameters.LoggedInUser.Userrole})";
             NotificationMessagesModel.Title = "Edit Event";
             NotificationMessagesModel.UserId = _parameters.UserId;
             NotificationMessagesModel.EventId = eventModel.Id;

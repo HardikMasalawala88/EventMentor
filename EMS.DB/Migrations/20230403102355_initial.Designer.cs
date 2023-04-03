@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMS.DB.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230327175444_initail")]
-    partial class initail
+    [Migration("20230403102355_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -280,8 +280,8 @@ namespace EMS.DB.Migrations
 
                     b.Property<string>("AddressLine1")
                         .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("AddressLine2")
                         .HasColumnType("nvarchar(max)");
@@ -326,8 +326,8 @@ namespace EMS.DB.Migrations
 
                     b.Property<string>("Landmark")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("MobileNo")
                         .IsRequired()
@@ -371,10 +371,9 @@ namespace EMS.DB.Migrations
 
             modelBuilder.Entity("EMS.DB.Models.NotificationMessages", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");

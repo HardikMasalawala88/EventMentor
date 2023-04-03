@@ -53,6 +53,7 @@
     private List<CategoryService> ServiceList = new();
     private string searchString = "";
     private HubConnection hubConnection;
+    private MudTable<Staff> tableRef;
 
     protected override async Task OnInitializedAsync()
     {
@@ -105,7 +106,7 @@
         try
         {
             _StaffRepository.Update(staffModel);
-            //await hubConnection.SendAsync("ServiceAddUpdate", StaffModel);
+            await hubConnection.SendAsync("ServiceAddUpdate", StaffModel);
             MudDialog.Close(DialogResult.Ok(true));
             staffModel = new Staff();
         }

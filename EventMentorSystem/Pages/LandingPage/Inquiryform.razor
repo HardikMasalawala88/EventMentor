@@ -80,10 +80,6 @@
                             <MudRadio Option="@(EventSlotType.FullDay.ToString())" Color="Color.Primary">@EventSlotType.FullDay.ToString()</MudRadio>
                             <MudRadio Option="@(EventSlotType.MultipleDay.ToString())" Color="Color.Primary">@EventSlotType.MultipleDay.ToString()</MudRadio>
                         </MudRadioGroup>
-                        @if (!string.IsNullOrEmpty(inquiryModel.SlotType))
-                        {
-                            inquiryModel.FromDate = DateTime.Today.AddDays(7);
-                        }
                         <MudDatePicker Variant="Variant.Outlined" For="@(() => inquiryModel.FromDate)" Label="From Date" @bind-Date="inquiryModel.FromDate" DateFormat="dd.MM.yyyy" />
                         @if (inquiryModel.SlotType == "MultipleDay")
                         {
@@ -163,6 +159,7 @@
     {
         if (firstRender)
         {
+            inquiryModel.FromDate = DateTime.Today.AddDays(7);
             GetEventCategoryList();
             StateHasChanged();
         }

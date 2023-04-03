@@ -36,7 +36,7 @@ namespace EventMentorSystem.Pages.dashboard
         private MudTable<EventStaffWork> tableRefEventStaffWork;
         private int totalItems;
         private int totaleventforOprator;
-        public string nowork = "No Work";
+        public string nowork;
         private List<Event> OpratorWorkPlace;
         private string userId;
         private int totalItemsOperator;
@@ -125,6 +125,10 @@ namespace EventMentorSystem.Pages.dashboard
         private List<Event> GeteventforOperator()
         {
             OpratorWorkPlace = _EventRepository.GetListToday(userId);
+            if (OpratorWorkPlace.Count() > 0)
+            {
+                nowork = "No Work";
+            }
             return OpratorWorkPlace;
         }
         private List<Staff> Getstaff()

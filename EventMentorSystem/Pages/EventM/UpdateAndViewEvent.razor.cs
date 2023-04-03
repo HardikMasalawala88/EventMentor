@@ -86,9 +86,9 @@ namespace EventMentorSystem.Pages.EventM
             ServiceList = _CategoryServiceRepository.GetList();
             return ServiceList;
         }
-        private List<Staff> Getstaff()
+        private List<Staff> Getstaff(long id)
         {
-            StaffList = _StaffRepository.GetById(staffId);
+            StaffList = _StaffRepository.GetById(id);
             return StaffList;
         }
         private List<EventStaffWork> GetEventStaffWork()

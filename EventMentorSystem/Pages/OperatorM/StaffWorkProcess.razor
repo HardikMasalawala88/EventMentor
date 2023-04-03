@@ -93,7 +93,7 @@
         try
         {
             _EventStaffWorkRepository.Update(eventStaffWorkModel);
-            Snackbar.Add("Event work Status Change", Severity.Success);
+            Snackbar.Add("Event work status change", Severity.Success);
             NotificationMessagesModel.Message = $"staff:{EventStaffWorkModel.StaffId}has change Event Status.";
             NotificationMessagesModel.Title = "Edit Event Status";
             NotificationMessagesModel.UserId = userId;

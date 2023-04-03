@@ -29,7 +29,7 @@ namespace EMS.DB.Repository
         public async Task<List<NotificationMessages>> GetMessages(string userId)
         {
             using AppDbContext _myContext = base.GetContext();
-            return await _myContext.NotificationMessages.Include(x => x.User).Where(x => x.UserId == userId && x.CreatedOn==DateTime.Today).ToListAsync();
+            return await _myContext.NotificationMessages.Include(x => x.User).Where(x => x.UserId == userId && x.MarkAsRead).OrderByDescending(x => x.CreatedOn).Take(50).ToListAsync();
         }
 
 
@@ -70,10 +70,11 @@ namespace EMS.DB.Repository
                 foreach (var userInfo in notifyUsers.Where(x => x.Id.Equals(currentUserId, StringComparison.OrdinalIgnoreCase) == false))
                 {
                     NotificationMessageModel.UserId = userInfo.Id;
-                    await _myContext.NotificationMessages.AddAsync(NotificationMessageModel);
+                    NotificationMessageModel.Id = Guid.NewGuid();
+                    _myContext.NotificationMessages.Add(NotificationMessageModel);
+                    _myContext.SaveChanges();
                 }
 
-                await _myContext.SaveChangesAsync();
             }
         }
 

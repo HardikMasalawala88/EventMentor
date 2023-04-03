@@ -36,6 +36,7 @@ namespace EMS.DB.Repository
         {
             using AppDbContext _myContext = base.GetContext();
             _myContext.CategoryServices.Add(categoryService);
+            _myContext.SaveChanges();
         }
 
         public void Delete(long id)

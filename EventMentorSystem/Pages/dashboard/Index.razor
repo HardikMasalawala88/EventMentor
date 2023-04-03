@@ -18,7 +18,7 @@
                 <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="eventlink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
-                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Events</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1"><b>Total Events</b></MudText>
                         <MudText Typo="Typo.h6">@Totalevent</MudText>
                     </div>
                 </MudPaper>
@@ -27,7 +27,7 @@
                 <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="userlink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
-                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Users</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1"><b>Total Users</b></MudText>
                         <MudText Typo="Typo.h6">@Totaluser</MudText>
                     </div>
                 </MudPaper>
@@ -36,7 +36,7 @@
                 <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="servicelink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.MiscellaneousServices" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
-                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Service</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1"><b>Total Service</b></MudText>
                         <MudText Typo="Typo.h6">@Totalservice</MudText>
                     </div>
                 </MudPaper>
@@ -45,8 +45,8 @@
             <MudItem xs="12" sm="6" md="6">
                 <MudPaper Class="pa-3 ma-1" Outlined="true">
                     <div>
-                        <MudText Typo="Typo.h6" Class="my-1"> Select Range</MudText>
-                        <MudDateRangePicker @ref="_picker" PickerClosed="(() => UpdateDashboardData())" @bind-DateRange="_dateRange" AutoClose="@_autoClose" Class="my-1">
+                        <MudText Typo="Typo.h6" Class="my-1"><b> Select Range</b></MudText>
+                        <MudDateRangePicker @ref="_picker" PickerClosed="(() => UpdateDashboardData())"  @bind-DateRange="_dateRange" AutoClose="@_autoClose" Class="my-1">
                             <PickerActions Context="data">
                                 <MudButton Class="mr-auto align-self-start" OnClick="@(() => { _picker.Clear();tableRef.ReloadServerData();} )">Clear</MudButton>
                                 <MudButton OnClick="@(() => _picker.Close(false))">Cancel</MudButton>
@@ -64,7 +64,7 @@
                           Filter="new Func<Event, bool>(Search)"
                           @bind-customer="eventList">
                     <ToolBarContent>
-                        <MudText Typo="Typo.h6">Event Details</MudText>
+                        <MudText Typo="Typo.h6"><b>Events</b></MudText>
                         <MudSpacer />
                         <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                     </ToolBarContent>
@@ -105,7 +105,7 @@
                           Filter="new Func<EventStaffWork, bool>(SearchforOperatorwork)"
                           Class="w-100" @bind-customer="EventStaffWorkList">
                     <ToolBarContent>
-                        <MudText Typo="Typo.h6">StaffWork Details</MudText>
+                        <MudText Typo="Typo.h6"><b>Event Works</b></MudText>
 
                         <MudSpacer />
                         <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
@@ -142,7 +142,7 @@
                 <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="eventlink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
-                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Events</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1"><b>Total Events</b></MudText>
                         <MudText Typo="Typo.h6">@totaleventforOprator</MudText>
                     </div>
                 </MudPaper>
@@ -151,7 +151,7 @@
                 <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="eventlink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.MiscellaneousServices" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
-                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Today Event Name</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1"><b>Today Event Name</b></MudText>
                         <MudText Typo="Typo.h6">
                             @if (OpratorWorkPlace is not null)
                             {
@@ -168,8 +168,8 @@
                 <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="eventlink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
-                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Today Event Venue</MudText>
-                        <MudText Typo="Typo.h6">
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1"><b>Today Event Venue</b></MudText>
+                        <MudText>
                             @if (OpratorWorkPlace is not null)
                             {
                                 foreach (var data in OpratorWorkPlace)
@@ -189,7 +189,7 @@
                               Filter="new Func<Event, bool>(Search)"
                               @bind-customer="eventList">
                         <ToolBarContent>
-                    <MudText Typo="Typo.h6">Event Details</MudText>
+                            <MudText Typo="Typo.h6"><b>Events </b></MudText>
                             <MudSpacer />
                             <MudTextField Value="searchString" T="string" ValueChanged="@(s=> OnSearch(s))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                         </ToolBarContent>
@@ -234,7 +234,7 @@
                 <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4 " @onclick="eventlink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
-                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total Work</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1"><b>Total Work</b></MudText>
                         <MudText Typo="Typo.h6">@TotalWork</MudText>
                     </div>
                 </MudPaper>
@@ -243,10 +243,11 @@
                 <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" @onclick="userlink" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
-                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Todate WorkPlace</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1"><b>Todate WorkPlace</b></MudText>
                         @foreach (var data in EventStaffWorkList)
                         {
-                            <MudText Typo="Typo.h6">@data.Event.EventVenue</MudText>
+                            <MudText >@data.Event.EventVenue</MudText>
+                            break;
                         }
                     </div>
                 </MudPaper>
@@ -255,7 +256,7 @@
                 <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.MiscellaneousServices" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
-                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Service</MudText>
+                        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1"><b>Service</b></MudText>
                         @foreach (var staff in stafflist)
                         {
                             foreach (var service in categoryservicelist)
@@ -278,7 +279,7 @@
                               Filter="new Func<EventStaffWork, bool>(SearchforOperatorwork)"
                               Class="w-100" @bind-customer="EventStaffWorkList">
                         <ToolBarContent>
-                    <MudText Typo="Typo.h6">Work Pending</MudText>
+                            <MudText Typo="Typo.h6"><b>Work Pending</b></MudText>
                             <MudSpacer />
                             <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
                         </ToolBarContent>
@@ -311,7 +312,7 @@
                               Filter="new Func<EventStaffWork, bool>(SearchforOperatorwork)"
                               Class="w-100" @bind-customer="EventStaffWorkList">
                         <ToolBarContent>
-                    <MudText Typo="Typo.h6">Work Finish</MudText>
+                            <MudText Typo="Typo.h6"><b>Work Finish</b></MudText>
 
                             <MudSpacer />
                             <MudTextField Value="searchString1" T="string" ValueChanged="@(x=> OnSearchOperator(x))" Immediate="true" Placeholder="Search For Here.." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" AdornmentColor="Color.Primary"></MudTextField>
