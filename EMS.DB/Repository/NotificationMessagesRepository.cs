@@ -71,10 +71,10 @@ namespace EMS.DB.Repository
                 {
                     NotificationMessageModel.UserId = userInfo.Id;
                     NotificationMessageModel.Id = Guid.NewGuid();
+                    NotificationMessageModel.CreatedOn = DateTime.Now;
                     _myContext.NotificationMessages.Add(NotificationMessageModel);
                     _myContext.SaveChanges();
                 }
-
             }
         }
 
